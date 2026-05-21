@@ -6,13 +6,15 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.api.routes import router
-from app.api.auth_routes import auth_router
-
 from app.core.database import Base, engine
 
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
+
+Base.metadata.create_all(bind=engine)
+
+from app.api.routes import router
+from app.api.auth_routes import auth_router
 
 load_dotenv()
 

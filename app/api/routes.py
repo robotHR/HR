@@ -7,7 +7,7 @@ from io import BytesIO
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
@@ -29,17 +29,20 @@ TERMINAL_STATUSES = ["REFUZAT", "ANGAJAT", "EXCLUS"]
 
 
 def ensure_candidate_extra_columns():
-    with engine.connect() as conn:
-        rows = conn.execute(text("PRAGMA table_info(candidates)")).fetchall()
-        existing = [row[1] for row in rows]
+    inspector = inspect(engine)
 
+    if not inspector.has_table("candidates"):
+        return
+
+    existing = [column["name"] for column in inspector.get_columns("candidates")]
+
+    with engine.begin() as conn:
         if "batch_id" not in existing:
             conn.execute(text("ALTER TABLE candidates ADD COLUMN batch_id VARCHAR"))
 
         if "visible_in_dashboard" not in existing:
             conn.execute(text("ALTER TABLE candidates ADD COLUMN visible_in_dashboard INTEGER DEFAULT 1"))
-
-        conn.commit()
+            conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
 
 
 ensure_candidate_extra_columns()

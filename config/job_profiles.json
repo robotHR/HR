@@ -1,0 +1,6705 @@
+{
+  "version": "1.0",
+  "profiles_count": 126,
+  "profiles": [
+    {
+      "job_id": "contabil",
+      "job_title": "Contabil",
+      "domain": "Financiar Contabil",
+      "level": "Middle",
+      "aliases": [
+        "accountant",
+        "economist contabil"
+      ],
+      "must_have": [
+        "contabilitate",
+        "facturi",
+        "balanta",
+        "declaratii",
+        "Saga sau ERP"
+      ],
+      "nice_to_have": [
+        "CECCAR",
+        "Excel",
+        "e-Factura"
+      ],
+      "reject_if_missing": [
+        "lipsa contabilitate"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "accountant",
+        "economist contabil"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Contabil?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "contabil_junior",
+      "job_title": "Contabil junior",
+      "domain": "Financiar Contabil",
+      "level": "Junior",
+      "aliases": [
+        "asistent contabil",
+        "junior accountant"
+      ],
+      "must_have": [
+        "contabilitate primara",
+        "facturi",
+        "documente",
+        "Excel"
+      ],
+      "nice_to_have": [
+        "Saga",
+        "studii economice"
+      ],
+      "reject_if_missing": [
+        "lipsa baza contabilitate"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "asistent contabil",
+        "junior accountant"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Contabil junior?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "contabil_sef",
+      "job_title": "Contabil sef",
+      "domain": "Financiar Contabil",
+      "level": "Senior",
+      "aliases": [
+        "chief accountant",
+        "sef contabil"
+      ],
+      "must_have": [
+        "contabilitate completa",
+        "bilant",
+        "declaratii fiscale",
+        "coordonare"
+      ],
+      "nice_to_have": [
+        "CECCAR",
+        "ERP",
+        "management echipa"
+      ],
+      "reject_if_missing": [
+        "lipsa contabilitate completa"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "chief accountant",
+        "sef contabil"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Contabil sef?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "economist",
+      "job_title": "Economist",
+      "domain": "Financiar",
+      "level": "Middle",
+      "aliases": [
+        "financial analyst"
+      ],
+      "must_have": [
+        "studii economice",
+        "analiza financiara",
+        "raportare",
+        "Excel"
+      ],
+      "nice_to_have": [
+        "ERP",
+        "bugete",
+        "controlling"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta economica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "financial analyst"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Economist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operator_facturare",
+      "job_title": "Operator facturare",
+      "domain": "Administrativ Financiar",
+      "level": "Middle",
+      "aliases": [
+        "operator facturi",
+        "billing operator"
+      ],
+      "must_have": [
+        "facturare",
+        "documente",
+        "Excel",
+        "operare calculator"
+      ],
+      "nice_to_have": [
+        "e-Factura",
+        "ERP",
+        "SAP",
+        "SmartBill"
+      ],
+      "reject_if_missing": [
+        "lipsa operare calculator"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "operator facturi",
+        "billing operator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operator facturare?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "casier",
+      "job_title": "Casier",
+      "domain": "Retail Financiar",
+      "level": "Junior",
+      "aliases": [
+        "cashier"
+      ],
+      "must_have": [
+        "incasari",
+        "casa de marcat",
+        "clienti",
+        "atentie la bani"
+      ],
+      "nice_to_have": [
+        "POS",
+        "retail",
+        "gestiune"
+      ],
+      "reject_if_missing": [
+        "lipsa lucru cu numerar sau clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "cashier"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Casier?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "payroll_specialist",
+      "job_title": "Payroll specialist",
+      "domain": "HR Payroll",
+      "level": "Middle",
+      "aliases": [
+        "specialist salarizare"
+      ],
+      "must_have": [
+        "salarizare",
+        "Revisal",
+        "pontaje",
+        "legislatie munca",
+        "Excel"
+      ],
+      "nice_to_have": [
+        "Charisma",
+        "SAP HR"
+      ],
+      "reject_if_missing": [
+        "lipsa salarizare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist salarizare"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Payroll specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "auditor",
+      "job_title": "Auditor",
+      "domain": "Financiar",
+      "level": "Senior",
+      "aliases": [
+        "internal auditor"
+      ],
+      "must_have": [
+        "audit",
+        "control intern",
+        "raportare",
+        "analiza financiara"
+      ],
+      "nice_to_have": [
+        "IFRS",
+        "Big4",
+        "certificari"
+      ],
+      "reject_if_missing": [
+        "lipsa audit"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "internal auditor"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Auditor?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "receptioner",
+      "job_title": "Receptioner",
+      "domain": "Administrativ",
+      "level": "Junior",
+      "aliases": [
+        "receptionist",
+        "front desk"
+      ],
+      "must_have": [
+        "front desk",
+        "clienti",
+        "telefon",
+        "email",
+        "organizare"
+      ],
+      "nice_to_have": [
+        "engleza",
+        "programari",
+        "CRM"
+      ],
+      "reject_if_missing": [
+        "lipsa comunicare clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "receptionist",
+        "front desk"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Receptioner?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "agent_call_center",
+      "job_title": "Agent call center",
+      "domain": "Customer Support",
+      "level": "Junior",
+      "aliases": [
+        "operator call center",
+        "call center"
+      ],
+      "must_have": [
+        "telefon",
+        "clienti",
+        "comunicare",
+        "operare calculator"
+      ],
+      "nice_to_have": [
+        "CRM",
+        "suport clienti",
+        "vanzari telefonice"
+      ],
+      "reject_if_missing": [
+        "lipsa comunicare telefonica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "operator call center",
+        "call center"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Agent call center?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "customer_support",
+      "job_title": "Customer support",
+      "domain": "Customer Support",
+      "level": "Middle",
+      "aliases": [
+        "client service"
+      ],
+      "must_have": [
+        "suport clienti",
+        "email",
+        "telefon",
+        "CRM",
+        "rezolvare probleme"
+      ],
+      "nice_to_have": [
+        "engleza",
+        "ticketing",
+        "chat support"
+      ],
+      "reject_if_missing": [
+        "lipsa interactiune clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "client service"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Customer support?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "asistent_manager",
+      "job_title": "Asistent manager",
+      "domain": "Administrativ",
+      "level": "Middle",
+      "aliases": [
+        "assistant manager",
+        "executive assistant"
+      ],
+      "must_have": [
+        "agenda",
+        "organizare",
+        "email",
+        "documente",
+        "Microsoft Office"
+      ],
+      "nice_to_have": [
+        "engleza",
+        "raportare",
+        "protocol"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta administrativa"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "assistant manager",
+        "executive assistant"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Asistent manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "secretara",
+      "job_title": "Secretara",
+      "domain": "Administrativ",
+      "level": "Junior",
+      "aliases": [
+        "secretary"
+      ],
+      "must_have": [
+        "documente",
+        "telefon",
+        "email",
+        "organizare"
+      ],
+      "nice_to_have": [
+        "arhivare",
+        "Office",
+        "programari"
+      ],
+      "reject_if_missing": [
+        "lipsa operare calculator"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "secretary"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Secretara?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "office_assistant",
+      "job_title": "Office assistant",
+      "domain": "Administrativ",
+      "level": "Junior",
+      "aliases": [
+        "asistent birou"
+      ],
+      "must_have": [
+        "Office",
+        "email",
+        "documente",
+        "organizare"
+      ],
+      "nice_to_have": [
+        "Excel",
+        "facturi",
+        "curierat"
+      ],
+      "reject_if_missing": [
+        "lipsa lucru birou"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "asistent birou"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Office assistant?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operator_introducere_date",
+      "job_title": "Operator introducere date",
+      "domain": "Administrativ",
+      "level": "Junior",
+      "aliases": [
+        "data entry",
+        "operator calculator"
+      ],
+      "must_have": [
+        "introducere date",
+        "operare calculator",
+        "atentie la detalii",
+        "Excel"
+      ],
+      "nice_to_have": [
+        "ERP",
+        "SAP",
+        "viteza tastare"
+      ],
+      "reject_if_missing": [
+        "lipsa operare calculator"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "data entry",
+        "operator calculator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operator introducere date?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "referent_back_office",
+      "job_title": "Referent back office",
+      "domain": "Administrativ",
+      "level": "Middle",
+      "aliases": [
+        "back office specialist"
+      ],
+      "must_have": [
+        "back office",
+        "documente",
+        "email",
+        "Excel",
+        "raportare"
+      ],
+      "nice_to_have": [
+        "ERP",
+        "SAP",
+        "facturare"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta office"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "back office specialist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Referent back office?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "registrator_medical",
+      "job_title": "Registrator medical",
+      "domain": "Medical Administrativ",
+      "level": "Junior",
+      "aliases": [
+        "receptioner medical"
+      ],
+      "must_have": [
+        "programari",
+        "pacienti",
+        "documente medicale",
+        "calculator"
+      ],
+      "nice_to_have": [
+        "clinica",
+        "CAS",
+        "CRM medical"
+      ],
+      "reject_if_missing": [
+        "lipsa interactiune pacienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "receptioner medical"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Registrator medical?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "dispecer_transport",
+      "job_title": "Dispecer transport",
+      "domain": "Transport Logistica",
+      "level": "Middle",
+      "aliases": [
+        "transport dispatcher",
+        "dispatcher"
+      ],
+      "must_have": [
+        "dispecerat",
+        "transport",
+        "rute",
+        "soferi",
+        "telefon",
+        "coordonare"
+      ],
+      "nice_to_have": [
+        "TMS",
+        "GPS",
+        "Excel",
+        "engleza"
+      ],
+      "reject_if_missing": [
+        "lipsa transport sau coordonare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "transport dispatcher",
+        "dispatcher"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Dispecer transport?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "coordonator_transport",
+      "job_title": "Coordonator transport",
+      "domain": "Transport Logistica",
+      "level": "Senior",
+      "aliases": [
+        "transport coordinator"
+      ],
+      "must_have": [
+        "coordonare transport",
+        "soferi",
+        "rute",
+        "costuri transport",
+        "raportare"
+      ],
+      "nice_to_have": [
+        "TMS",
+        "management echipa",
+        "negociere"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta transport"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "transport coordinator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Coordonator transport?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "logistician",
+      "job_title": "Logistician",
+      "domain": "Logistica",
+      "level": "Middle",
+      "aliases": [
+        "specialist logistica"
+      ],
+      "must_have": [
+        "logistica",
+        "comenzi",
+        "transport",
+        "depozit",
+        "Excel"
+      ],
+      "nice_to_have": [
+        "SAP",
+        "WMS",
+        "TMS",
+        "optimizare"
+      ],
+      "reject_if_missing": [
+        "lipsa logistica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist logistica"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Logistician?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "gestionar",
+      "job_title": "Gestionar",
+      "domain": "Depozit Logistica",
+      "level": "Middle",
+      "aliases": [
+        "gestionar depozit"
+      ],
+      "must_have": [
+        "gestiune marfa",
+        "inventar",
+        "receptie marfa",
+        "documente gestiune"
+      ],
+      "nice_to_have": [
+        "WMS",
+        "ERP",
+        "scanner",
+        "stivuitor"
+      ],
+      "reject_if_missing": [
+        "lipsa gestiune sau inventar"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "gestionar depozit"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Gestionar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "magazioner",
+      "job_title": "Magazioner",
+      "domain": "Depozit Logistica",
+      "level": "Middle",
+      "aliases": [
+        "warehouse clerk"
+      ],
+      "must_have": [
+        "depozit",
+        "receptie",
+        "marfa",
+        "inventar",
+        "eliberare produse"
+      ],
+      "nice_to_have": [
+        "scanner",
+        "WMS",
+        "ERP"
+      ],
+      "reject_if_missing": [
+        "lipsa lucru depozit"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "warehouse clerk"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Magazioner?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "lucrator_depozit",
+      "job_title": "Lucrator depozit",
+      "domain": "Depozit Logistica",
+      "level": "Junior",
+      "aliases": [
+        "operator depozit",
+        "warehouse worker"
+      ],
+      "must_have": [
+        "depozit",
+        "munca fizica",
+        "manipulare marfa",
+        "ambalare sau picking"
+      ],
+      "nice_to_have": [
+        "scanner",
+        "inventar",
+        "WMS",
+        "stivuitor"
+      ],
+      "reject_if_missing": [
+        "profil exclusiv academic sau director",
+        "lipsa munca fizica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "operator depozit",
+        "warehouse worker"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Lucrator depozit?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "manipulant_marfa",
+      "job_title": "Manipulant marfa",
+      "domain": "Depozit Logistica",
+      "level": "Junior",
+      "aliases": [
+        "material handler"
+      ],
+      "must_have": [
+        "manipulare marfa",
+        "munca fizica",
+        "incarcare descarcare"
+      ],
+      "nice_to_have": [
+        "depozit",
+        "stivuitor",
+        "scanner"
+      ],
+      "reject_if_missing": [
+        "lipsa munca fizica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "material handler"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Manipulant marfa?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "picker",
+      "job_title": "Picker",
+      "domain": "Depozit Logistica",
+      "level": "Junior",
+      "aliases": [
+        "order picker"
+      ],
+      "must_have": [
+        "picking",
+        "depozit",
+        "scanner",
+        "atentie la detalii"
+      ],
+      "nice_to_have": [
+        "WMS",
+        "ambalare",
+        "inventar"
+      ],
+      "reject_if_missing": [
+        "lipsa depozit"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "order picker"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Picker?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ambalator",
+      "job_title": "Ambalator",
+      "domain": "Productie Depozit",
+      "level": "Junior",
+      "aliases": [
+        "packer"
+      ],
+      "must_have": [
+        "ambalare",
+        "munca repetitiva",
+        "atentie la detalii"
+      ],
+      "nice_to_have": [
+        "productie",
+        "depozit",
+        "norma"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate munca repetitiva"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "packer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Ambalator?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "stivuitorist",
+      "job_title": "Stivuitorist",
+      "domain": "Depozit Logistica",
+      "level": "Middle",
+      "aliases": [
+        "forklift operator"
+      ],
+      "must_have": [
+        "stivuitor",
+        "autorizatie ISCIR",
+        "depozit",
+        "manipulare paleti"
+      ],
+      "nice_to_have": [
+        "WMS",
+        "inventar",
+        "receptie marfa"
+      ],
+      "reject_if_missing": [
+        "lipsa autorizatie stivuitor daca postul o cere"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "forklift operator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Stivuitorist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "planner_productie",
+      "job_title": "Planner productie",
+      "domain": "Productie Logistica",
+      "level": "Middle",
+      "aliases": [
+        "production planner"
+      ],
+      "must_have": [
+        "planificare productie",
+        "Excel",
+        "ERP",
+        "stocuri",
+        "comenzi"
+      ],
+      "nice_to_have": [
+        "SAP",
+        "forecast",
+        "supply chain"
+      ],
+      "reject_if_missing": [
+        "lipsa planificare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "production planner"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Planner productie?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "supply_chain_specialist",
+      "job_title": "Supply chain specialist",
+      "domain": "Supply Chain",
+      "level": "Middle",
+      "aliases": [
+        "specialist supply chain"
+      ],
+      "must_have": [
+        "supply chain",
+        "stocuri",
+        "furnizori",
+        "transport",
+        "forecast"
+      ],
+      "nice_to_have": [
+        "SAP",
+        "Excel avansat",
+        "Power BI"
+      ],
+      "reject_if_missing": [
+        "lipsa supply chain"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist supply chain"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Supply chain specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "sofer_b",
+      "job_title": "Sofer categoria B",
+      "domain": "Transport Soferie",
+      "level": "Middle",
+      "aliases": [
+        "sofer livrari",
+        "curier",
+        "driver B"
+      ],
+      "must_have": [
+        "permis B",
+        "condus",
+        "livrari sau distributie",
+        "punctualitate"
+      ],
+      "nice_to_have": [
+        "curierat",
+        "autoutilitara",
+        "clienti",
+        "documente transport"
+      ],
+      "reject_if_missing": [
+        "lipsa permis B",
+        "profil directoral fara intentie operationala"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "sofer livrari",
+        "curier",
+        "driver B"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Sofer categoria B?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "sofer_c",
+      "job_title": "Sofer categoria C",
+      "domain": "Transport Soferie",
+      "level": "Middle",
+      "aliases": [
+        "driver C"
+      ],
+      "must_have": [
+        "permis C",
+        "camion",
+        "transport marfa"
+      ],
+      "nice_to_have": [
+        "atestat",
+        "tahograf",
+        "ADR",
+        "curse"
+      ],
+      "reject_if_missing": [
+        "lipsa permis C"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "driver C"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Sofer categoria C?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "sofer_tir",
+      "job_title": "Sofer TIR",
+      "domain": "Transport Soferie",
+      "level": "Middle",
+      "aliases": [
+        "HGV driver",
+        "sofer CE"
+      ],
+      "must_have": [
+        "permis CE",
+        "atestat",
+        "tahograf",
+        "transport international"
+      ],
+      "nice_to_have": [
+        "ADR",
+        "experienta UE",
+        "camion articulat"
+      ],
+      "reject_if_missing": [
+        "lipsa permis CE"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "HGV driver",
+        "sofer CE"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Sofer TIR?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "curier",
+      "job_title": "Curier",
+      "domain": "Transport Livrari",
+      "level": "Junior",
+      "aliases": [
+        "delivery driver"
+      ],
+      "must_have": [
+        "livrari",
+        "permis B sau scuter",
+        "orientare in oras",
+        "clienti"
+      ],
+      "nice_to_have": [
+        "aplicatii livrare",
+        "cash",
+        "autoutilitara"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate teren"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "delivery driver"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Curier?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "livrator",
+      "job_title": "Livrator",
+      "domain": "Transport Livrari",
+      "level": "Junior",
+      "aliases": [
+        "delivery courier"
+      ],
+      "must_have": [
+        "livrari",
+        "punctualitate",
+        "clienti"
+      ],
+      "nice_to_have": [
+        "permis B",
+        "bicicleta",
+        "scuter",
+        "curierat"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate teren"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "delivery courier"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Livrator?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "electrician",
+      "job_title": "Electrician",
+      "domain": "Tehnic",
+      "level": "Middle",
+      "aliases": [
+        "electrician mentenanta"
+      ],
+      "must_have": [
+        "instalatii electrice",
+        "scheme electrice",
+        "autorizatie ANRE sau experienta",
+        "scule"
+      ],
+      "nice_to_have": [
+        "mentenanta",
+        "automatizari",
+        "joasa tensiune"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta electrica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "electrician mentenanta"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Electrician?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "instalator",
+      "job_title": "Instalator",
+      "domain": "Tehnic",
+      "level": "Middle",
+      "aliases": [
+        "plumber"
+      ],
+      "must_have": [
+        "instalatii sanitare",
+        "tevi",
+        "montaj",
+        "reparatii"
+      ],
+      "nice_to_have": [
+        "termice",
+        "centrale",
+        "gaz"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta instalatii"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "plumber"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Instalator?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "lacatus",
+      "job_title": "Lacatus mecanic",
+      "domain": "Tehnic Productie",
+      "level": "Middle",
+      "aliases": [
+        "lacatus"
+      ],
+      "must_have": [
+        "lacatusarie",
+        "scule",
+        "asamblare",
+        "desen tehnic"
+      ],
+      "nice_to_have": [
+        "sudura",
+        "mentenanta"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta tehnica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "lacatus"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Lacatus mecanic?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "sudor",
+      "job_title": "Sudor",
+      "domain": "Tehnic Productie",
+      "level": "Middle",
+      "aliases": [
+        "welder"
+      ],
+      "must_have": [
+        "sudura",
+        "MIG",
+        "MAG",
+        "TIG",
+        "electrod",
+        "citire desen"
+      ],
+      "nice_to_have": [
+        "autorizatie sudor",
+        "argon",
+        "inox"
+      ],
+      "reject_if_missing": [
+        "lipsa sudura"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "welder"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Sudor?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "mecanic_auto",
+      "job_title": "Mecanic auto",
+      "domain": "Auto Service",
+      "level": "Middle",
+      "aliases": [
+        "auto mechanic"
+      ],
+      "must_have": [
+        "mecanica auto",
+        "revizii",
+        "reparatii",
+        "diagnoza"
+      ],
+      "nice_to_have": [
+        "OBD",
+        "marci auto",
+        "electric auto"
+      ],
+      "reject_if_missing": [
+        "lipsa mecanica auto"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "auto mechanic"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Mecanic auto?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "tehnician_service",
+      "job_title": "Tehnician service",
+      "domain": "Tehnic Service",
+      "level": "Middle",
+      "aliases": [
+        "service technician"
+      ],
+      "must_have": [
+        "service",
+        "reparatii",
+        "diagnostic",
+        "clienti sau teren"
+      ],
+      "nice_to_have": [
+        "electronica",
+        "mecanica",
+        "rapoarte interventie"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta service sau tehnica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "service technician"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Tehnician service?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "electrician_auto",
+      "job_title": "Electrician auto",
+      "domain": "Auto Service",
+      "level": "Middle",
+      "aliases": [
+        "auto electrician"
+      ],
+      "must_have": [
+        "electrica auto",
+        "diagnoza",
+        "scheme electrice",
+        "reparatii"
+      ],
+      "nice_to_have": [
+        "OBD",
+        "CAN",
+        "senzori"
+      ],
+      "reject_if_missing": [
+        "lipsa electrica auto"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "auto electrician"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Electrician auto?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "tinichigiu_auto",
+      "job_title": "Tinichigiu auto",
+      "domain": "Auto Service",
+      "level": "Middle",
+      "aliases": [
+        "tinichigiu"
+      ],
+      "must_have": [
+        "tinichigerie",
+        "caroserie",
+        "reparatii tabla"
+      ],
+      "nice_to_have": [
+        "sudura",
+        "redresare",
+        "service auto"
+      ],
+      "reject_if_missing": [
+        "lipsa tinichigerie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "tinichigiu"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Tinichigiu auto?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "vopsitor_auto",
+      "job_title": "Vopsitor auto",
+      "domain": "Auto Service",
+      "level": "Middle",
+      "aliases": [
+        "auto painter"
+      ],
+      "must_have": [
+        "vopsitorie auto",
+        "pregatire suprafete",
+        "cabina vopsire"
+      ],
+      "nice_to_have": [
+        "coloristica",
+        "polish",
+        "tinichigerie"
+      ],
+      "reject_if_missing": [
+        "lipsa vopsitorie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "auto painter"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Vopsitor auto?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "tehnician_hvac",
+      "job_title": "Tehnician HVAC",
+      "domain": "Tehnic Instalatii",
+      "level": "Middle",
+      "aliases": [
+        "frigotehnist"
+      ],
+      "must_have": [
+        "HVAC",
+        "climatizare",
+        "mentenanta",
+        "instalatii"
+      ],
+      "nice_to_have": [
+        "frigotehnie",
+        "autorizatie",
+        "service teren"
+      ],
+      "reject_if_missing": [
+        "lipsa HVAC"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "frigotehnist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Tehnician HVAC?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "tehnician_mentenanta",
+      "job_title": "Tehnician mentenanta",
+      "domain": "Tehnic Productie",
+      "level": "Middle",
+      "aliases": [
+        "maintenance technician"
+      ],
+      "must_have": [
+        "mentenanta",
+        "reparatii",
+        "echipamente",
+        "preventiv"
+      ],
+      "nice_to_have": [
+        "electric",
+        "mecanic",
+        "automatizari"
+      ],
+      "reject_if_missing": [
+        "lipsa mentenanta"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "maintenance technician"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Tehnician mentenanta?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operator_cnc",
+      "job_title": "Operator CNC",
+      "domain": "Productie",
+      "level": "Middle",
+      "aliases": [
+        "cnc operator"
+      ],
+      "must_have": [
+        "CNC",
+        "masina CNC",
+        "citire desen",
+        "masuratori"
+      ],
+      "nice_to_have": [
+        "programare CNC",
+        "Fanuc",
+        "Siemens"
+      ],
+      "reject_if_missing": [
+        "lipsa CNC"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "cnc operator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operator CNC?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operator_productie",
+      "job_title": "Operator productie",
+      "domain": "Productie",
+      "level": "Junior",
+      "aliases": [
+        "production operator"
+      ],
+      "must_have": [
+        "linie productie",
+        "munca repetitiva",
+        "norme",
+        "calitate"
+      ],
+      "nice_to_have": [
+        "masini productie",
+        "ture",
+        "SSM"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate productie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "production operator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operator productie?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operator_masini",
+      "job_title": "Operator masini",
+      "domain": "Productie",
+      "level": "Junior",
+      "aliases": [
+        "machine operator"
+      ],
+      "must_have": [
+        "operare masini",
+        "productie",
+        "setari de baza",
+        "calitate"
+      ],
+      "nice_to_have": [
+        "mentenanta usoara",
+        "norme"
+      ],
+      "reject_if_missing": [
+        "confuzie cu operator calculator"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "machine operator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operator masini?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "controlor_calitate",
+      "job_title": "Controlor calitate",
+      "domain": "Productie Calitate",
+      "level": "Middle",
+      "aliases": [
+        "quality inspector"
+      ],
+      "must_have": [
+        "control calitate",
+        "inspectie",
+        "masuratori",
+        "rapoarte"
+      ],
+      "nice_to_have": [
+        "ISO",
+        "instrumente masura",
+        "desen tehnic"
+      ],
+      "reject_if_missing": [
+        "lipsa calitate"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "quality inspector"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Controlor calitate?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "inginer_calitate",
+      "job_title": "Inginer calitate",
+      "domain": "Inginerie Calitate",
+      "level": "Middle",
+      "aliases": [
+        "quality engineer"
+      ],
+      "must_have": [
+        "calitate",
+        "ISO",
+        "raportare",
+        "analiza neconformitati"
+      ],
+      "nice_to_have": [
+        "8D",
+        "FMEA",
+        "APQP",
+        "audit"
+      ],
+      "reject_if_missing": [
+        "lipsa calitate sau inginerie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "quality engineer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Inginer calitate?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "inginer_mecanic",
+      "job_title": "Inginer mecanic",
+      "domain": "Inginerie",
+      "level": "Middle",
+      "aliases": [
+        "mechanical engineer"
+      ],
+      "must_have": [
+        "inginerie mecanica",
+        "desen tehnic",
+        "proiectare sau productie"
+      ],
+      "nice_to_have": [
+        "AutoCAD",
+        "SolidWorks",
+        "mentenanta"
+      ],
+      "reject_if_missing": [
+        "lipsa mecanica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "mechanical engineer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Inginer mecanic?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "inginer_constructor",
+      "job_title": "Inginer constructor",
+      "domain": "Constructii",
+      "level": "Middle",
+      "aliases": [
+        "civil engineer"
+      ],
+      "must_have": [
+        "constructii",
+        "santier",
+        "proiecte",
+        "citire planuri"
+      ],
+      "nice_to_have": [
+        "AutoCAD",
+        "BIM",
+        "diriginte santier"
+      ],
+      "reject_if_missing": [
+        "lipsa constructii"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "civil engineer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Inginer constructor?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "sef_santier",
+      "job_title": "Sef santier",
+      "domain": "Constructii",
+      "level": "Senior",
+      "aliases": [
+        "site manager"
+      ],
+      "must_have": [
+        "santier",
+        "coordonare echipa",
+        "planificare lucrari",
+        "SSM"
+      ],
+      "nice_to_have": [
+        "bugete",
+        "subcontractori",
+        "AutoCAD"
+      ],
+      "reject_if_missing": [
+        "lipsa santier sau coordonare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "site manager"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Sef santier?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "muncitor_constructii",
+      "job_title": "Muncitor constructii",
+      "domain": "Constructii",
+      "level": "Junior",
+      "aliases": [
+        "muncitor necalificat"
+      ],
+      "must_have": [
+        "munca santier",
+        "scule",
+        "efort fizic"
+      ],
+      "nice_to_have": [
+        "zidarie",
+        "dulgherie",
+        "fier beton"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate munca fizica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "muncitor necalificat"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Muncitor constructii?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "zidar",
+      "job_title": "Zidar",
+      "domain": "Constructii",
+      "level": "Middle",
+      "aliases": [
+        "mason"
+      ],
+      "must_have": [
+        "zidarie",
+        "tencuiala",
+        "santier"
+      ],
+      "nice_to_have": [
+        "finisaje",
+        "citire plan"
+      ],
+      "reject_if_missing": [
+        "lipsa zidarie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "mason"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Zidar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "dulgher",
+      "job_title": "Dulgher",
+      "domain": "Constructii",
+      "level": "Middle",
+      "aliases": [
+        "carpenter"
+      ],
+      "must_have": [
+        "cofraje",
+        "lemn",
+        "santier"
+      ],
+      "nice_to_have": [
+        "planuri",
+        "beton"
+      ],
+      "reject_if_missing": [
+        "lipsa dulgherie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "carpenter"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Dulgher?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "fierar_betonist",
+      "job_title": "Fierar betonist",
+      "domain": "Constructii",
+      "level": "Middle",
+      "aliases": [
+        "rebar worker"
+      ],
+      "must_have": [
+        "armaturi",
+        "fier beton",
+        "santier"
+      ],
+      "nice_to_have": [
+        "citire planuri",
+        "cofraje"
+      ],
+      "reject_if_missing": [
+        "lipsa fier beton"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "rebar worker"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Fierar betonist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "agent_vanzari",
+      "job_title": "Agent vanzari",
+      "domain": "Vanzari",
+      "level": "Middle",
+      "aliases": [
+        "sales agent"
+      ],
+      "must_have": [
+        "vanzari",
+        "clienti",
+        "negociere",
+        "comunicare"
+      ],
+      "nice_to_have": [
+        "CRM",
+        "target",
+        "teren",
+        "permis B"
+      ],
+      "reject_if_missing": [
+        "lipsa interactiune clienti sau vanzari"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "sales agent"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Agent vanzari?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "reprezentant_vanzari",
+      "job_title": "Reprezentant vanzari",
+      "domain": "Vanzari",
+      "level": "Middle",
+      "aliases": [
+        "sales representative"
+      ],
+      "must_have": [
+        "vanzari",
+        "portofoliu clienti",
+        "ofertare",
+        "negociere"
+      ],
+      "nice_to_have": [
+        "B2B",
+        "CRM",
+        "permis B"
+      ],
+      "reject_if_missing": [
+        "lipsa vanzari"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "sales representative"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Reprezentant vanzari?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "account_manager",
+      "job_title": "Account manager",
+      "domain": "Vanzari",
+      "level": "Middle",
+      "aliases": [
+        "key account"
+      ],
+      "must_have": [
+        "clienti existenti",
+        "relatii comerciale",
+        "negociere",
+        "raportare"
+      ],
+      "nice_to_have": [
+        "B2B",
+        "CRM",
+        "upsell"
+      ],
+      "reject_if_missing": [
+        "lipsa gestionare clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "key account"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Account manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "sales_manager",
+      "job_title": "Sales manager",
+      "domain": "Vanzari Management",
+      "level": "Senior",
+      "aliases": [
+        "manager vanzari"
+      ],
+      "must_have": [
+        "management vanzari",
+        "echipa",
+        "target",
+        "strategie"
+      ],
+      "nice_to_have": [
+        "bugete",
+        "CRM",
+        "KPI"
+      ],
+      "reject_if_missing": [
+        "lipsa coordonare vanzari"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "manager vanzari"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Sales manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "consultant_vanzari",
+      "job_title": "Consultant vanzari",
+      "domain": "Vanzari Retail",
+      "level": "Junior",
+      "aliases": [
+        "sales consultant"
+      ],
+      "must_have": [
+        "clienti",
+        "vanzare consultativa",
+        "produse",
+        "comunicare"
+      ],
+      "nice_to_have": [
+        "retail",
+        "cash",
+        "target"
+      ],
+      "reject_if_missing": [
+        "lipsa clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "sales consultant"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Consultant vanzari?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "merchandiser",
+      "job_title": "Merchandiser",
+      "domain": "Retail",
+      "level": "Junior",
+      "aliases": [
+        "field merchandiser"
+      ],
+      "must_have": [
+        "magazine",
+        "raft",
+        "produse",
+        "vizite teren"
+      ],
+      "nice_to_have": [
+        "retail",
+        "permis B",
+        "raportare"
+      ],
+      "reject_if_missing": [
+        "lipsa teren sau retail"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "field merchandiser"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Merchandiser?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "promoter",
+      "job_title": "Promoter",
+      "domain": "Marketing Retail",
+      "level": "Junior",
+      "aliases": [
+        "brand promoter"
+      ],
+      "must_have": [
+        "promovare",
+        "clienti",
+        "comunicare"
+      ],
+      "nice_to_have": [
+        "evenimente",
+        "retail",
+        "vanzari"
+      ],
+      "reject_if_missing": [
+        "lipsa comunicare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "brand promoter"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Promoter?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "marketing_specialist",
+      "job_title": "Marketing specialist",
+      "domain": "Marketing",
+      "level": "Middle",
+      "aliases": [
+        "specialist marketing"
+      ],
+      "must_have": [
+        "campanii",
+        "continut",
+        "analiza",
+        "strategie"
+      ],
+      "nice_to_have": [
+        "SEO",
+        "PPC",
+        "social media",
+        "Google Ads"
+      ],
+      "reject_if_missing": [
+        "lipsa marketing"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist marketing"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Marketing specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "social_media_specialist",
+      "job_title": "Social media specialist",
+      "domain": "Marketing Digital",
+      "level": "Middle",
+      "aliases": [
+        "social media manager"
+      ],
+      "must_have": [
+        "social media",
+        "continut",
+        "Facebook",
+        "Instagram",
+        "LinkedIn",
+        "calendar editorial"
+      ],
+      "nice_to_have": [
+        "Canva",
+        "Meta Ads",
+        "copywriting"
+      ],
+      "reject_if_missing": [
+        "lipsa social media"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "social media manager"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Social media specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ppc_specialist",
+      "job_title": "PPC specialist",
+      "domain": "Marketing Digital",
+      "level": "Middle",
+      "aliases": [
+        "performance marketer"
+      ],
+      "must_have": [
+        "Google Ads sau Meta Ads",
+        "campanii platite",
+        "bugete",
+        "raportare"
+      ],
+      "nice_to_have": [
+        "GA4",
+        "GTM",
+        "ROAS"
+      ],
+      "reject_if_missing": [
+        "lipsa PPC"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "performance marketer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de PPC specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "seo_specialist",
+      "job_title": "SEO specialist",
+      "domain": "Marketing Digital",
+      "level": "Middle",
+      "aliases": [
+        "SEO analyst"
+      ],
+      "must_have": [
+        "SEO",
+        "keyword research",
+        "on-page",
+        "technical SEO"
+      ],
+      "nice_to_have": [
+        "Search Console",
+        "Ahrefs",
+        "Semrush"
+      ],
+      "reject_if_missing": [
+        "lipsa SEO"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "SEO analyst"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de SEO specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "content_writer",
+      "job_title": "Content writer",
+      "domain": "Marketing Continut",
+      "level": "Middle",
+      "aliases": [
+        "copywriter"
+      ],
+      "must_have": [
+        "scriere continut",
+        "copywriting",
+        "gramatica",
+        "research"
+      ],
+      "nice_to_have": [
+        "SEO",
+        "blog",
+        "social media"
+      ],
+      "reject_if_missing": [
+        "lipsa scriere"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "copywriter"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Content writer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "graphic_designer",
+      "job_title": "Graphic designer",
+      "domain": "Design",
+      "level": "Middle",
+      "aliases": [
+        "designer grafic"
+      ],
+      "must_have": [
+        "design grafic",
+        "Photoshop",
+        "Illustrator",
+        "Canva",
+        "portofoliu"
+      ],
+      "nice_to_have": [
+        "branding",
+        "social media",
+        "Figma"
+      ],
+      "reject_if_missing": [
+        "lipsa portofoliu sau design"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "designer grafic"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Graphic designer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "web_designer",
+      "job_title": "Web designer",
+      "domain": "Design Web",
+      "level": "Middle",
+      "aliases": [
+        "UI designer"
+      ],
+      "must_have": [
+        "web design",
+        "UI",
+        "Figma sau HTML CSS",
+        "portofoliu"
+      ],
+      "nice_to_have": [
+        "UX",
+        "responsive",
+        "WordPress"
+      ],
+      "reject_if_missing": [
+        "lipsa web design"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "UI designer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Web designer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "frontend_developer",
+      "job_title": "Frontend developer",
+      "domain": "IT",
+      "level": "Middle",
+      "aliases": [
+        "front-end developer"
+      ],
+      "must_have": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "frontend framework"
+      ],
+      "nice_to_have": [
+        "React",
+        "Vue",
+        "TypeScript"
+      ],
+      "reject_if_missing": [
+        "lipsa frontend"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "front-end developer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Frontend developer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "backend_developer",
+      "job_title": "Backend developer",
+      "domain": "IT",
+      "level": "Middle",
+      "aliases": [
+        "back-end developer"
+      ],
+      "must_have": [
+        "backend",
+        "API",
+        "baze de date",
+        "limbaj server"
+      ],
+      "nice_to_have": [
+        "Python",
+        "Node",
+        "Java",
+        "Docker"
+      ],
+      "reject_if_missing": [
+        "lipsa backend"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "back-end developer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Backend developer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "full_stack_developer",
+      "job_title": "Full stack developer",
+      "domain": "IT",
+      "level": "Middle",
+      "aliases": [
+        "fullstack developer"
+      ],
+      "must_have": [
+        "frontend",
+        "backend",
+        "API",
+        "baze de date"
+      ],
+      "nice_to_have": [
+        "React",
+        "Node",
+        "Python",
+        "Docker"
+      ],
+      "reject_if_missing": [
+        "doar office fara cod"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "fullstack developer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Full stack developer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "qa_tester",
+      "job_title": "QA tester",
+      "domain": "IT QA",
+      "level": "Middle",
+      "aliases": [
+        "software tester"
+      ],
+      "must_have": [
+        "testare",
+        "test cases",
+        "bug reports",
+        "atentie la detalii"
+      ],
+      "nice_to_have": [
+        "automation",
+        "Selenium",
+        "API testing"
+      ],
+      "reject_if_missing": [
+        "lipsa testare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "software tester"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de QA tester?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "it_support",
+      "job_title": "IT support",
+      "domain": "IT Support",
+      "level": "Middle",
+      "aliases": [
+        "helpdesk"
+      ],
+      "must_have": [
+        "suport IT",
+        "Windows",
+        "hardware",
+        "software",
+        "ticketing"
+      ],
+      "nice_to_have": [
+        "Active Directory",
+        "networking",
+        "remote support"
+      ],
+      "reject_if_missing": [
+        "lipsa IT support"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "helpdesk"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de IT support?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "system_administrator",
+      "job_title": "System administrator",
+      "domain": "IT Infrastructure",
+      "level": "Middle",
+      "aliases": [
+        "sysadmin"
+      ],
+      "must_have": [
+        "servere",
+        "retea",
+        "Windows sau Linux",
+        "administrare sisteme"
+      ],
+      "nice_to_have": [
+        "cloud",
+        "backup",
+        "security"
+      ],
+      "reject_if_missing": [
+        "lipsa administrare sisteme"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "sysadmin"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de System administrator?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "data_analyst",
+      "job_title": "Data analyst",
+      "domain": "Data",
+      "level": "Middle",
+      "aliases": [
+        "analist date"
+      ],
+      "must_have": [
+        "Excel avansat",
+        "analiza date",
+        "raportare",
+        "SQL sau BI"
+      ],
+      "nice_to_have": [
+        "Power BI",
+        "Python",
+        "Tableau"
+      ],
+      "reject_if_missing": [
+        "lipsa analiza date"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "analist date"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Data analyst?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "business_analyst",
+      "job_title": "Business analyst",
+      "domain": "Business",
+      "level": "Middle",
+      "aliases": [
+        "BA"
+      ],
+      "must_have": [
+        "analiza procese",
+        "cerinte business",
+        "documentare",
+        "stakeholders"
+      ],
+      "nice_to_have": [
+        "SQL",
+        "ERP",
+        "BPMN"
+      ],
+      "reject_if_missing": [
+        "lipsa analiza business"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "BA"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Business analyst?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "project_manager",
+      "job_title": "Project manager",
+      "domain": "Management Proiecte",
+      "level": "Senior",
+      "aliases": [
+        "PM"
+      ],
+      "must_have": [
+        "project management",
+        "planificare",
+        "stakeholders",
+        "risc",
+        "livrabile"
+      ],
+      "nice_to_have": [
+        "Agile",
+        "PMP",
+        "bugete"
+      ],
+      "reject_if_missing": [
+        "lipsa management proiecte"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "PM"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Project manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "product_manager",
+      "job_title": "Product manager",
+      "domain": "Product",
+      "level": "Senior",
+      "aliases": [
+        "product owner"
+      ],
+      "must_have": [
+        "strategie produs",
+        "roadmap",
+        "clienti",
+        "prioritizare"
+      ],
+      "nice_to_have": [
+        "analytics",
+        "UX",
+        "Agile"
+      ],
+      "reject_if_missing": [
+        "lipsa product management"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "product owner"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Product manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "hr_recruiter",
+      "job_title": "HR recruiter",
+      "domain": "HR",
+      "level": "Middle",
+      "aliases": [
+        "recruiter"
+      ],
+      "must_have": [
+        "recrutare",
+        "interviuri",
+        "screening CV",
+        "candidati"
+      ],
+      "nice_to_have": [
+        "LinkedIn Recruiter",
+        "ATS",
+        "sourcing"
+      ],
+      "reject_if_missing": [
+        "lipsa HR sau recrutare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "recruiter"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de HR recruiter?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "hr_generalist",
+      "job_title": "HR generalist",
+      "domain": "HR",
+      "level": "Middle",
+      "aliases": [
+        "specialist HR"
+      ],
+      "must_have": [
+        "HR",
+        "administrare personal",
+        "recrutare",
+        "documente"
+      ],
+      "nice_to_have": [
+        "Revisal",
+        "payroll",
+        "training"
+      ],
+      "reject_if_missing": [
+        "lipsa HR"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist HR"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de HR generalist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "inspector_resurse_umane",
+      "job_title": "Inspector resurse umane",
+      "domain": "HR",
+      "level": "Middle",
+      "aliases": [
+        "inspector HR"
+      ],
+      "must_have": [
+        "Revisal",
+        "contracte",
+        "dosare personal",
+        "legislatie munca"
+      ],
+      "nice_to_have": [
+        "salarizare",
+        "pontaje"
+      ],
+      "reject_if_missing": [
+        "lipsa Revisal"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "inspector HR"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Inspector resurse umane?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ssm_specialist",
+      "job_title": "SSM specialist",
+      "domain": "SSM",
+      "level": "Middle",
+      "aliases": [
+        "specialist sanatate securitate"
+      ],
+      "must_have": [
+        "SSM",
+        "evaluare risc",
+        "instruiri",
+        "legislatie"
+      ],
+      "nice_to_have": [
+        "PSI",
+        "SU",
+        "audit"
+      ],
+      "reject_if_missing": [
+        "lipsa SSM"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist sanatate securitate"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de SSM specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "achizitii_specialist",
+      "job_title": "Specialist achizitii",
+      "domain": "Achizitii",
+      "level": "Middle",
+      "aliases": [
+        "procurement specialist"
+      ],
+      "must_have": [
+        "achizitii",
+        "furnizori",
+        "negociere",
+        "comenzi"
+      ],
+      "nice_to_have": [
+        "ERP",
+        "contracte",
+        "Excel"
+      ],
+      "reject_if_missing": [
+        "lipsa achizitii"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "procurement specialist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Specialist achizitii?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "procurement_manager",
+      "job_title": "Procurement manager",
+      "domain": "Achizitii",
+      "level": "Senior",
+      "aliases": [
+        "manager achizitii"
+      ],
+      "must_have": [
+        "management achizitii",
+        "furnizori",
+        "negociere",
+        "strategie"
+      ],
+      "nice_to_have": [
+        "bugete",
+        "echipa",
+        "ERP"
+      ],
+      "reject_if_missing": [
+        "lipsa management achizitii"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "manager achizitii"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Procurement manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "buyer",
+      "job_title": "Buyer",
+      "domain": "Achizitii",
+      "level": "Middle",
+      "aliases": [
+        "purchasing specialist"
+      ],
+      "must_have": [
+        "cumparari",
+        "furnizori",
+        "comenzi",
+        "negociere"
+      ],
+      "nice_to_have": [
+        "ERP",
+        "stocuri",
+        "Excel"
+      ],
+      "reject_if_missing": [
+        "lipsa achizitii"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "purchasing specialist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Buyer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "jurist",
+      "job_title": "Jurist",
+      "domain": "Legal",
+      "level": "Middle",
+      "aliases": [
+        "legal advisor"
+      ],
+      "must_have": [
+        "drept",
+        "contracte",
+        "legislatie",
+        "avize"
+      ],
+      "nice_to_have": [
+        "litigii",
+        "GDPR",
+        "achizitii"
+      ],
+      "reject_if_missing": [
+        "lipsa studii juridice"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "legal advisor"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Jurist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "farmacist",
+      "job_title": "Farmacist",
+      "domain": "Medical Farmacie",
+      "level": "Middle",
+      "aliases": [
+        "pharmacist"
+      ],
+      "must_have": [
+        "facultate farmacie",
+        "aviz",
+        "medicamente",
+        "clienti"
+      ],
+      "nice_to_have": [
+        "farmacie comunitara",
+        "gestiune"
+      ],
+      "reject_if_missing": [
+        "lipsa studii farmacie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "pharmacist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Farmacist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "asistent_medical",
+      "job_title": "Asistent medical",
+      "domain": "Medical",
+      "level": "Middle",
+      "aliases": [
+        "nurse"
+      ],
+      "must_have": [
+        "asistent medical",
+        "aviz",
+        "pacienti",
+        "proceduri"
+      ],
+      "nice_to_have": [
+        "clinica",
+        "spital",
+        "recoltare"
+      ],
+      "reject_if_missing": [
+        "lipsa calificare asistent"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "nurse"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Asistent medical?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "infirmier",
+      "job_title": "Infirmier",
+      "domain": "Medical",
+      "level": "Junior",
+      "aliases": [
+        "care assistant"
+      ],
+      "must_have": [
+        "ingrijire pacienti",
+        "igiena",
+        "asistenta"
+      ],
+      "nice_to_have": [
+        "spital",
+        "camin",
+        "certificat"
+      ],
+      "reject_if_missing": [
+        "lipsa ingrijire persoane"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "care assistant"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Infirmier?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "medic_veterinar",
+      "job_title": "Medic veterinar",
+      "domain": "Medical Veterinar",
+      "level": "Middle",
+      "aliases": [
+        "veterinarian"
+      ],
+      "must_have": [
+        "medicina veterinara",
+        "animale",
+        "diagnostic",
+        "tratamente"
+      ],
+      "nice_to_have": [
+        "cabinet veterinar",
+        "chirurgie"
+      ],
+      "reject_if_missing": [
+        "lipsa studii veterinare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "veterinarian"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Medic veterinar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "profesor",
+      "job_title": "Profesor",
+      "domain": "Educatie",
+      "level": "Middle",
+      "aliases": [
+        "teacher"
+      ],
+      "must_have": [
+        "predare",
+        "materie",
+        "pedagogie",
+        "elevi sau studenti"
+      ],
+      "nice_to_have": [
+        "definitivat",
+        "grade",
+        "training"
+      ],
+      "reject_if_missing": [
+        "lipsa predare"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "teacher"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Profesor?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "trainer",
+      "job_title": "Trainer",
+      "domain": "Training",
+      "level": "Middle",
+      "aliases": [
+        "formator"
+      ],
+      "must_have": [
+        "training",
+        "prezentare",
+        "cursanti",
+        "materiale"
+      ],
+      "nice_to_have": [
+        "certificare trainer",
+        "public speaking"
+      ],
+      "reject_if_missing": [
+        "lipsa livrare training"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "formator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Trainer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "bucatar",
+      "job_title": "Bucatar",
+      "domain": "HoReCa",
+      "level": "Middle",
+      "aliases": [
+        "cook"
+      ],
+      "must_have": [
+        "gatit",
+        "bucatarie",
+        "retete",
+        "igiena"
+      ],
+      "nice_to_have": [
+        "restaurant",
+        "meniuri",
+        "HACCP"
+      ],
+      "reject_if_missing": [
+        "lipsa bucatarie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "cook"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Bucatar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ajutor_bucatar",
+      "job_title": "Ajutor bucatar",
+      "domain": "HoReCa",
+      "level": "Junior",
+      "aliases": [
+        "kitchen assistant"
+      ],
+      "must_have": [
+        "bucatarie",
+        "pregatire ingrediente",
+        "curatenie",
+        "ajutor"
+      ],
+      "nice_to_have": [
+        "restaurant",
+        "HACCP"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate bucatarie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "kitchen assistant"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Ajutor bucatar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ospatar",
+      "job_title": "Ospatar",
+      "domain": "HoReCa",
+      "level": "Junior",
+      "aliases": [
+        "waiter"
+      ],
+      "must_have": [
+        "servire clienti",
+        "comenzi",
+        "restaurant",
+        "comunicare"
+      ],
+      "nice_to_have": [
+        "POS",
+        "limbi straine",
+        "bar"
+      ],
+      "reject_if_missing": [
+        "lipsa interactiune clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "waiter"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Ospatar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "barman",
+      "job_title": "Barman",
+      "domain": "HoReCa",
+      "level": "Junior",
+      "aliases": [
+        "bartender"
+      ],
+      "must_have": [
+        "bar",
+        "bauturi",
+        "clienti",
+        "incasari"
+      ],
+      "nice_to_have": [
+        "cocktailuri",
+        "POS"
+      ],
+      "reject_if_missing": [
+        "lipsa experienta bar"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "bartender"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Barman?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "camerista",
+      "job_title": "Camerista",
+      "domain": "Hotel",
+      "level": "Junior",
+      "aliases": [
+        "housekeeper"
+      ],
+      "must_have": [
+        "curatenie camere",
+        "hotel",
+        "atentie la detalii"
+      ],
+      "nice_to_have": [
+        "housekeeping",
+        "lenjerii"
+      ],
+      "reject_if_missing": [
+        "lipsa curatenie sau hotel"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "housekeeper"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Camerista?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "agent_securitate",
+      "job_title": "Agent securitate",
+      "domain": "Securitate",
+      "level": "Junior",
+      "aliases": [
+        "security guard"
+      ],
+      "must_have": [
+        "paza",
+        "supraveghere",
+        "responsabilitate"
+      ],
+      "nice_to_have": [
+        "atestat paza",
+        "control acces"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate paza"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "security guard"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Agent securitate?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "paznic",
+      "job_title": "Paznic",
+      "domain": "Securitate",
+      "level": "Junior",
+      "aliases": [
+        "guard"
+      ],
+      "must_have": [
+        "paza",
+        "control acces",
+        "vigilenta"
+      ],
+      "nice_to_have": [
+        "atestat",
+        "ture"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate ture"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "guard"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Paznic?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operator_curatenie",
+      "job_title": "Operator curatenie",
+      "domain": "Facility",
+      "level": "Junior",
+      "aliases": [
+        "cleaner"
+      ],
+      "must_have": [
+        "curatenie",
+        "igiena",
+        "munca fizica"
+      ],
+      "nice_to_have": [
+        "birouri",
+        "hotel",
+        "spatii comerciale"
+      ],
+      "reject_if_missing": [
+        "lipsa disponibilitate curatenie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "cleaner"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operator curatenie?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "frizer",
+      "job_title": "Frizer",
+      "domain": "Beauty",
+      "level": "Middle",
+      "aliases": [
+        "barber"
+      ],
+      "must_have": [
+        "tuns",
+        "frizerie",
+        "clienti"
+      ],
+      "nice_to_have": [
+        "barber",
+        "programari",
+        "portofoliu"
+      ],
+      "reject_if_missing": [
+        "lipsa frizerie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "barber"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Frizer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "cosmetician",
+      "job_title": "Cosmetician",
+      "domain": "Beauty",
+      "level": "Middle",
+      "aliases": [
+        "beautician"
+      ],
+      "must_have": [
+        "cosmetica",
+        "clienti",
+        "tratamente"
+      ],
+      "nice_to_have": [
+        "certificat",
+        "epilare",
+        "makeup"
+      ],
+      "reject_if_missing": [
+        "lipsa cosmetica"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "beautician"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Cosmetician?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "fotograf",
+      "job_title": "Fotograf",
+      "domain": "Creative",
+      "level": "Middle",
+      "aliases": [
+        "photographer"
+      ],
+      "must_have": [
+        "fotografie",
+        "camera",
+        "editare",
+        "portofoliu"
+      ],
+      "nice_to_have": [
+        "Lightroom",
+        "Photoshop",
+        "evenimente"
+      ],
+      "reject_if_missing": [
+        "lipsa portofoliu"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "photographer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Fotograf?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "videograf",
+      "job_title": "Videograf",
+      "domain": "Creative",
+      "level": "Middle",
+      "aliases": [
+        "video editor"
+      ],
+      "must_have": [
+        "video",
+        "filmare",
+        "editare",
+        "portofoliu"
+      ],
+      "nice_to_have": [
+        "Premiere",
+        "DaVinci",
+        "drone"
+      ],
+      "reject_if_missing": [
+        "lipsa video sau portofoliu"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "video editor"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Videograf?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "operations_manager",
+      "job_title": "Operations manager",
+      "domain": "Management Operatiuni",
+      "level": "Senior",
+      "aliases": [
+        "manager operational"
+      ],
+      "must_have": [
+        "operatiuni",
+        "procese",
+        "echipa",
+        "KPI"
+      ],
+      "nice_to_have": [
+        "logistica",
+        "productie",
+        "bugete"
+      ],
+      "reject_if_missing": [
+        "lipsa operatiuni"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "manager operational"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Operations manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "warehouse_manager",
+      "job_title": "Warehouse manager",
+      "domain": "Depozit Management",
+      "level": "Senior",
+      "aliases": [
+        "manager depozit"
+      ],
+      "must_have": [
+        "management depozit",
+        "echipa",
+        "stocuri",
+        "WMS",
+        "KPI"
+      ],
+      "nice_to_have": [
+        "Lean",
+        "SAP",
+        "inventar"
+      ],
+      "reject_if_missing": [
+        "lipsa depozit management"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "manager depozit"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Warehouse manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "quality_manager",
+      "job_title": "Quality manager",
+      "domain": "Calitate Management",
+      "level": "Senior",
+      "aliases": [
+        "manager calitate"
+      ],
+      "must_have": [
+        "management calitate",
+        "ISO",
+        "audit",
+        "neconformitati"
+      ],
+      "nice_to_have": [
+        "8D",
+        "FMEA",
+        "echipa"
+      ],
+      "reject_if_missing": [
+        "lipsa calitate management"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "manager calitate"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Quality manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "production_manager",
+      "job_title": "Production manager",
+      "domain": "Productie Management",
+      "level": "Senior",
+      "aliases": [
+        "manager productie"
+      ],
+      "must_have": [
+        "management productie",
+        "linie productie",
+        "KPI",
+        "echipa"
+      ],
+      "nice_to_have": [
+        "Lean",
+        "Kaizen",
+        "ERP"
+      ],
+      "reject_if_missing": [
+        "lipsa productie management"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "manager productie"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Production manager?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "financial_controller",
+      "job_title": "Financial controller",
+      "domain": "Financiar",
+      "level": "Senior",
+      "aliases": [
+        "controller financiar"
+      ],
+      "must_have": [
+        "controlling",
+        "bugete",
+        "raportare financiara",
+        "Excel"
+      ],
+      "nice_to_have": [
+        "Power BI",
+        "ERP",
+        "IFRS"
+      ],
+      "reject_if_missing": [
+        "lipsa controlling"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "controller financiar"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Financial controller?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "legal_counsel",
+      "job_title": "Legal counsel",
+      "domain": "Legal",
+      "level": "Senior",
+      "aliases": [
+        "consilier juridic"
+      ],
+      "must_have": [
+        "juridic",
+        "contracte",
+        "consultanta legala"
+      ],
+      "nice_to_have": [
+        "litigii",
+        "compliance",
+        "GDPR"
+      ],
+      "reject_if_missing": [
+        "lipsa juridic"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "consilier juridic"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Legal counsel?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "compliance_officer",
+      "job_title": "Compliance officer",
+      "domain": "Compliance",
+      "level": "Senior",
+      "aliases": [
+        "specialist conformitate"
+      ],
+      "must_have": [
+        "compliance",
+        "proceduri",
+        "audit intern",
+        "risc"
+      ],
+      "nice_to_have": [
+        "GDPR",
+        "AML",
+        "ISO"
+      ],
+      "reject_if_missing": [
+        "lipsa compliance"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist conformitate"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Compliance officer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "crm_specialist",
+      "job_title": "CRM specialist",
+      "domain": "Vanzari Marketing",
+      "level": "Middle",
+      "aliases": [
+        "CRM administrator"
+      ],
+      "must_have": [
+        "CRM",
+        "date clienti",
+        "campanii",
+        "raportare"
+      ],
+      "nice_to_have": [
+        "Salesforce",
+        "HubSpot",
+        "email marketing"
+      ],
+      "reject_if_missing": [
+        "lipsa CRM"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "CRM administrator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de CRM specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ecommerce_specialist",
+      "job_title": "E-commerce specialist",
+      "domain": "Digital",
+      "level": "Middle",
+      "aliases": [
+        "specialist ecommerce"
+      ],
+      "must_have": [
+        "magazin online",
+        "produse",
+        "comenzi",
+        "platforma ecommerce"
+      ],
+      "nice_to_have": [
+        "Shopify",
+        "WooCommerce",
+        "SEO"
+      ],
+      "reject_if_missing": [
+        "lipsa ecommerce"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "specialist ecommerce"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de E-commerce specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "wordpress_developer",
+      "job_title": "WordPress developer",
+      "domain": "IT Web",
+      "level": "Middle",
+      "aliases": [
+        "developer wordpress"
+      ],
+      "must_have": [
+        "WordPress",
+        "HTML CSS",
+        "teme",
+        "pluginuri"
+      ],
+      "nice_to_have": [
+        "WooCommerce",
+        "PHP",
+        "SEO"
+      ],
+      "reject_if_missing": [
+        "lipsa WordPress"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "developer wordpress"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de WordPress developer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "devops_engineer",
+      "job_title": "DevOps engineer",
+      "domain": "IT Infrastructure",
+      "level": "Senior",
+      "aliases": [
+        "devops"
+      ],
+      "must_have": [
+        "CI CD",
+        "Docker",
+        "cloud",
+        "Linux"
+      ],
+      "nice_to_have": [
+        "Kubernetes",
+        "Terraform",
+        "AWS",
+        "Azure"
+      ],
+      "reject_if_missing": [
+        "lipsa DevOps"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "devops"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de DevOps engineer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "cloud_engineer",
+      "job_title": "Cloud engineer",
+      "domain": "IT Cloud",
+      "level": "Senior",
+      "aliases": [
+        "cloud specialist"
+      ],
+      "must_have": [
+        "cloud",
+        "AWS sau Azure sau GCP",
+        "retea",
+        "servere"
+      ],
+      "nice_to_have": [
+        "Terraform",
+        "Kubernetes",
+        "security"
+      ],
+      "reject_if_missing": [
+        "lipsa cloud"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "cloud specialist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Cloud engineer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "cybersecurity_specialist",
+      "job_title": "Cybersecurity specialist",
+      "domain": "IT Security",
+      "level": "Senior",
+      "aliases": [
+        "security analyst"
+      ],
+      "must_have": [
+        "securitate IT",
+        "vulnerabilitati",
+        "risc",
+        "monitorizare"
+      ],
+      "nice_to_have": [
+        "SIEM",
+        "ISO27001",
+        "pentest"
+      ],
+      "reject_if_missing": [
+        "lipsa securitate IT"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "security analyst"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Cybersecurity specialist?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "scrum_master",
+      "job_title": "Scrum master",
+      "domain": "Agile",
+      "level": "Senior",
+      "aliases": [
+        "agile coach"
+      ],
+      "must_have": [
+        "Scrum",
+        "Agile",
+        "facilitare",
+        "echipa"
+      ],
+      "nice_to_have": [
+        "certificare Scrum",
+        "Jira"
+      ],
+      "reject_if_missing": [
+        "lipsa Agile sau Scrum"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "agile coach"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Scrum master?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "ux_ui_designer",
+      "job_title": "UX UI designer",
+      "domain": "Design Product",
+      "level": "Middle",
+      "aliases": [
+        "product designer"
+      ],
+      "must_have": [
+        "UX",
+        "UI",
+        "Figma",
+        "prototipare"
+      ],
+      "nice_to_have": [
+        "research",
+        "design system",
+        "user testing"
+      ],
+      "reject_if_missing": [
+        "lipsa portofoliu UX UI"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "product designer"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de UX UI designer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "technical_writer",
+      "job_title": "Technical writer",
+      "domain": "Documentatie",
+      "level": "Middle",
+      "aliases": [
+        "documentation specialist"
+      ],
+      "must_have": [
+        "documentatie tehnica",
+        "scriere clara",
+        "tools tehnice"
+      ],
+      "nice_to_have": [
+        "IT",
+        "API docs",
+        "engleza"
+      ],
+      "reject_if_missing": [
+        "lipsa documentatie"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "documentation specialist"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Technical writer?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "translator",
+      "job_title": "Translator",
+      "domain": "Limbi Straine",
+      "level": "Middle",
+      "aliases": [
+        "traducator"
+      ],
+      "must_have": [
+        "traducere",
+        "limba straina",
+        "gramatica"
+      ],
+      "nice_to_have": [
+        "autorizatie",
+        "CAT tools"
+      ],
+      "reject_if_missing": [
+        "lipsa limba straina"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "traducator"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Translator?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "interpreter",
+      "job_title": "Interpreter",
+      "domain": "Limbi Straine",
+      "level": "Middle",
+      "aliases": [
+        "interpret"
+      ],
+      "must_have": [
+        "interpretariat",
+        "limba straina",
+        "comunicare live"
+      ],
+      "nice_to_have": [
+        "autorizatie",
+        "conferinte"
+      ],
+      "reject_if_missing": [
+        "lipsa interpretariat"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "interpret"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Interpreter?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    },
+    {
+      "job_id": "real_estate_agent",
+      "job_title": "Agent imobiliar",
+      "domain": "Vanzari Imobiliare",
+      "level": "Middle",
+      "aliases": [
+        "real estate agent"
+      ],
+      "must_have": [
+        "vanzari",
+        "clienti",
+        "vizionari",
+        "negociere"
+      ],
+      "nice_to_have": [
+        "portofoliu proprietati",
+        "CRM",
+        "permis B"
+      ],
+      "reject_if_missing": [
+        "lipsa vanzari sau clienti"
+      ],
+      "overqualified_risk": [
+        "rector",
+        "profesor universitar",
+        "director general",
+        "CEO",
+        "antreprenor",
+        "consultant strategic",
+        "manager foarte senior"
+      ],
+      "equivalent_roles": [
+        "real estate agent"
+      ],
+      "red_flags": [
+        "lipsa experienta relevanta",
+        "CV generic",
+        "cerinta critica lipsa",
+        "nivel mult peste postul cautat"
+      ],
+      "max_score_rules": [
+        "Daca lipseste o cerinta critica, scorul maxim este 35.",
+        "Daca profilul este supracalificat pentru un rol operational, scorul maxim este 40.",
+        "Daca experienta este complet diferita de job, scorul maxim este 45."
+      ],
+      "interview_questions": [
+        "Ce experienta directa ai pentru rolul de Agent imobiliar?",
+        "Ce responsabilitati ai avut in ultimul job?",
+        "Ce rezultate concrete poti mentiona?",
+        "Ce tools sau proceduri ai folosit?",
+        "De ce vrei acest rol acum?"
+      ]
+    }
+  ]
+}

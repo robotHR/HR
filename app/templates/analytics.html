@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | NEXAS HR</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#050914;color:white;font-family:Arial,sans-serif}
+        .layout{display:flex;min-height:100vh}
+        .sidebar{width:280px;background:#0f172a;padding:38px;position:fixed;top:0;left:0;bottom:0}
+        .logo{font-size:48px;font-weight:900;line-height:1.08;margin-bottom:60px}
+        .nav{display:flex;flex-direction:column;gap:26px}
+        .nav a{color:#dbeafe;text-decoration:none;font-size:22px}.nav a.logout-link{color:#fecaca;margin-top:22px}
+        .nav a.active{color:white;font-weight:900}.nav a.logout-link{color:#fecaca;margin-top:22px}
+        .main{margin-left:280px;padding:48px;width:calc(100% - 280px)}
+        .title{font-size:62px;font-weight:950;margin-bottom:14px}
+        .subtitle{color:#94a3b8;font-size:18px;margin-bottom:34px}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;margin-bottom:30px}
+        .stat{background:#101827;border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:24px}
+        .stat small{display:block;color:#94a3b8;margin-bottom:10px}
+        .stat strong{font-size:36px;color:#a78bfa}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:30px}
+        .panel{background:#0f172a;border:1px solid rgba(255,255,255,.07);border-radius:28px;padding:26px}
+        .panel h2{font-size:26px;margin-bottom:22px}
+        .bar-row{display:grid;grid-template-columns:170px 1fr 70px;gap:14px;align-items:center;margin-bottom:16px}
+        .bar-label{color:#dbeafe;font-weight:800}
+        .bar-track{height:14px;background:#020817;border:1px solid rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+        .bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+        .bar-fill.green{background:#22c55e}
+        .bar-fill.yellow{background:#f59e0b}
+        .bar-fill.red{background:#ef4444}
+        .bar-value{text-align:right;color:#cbd5e1;font-weight:900}
+        .table-card{background:#0f172a;border:1px solid rgba(255,255,255,.07);border-radius:28px;overflow:hidden;margin-bottom:30px}
+        table{width:100%;border-collapse:collapse}
+        th{text-align:left;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:12px;padding:18px;border-bottom:1px solid rgba(255,255,255,.08);background:#0b1220}
+        td{padding:18px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
+        .name{font-weight:900;font-size:17px}
+        .small{color:#94a3b8;font-size:13px;margin-top:5px}
+        .tag{display:inline-block;padding:9px 12px;border-radius:999px;font-weight:900;font-size:12px}
+        .tag-green{background:#14532d;color:#bbf7d0}
+        .tag-yellow{background:#78350f;color:#fde68a}
+        .tag-red{background:#7f1d1d;color:#fecaca}
+        .tag-default{background:#1f2937;color:#e0e7ff}
+        .btn{display:inline-flex;text-decoration:none;border-radius:14px;padding:12px 14px;background:#8b5cf6;color:white;font-weight:900}
+        .empty{background:#111827;border-radius:26px;padding:38px;color:#cbd5e1;font-size:20px}
+        @media(max-width:1050px){.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:28px}.title{font-size:42px}.grid{grid-template-columns:1fr}.table-card{overflow-x:auto}table{min-width:900px}}
+    </style>
+</head>
+
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="logo">NEXAS<br>HR</div>
+        <nav class="nav">
+            <a href="/">Dashboard</a>
+            <a href="/candidati">Candidati</a>
+            <a class="active" href="/analytics">Analytics</a>
+            <a class="logout-link" href="/logout">Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <h1 class="title">Analytics</h1>
+        <div class="subtitle">Statistici pentru toata arhiva de candidati.</div>
+
+        {% if total == 0 %}
+            <div class="empty">Nu exista date pentru analytics.</div>
+        {% else %}
+            <div class="stats">
+                <div class="stat"><small>Total candidati</small><strong>{{ analytics.total }}</strong></div>
+                <div class="stat"><small>Scor mediu</small><strong>{{ analytics.avg_score }}</strong></div>
+                <div class="stat"><small>Rata interviu</small><strong>{{ analytics.rates.interview_rate }}%</strong></div>
+                <div class="stat"><small>Rata angajare</small><strong>{{ analytics.rates.hire_rate }}%</strong></div>
+                <div class="stat"><small>Rata inchidere</small><strong>{{ analytics.rates.reject_rate }}%</strong></div>
+            </div>
+
+            <div class="grid">
+                <section class="panel">
+                    <h2>Pipeline recrutare</h2>
+                    {% for item in analytics.pipeline %}
+                        {% set percent = calc_percent(item.count, analytics.total) %}
+                        <div class="bar-row">
+                            <div class="bar-label">{{ item.label }}</div>
+                            <div class="bar-track">
+                                <div class="bar-fill {% if item.label in ['Angajat','Top Candidat'] %}green{% elif item.label in ['Potrivit altor roluri','Candidat Exclus'] %}red{% else %}yellow{% endif %}" style="width: {{ percent }}%"></div>
+                            </div>
+                            <div class="bar-value">{{ item.count }}</div>
+                        </div>
+                    {% endfor %}
+                </section>
+
+                <section class="panel">
+                    <h2>Distributie scoruri</h2>
+                    {% set high_percent = calc_percent(analytics.high_score, analytics.total) %}
+                    {% set medium_percent = calc_percent(analytics.medium_score, analytics.total) %}
+                    {% set low_percent = calc_percent(analytics.low_score, analytics.total) %}
+
+                    <div class="bar-row"><div class="bar-label">70-100</div><div class="bar-track"><div class="bar-fill green" style="width: {{ high_percent }}%"></div></div><div class="bar-value">{{ analytics.high_score }}</div></div>
+                    <div class="bar-row"><div class="bar-label">45-69</div><div class="bar-track"><div class="bar-fill yellow" style="width: {{ medium_percent }}%"></div></div><div class="bar-value">{{ analytics.medium_score }}</div></div>
+                    <div class="bar-row"><div class="bar-label">0-44</div><div class="bar-track"><div class="bar-fill red" style="width: {{ low_percent }}%"></div></div><div class="bar-value">{{ analytics.low_score }}</div></div>
+                </section>
+            </div>
+
+            <section class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Top candidat</th>
+                            <th>Job</th>
+                            <th>Scor</th>
+                            <th>Status</th>
+                            <th>Actiune</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for candidate in analytics.top_candidates %}
+                            <tr>
+                                <td><div class="name">{{ candidate.name or "Candidat necunoscut" }}</div><div class="small">{{ candidate.email or "Email lipsa" }}</div></td>
+                                <td>{{ candidate.job_title or "Nespecificat" }}</td>
+                                <td>{{ candidate.score or 0 }}</td>
+                                <td><span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span></td>
+                                <td><a class="btn" href="/candidat/{{ candidate.id }}">Detalii</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        {% endif %}
+    </main>
+</div>
+</body>
+</html>

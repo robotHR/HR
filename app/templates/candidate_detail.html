@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalii candidat | NEXAS HR</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#050914;color:white;font-family:Arial,sans-serif;padding:42px}
+        .wrap{max-width:1180px;margin:0 auto}
+        .back{color:#c4b5fd;text-decoration:none;font-weight:800}
+        .top{margin-bottom:28px}
+        .notice{padding:16px 18px;border-radius:16px;margin-bottom:18px;font-weight:700}
+        .ok{background:#14532d;color:#bbf7d0}
+        .err{background:#7f1d1d;color:#fecaca}
+        .hero,.panel{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:28px;padding:30px}
+        .hero{background:#0f172a;position:relative;overflow:hidden}
+        .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.28),transparent 38%);pointer-events:none}
+        h1{font-size:48px;margin-bottom:12px;position:relative}
+        .sub{color:#94a3b8;font-size:18px;position:relative}
+        .score{position:absolute;right:34px;top:34px;width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:950}
+        .score-green{background:#22c55e}
+        .score-yellow{background:#f59e0b}
+        .score-red{background:#ef4444}
+        .score-default{background:#8b5cf6}
+        .tag{display:inline-block;margin-top:18px;padding:12px 18px;border-radius:999px;font-weight:900;position:relative}
+        .tag-green{background:#14532d;color:#bbf7d0}
+        .tag-yellow{background:#78350f;color:#fde68a}
+        .tag-red{background:#7f1d1d;color:#fecaca}
+        .tag-default{background:#1f2937;color:#e0e7ff}
+        .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:24px}
+        .panel h2{font-size:24px;margin-bottom:18px}
+        .info{display:grid;gap:14px}
+        .row{display:grid;grid-template-columns:160px 1fr;gap:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06)}
+        .key{color:#a78bfa;text-transform:uppercase;font-size:12px;letter-spacing:.08em}
+        .val{color:#f8fafc;line-height:1.5}
+        .actions{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;position:relative}
+        .btn{display:inline-flex;text-decoration:none;padding:15px 18px;border-radius:16px;font-weight:900;border:0;cursor:pointer;font-size:15px}
+        .btn-primary{background:#8b5cf6;color:white}
+        .btn-secondary{background:#1f2937;color:#dbeafe;border:1px solid rgba(255,255,255,.10)}
+        .btn-blue{background:#2563eb;color:white}
+        .btn-green{background:#16a34a;color:white}
+        .btn-red{background:#dc2626;color:white}
+        .btn-dark{background:#334155;color:white}
+        .btn-edit{background:#f59e0b;color:#111827}
+        .summary{font-size:17px;line-height:1.7;color:#e5e7eb}
+        .not-found{background:#111827;border-radius:24px;padding:30px;color:#fecaca}
+        .workflow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px}
+        .step{background:#020817;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px}
+        .step small{display:block;color:#94a3b8;margin-bottom:6px}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .field{display:grid;gap:8px}
+        .field.full{grid-column:1/-1}
+        label{color:#a78bfa;text-transform:uppercase;font-size:12px;letter-spacing:.08em;font-weight:800}
+        input,select,textarea{width:100%;background:#020817;border:1px solid rgba(255,255,255,.12);color:white;padding:14px 15px;border-radius:14px;font-size:15px}
+        textarea{min-height:130px;resize:vertical;line-height:1.5}
+        .edit-note{color:#94a3b8;margin-bottom:16px;line-height:1.5}
+        .timeline{display:grid;gap:14px}
+        .event{display:grid;grid-template-columns:18px 1fr;gap:14px;background:#020817;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
+        .dot{width:14px;height:14px;border-radius:50%;margin-top:4px;background:#64748b}
+        .dot-green{background:#22c55e}
+        .dot-yellow{background:#f59e0b}
+        .dot-red{background:#ef4444}
+        .dot-default{background:#64748b}
+        .event h3{font-size:16px;margin-bottom:6px}
+        .event p{color:#cbd5e1;line-height:1.5}
+        .date{color:#94a3b8;font-size:12px;margin-bottom:6px}
+        .danger-box{border:1px solid rgba(239,68,68,.35);background:rgba(127,29,29,.18)}
+        .hidden{display:none}
+        @media(max-width:900px){body{padding:22px}.grid{grid-template-columns:1fr}.score{position:relative;right:auto;top:auto;margin-top:18px}.row{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top" style="display:flex;justify-content:space-between;gap:16px;align-items:center;"><a class="back" href="/">Inapoi la dashboard</a><a class="back" style="color:#fecaca;" href="/logout">Logout</a></div>
+    {% if message %}<div class="notice ok">{{ message }}</div>{% endif %}
+    {% if error %}<div class="notice err">{{ error }}</div>{% endif %}
+
+    {% if not candidate %}
+        <div class="not-found">Candidatul nu a fost gasit.</div>
+    {% else %}
+        <section class="hero">
+            <h1>{{ candidate.name or "Candidat necunoscut" }}</h1>
+            <div class="sub">{{ candidate.job_title or "Job nespecificat" }}</div>
+
+            <div class="score {% if candidate.status == 'ADMIS' or candidate.status == 'ANGAJAT' %}score-green{% elif candidate.status == 'DE ANALIZAT' or candidate.status == 'SELECTAT' or candidate.status == 'INTERVIU' %}score-yellow{% elif candidate.status == 'RESPINS' or candidate.status == 'REFUZAT' or candidate.status == 'EXCLUS' %}score-red{% else %}score-default{% endif %}">
+                {{ candidate.score }}
+            </div>
+
+            <div class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</div>
+
+            <div class="workflow">
+                <div class="step"><small>Pas 1</small><strong>Analiza CV</strong></div>
+                <div class="step"><small>Pas 2</small><strong>Selectare</strong></div>
+                <div class="step"><small>Pas 3</small><strong>Interviu</strong></div>
+                <div class="step"><small>Pas 4</small><strong>Decizie finala</strong></div>
+            </div>
+
+            <div class="actions">
+                <a class="btn btn-primary" href="/cv/{{ candidate.id }}" target="_blank">Deschide CV original</a>
+                <a class="btn btn-secondary" href="/">Inapoi la lista</a>
+
+                <button class="btn btn-edit" type="button" onclick="toggleEdit()">✎ Editare</button>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/selecteaza">
+                    <button class="btn btn-dark" type="submit">Marcheaza Potential Candidat</button>
+                </form>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/trimite-interviu">
+                    <button class="btn btn-blue" type="submit">Trimite mail interviu</button>
+                </form>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/refuza">
+                    <button class="btn btn-red" type="submit">Potrivit altor roluri</button>
+                </form>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/angajeaza">
+                    <button class="btn btn-green" type="submit">Marcheaza angajat</button>
+                </form>
+            </div>
+        </section>
+
+        <div class="grid">
+            <section class="panel">
+                <h2>Profil candidat</h2>
+                <div class="info">
+                    <div class="row"><div class="key">Telefon</div><div class="val">{{ candidate.phone or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">Email</div><div class="val">{{ candidate.email or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">Pozitie detectata</div><div class="val">{{ candidate.position or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">Experienta</div><div class="val">{{ candidate.experience or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">Companii</div><div class="val">{{ candidate.companies or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">CV fisier</div><div class="val">{{ candidate.cv_file or "Nespecificat" }}</div></div>
+                </div>
+            </section>
+
+            <section class="panel hidden" id="editPanel">
+                <h2>Editare manuala candidat</h2>
+                <div class="edit-note">Corecteaza emailul, telefonul, numele, statusul si observatiile.</div>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/salveaza" class="form-grid">
+                    <div class="field"><label>Nume</label><input type="text" name="name" value="{{ candidate.name or '' }}"></div>
+                    <div class="field"><label>Email</label><input type="email" name="email" value="{{ candidate.email or '' }}"></div>
+                    <div class="field"><label>Telefon</label><input type="text" name="phone" value="{{ candidate.phone or '' }}"></div>
+
+                    <div class="field">
+                        <label>Status</label>
+                        <select name="status">
+                            {% for item in ["NOU","ADMIS","DE ANALIZAT","RESPINS","SELECTAT","INTERVIU","REFUZAT","ANGAJAT","EXCLUS"] %}
+                                <option value="{{ item }}" {% if candidate.status == item %}selected{% endif %}>{{ status_display(item) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="field"><label>Pozitie detectata</label><input type="text" name="position" value="{{ candidate.position or '' }}"></div>
+                    <div class="field"><label>Experienta</label><input type="text" name="experience" value="{{ candidate.experience or '' }}"></div>
+                    <div class="field full"><label>Skill-uri</label><textarea name="skills">{{ candidate.skills or '' }}</textarea></div>
+                    <div class="field full"><label>Rezumat / observatii HR</label><textarea name="summary">{{ candidate.summary or '' }}</textarea></div>
+                    <div class="field full"><button class="btn btn-green" type="submit">Salveaza modificarile</button></div>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Adauga nota HR</h2>
+                <div class="edit-note">Notele se salveaza in istoricul candidatului.</div>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/nota" class="form-grid">
+                    <div class="field full">
+                        <label>Nota HR</label>
+                        <textarea name="note" placeholder="Ex: L-am sunat. A avut atitudine nepotrivita. Nu recomandam contactari viitoare."></textarea>
+                    </div>
+                    <div class="field full"><button class="btn btn-blue" type="submit">Salveaza nota HR</button></div>
+                </form>
+            </section>
+
+            <section class="panel danger-box">
+                <h2>Candidat Exclus</h2>
+                <div class="edit-note">
+                    Foloseste acest buton pentru candidati cu atitudine nepotrivita. Nu se trimite email. Candidatul dispare din dashboard si ramane doar in arhiva Candidati.
+                </div>
+
+                <form method="post" action="/candidat/{{ candidate.id }}/exclude" class="form-grid" onsubmit="return confirm('Sigur vrei sa marchezi acest candidat ca EXCLUS? Nu se trimite email.')">
+                    <div class="field full">
+                        <label>Motiv excludere</label>
+                        <textarea name="reason" placeholder="Ex: Atitudine agresiva la telefon, limbaj nepotrivit, nu recomandam contactare viitoare."></textarea>
+                    </div>
+                    <div class="field full"><button class="btn btn-red" type="submit">Candidat Exclus</button></div>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Istoric actiuni</h2>
+                {% if events|length == 0 %}
+                    <div class="summary">Nu exista actiuni inregistrate.</div>
+                {% else %}
+                    <div class="timeline">
+                        {% for event in events %}
+                            <div class="event">
+                                <div class="dot dot-{{ event_class(event.event_type) }}"></div>
+                                <div>
+                                    <div class="date">{{ format_event_date(event.created_at) }}</div>
+                                    <h3>{{ event.title }}</h3>
+                                    <p>{{ event.description or "" }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="panel">
+                <h2>Skill-uri si observatii</h2>
+                <div class="info">
+                    <div class="row"><div class="key">Skill-uri</div><div class="val">{{ candidate.skills or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">Puncte forte</div><div class="val">{{ candidate.strengths or "Nespecificat" }}</div></div>
+                    <div class="row"><div class="key">Gap-uri</div><div class="val">{{ candidate.weaknesses or "Nespecificat" }}</div></div>
+                </div>
+            </section>
+
+            <section class="panel" style="grid-column:1/-1">
+                <h2>Rezumat AI / Observatii</h2>
+                <div class="summary">{{ candidate.summary or "Fara rezumat" }}</div>
+            </section>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleEdit(){
+    const panel = document.getElementById("editPanel");
+    panel.classList.toggle("hidden");
+    if(!panel.classList.contains("hidden")){
+        panel.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+}
+</script>
+
+</body>
+</html>

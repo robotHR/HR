@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | NEXAS HR</title>
+
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{min-height:100vh;background:#050914;color:white;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
+        .bg{position:fixed;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.28),transparent 35%),radial-gradient(circle at bottom left,rgba(37,99,235,.22),transparent 34%);pointer-events:none}
+        .card{width:min(460px,100%);background:#0f172a;border:1px solid rgba(255,255,255,.08);border-radius:32px;padding:38px;box-shadow:0 30px 100px rgba(0,0,0,.45);position:relative;overflow:hidden}
+        .card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.20),transparent 40%);pointer-events:none}
+        .logo{font-size:44px;font-weight:950;line-height:1;margin-bottom:12px;position:relative}
+        .logo span{color:#a78bfa}
+        .subtitle{color:#94a3b8;line-height:1.5;margin-bottom:30px;position:relative}
+        .field{display:grid;gap:8px;margin-bottom:16px;position:relative}
+        label{color:#a78bfa;text-transform:uppercase;font-size:12px;letter-spacing:.08em;font-weight:800}
+        input{width:100%;background:#020817;border:1px solid rgba(255,255,255,.12);color:white;padding:16px;border-radius:16px;font-size:16px}
+        input:focus{outline:none;border-color:#8b5cf6}
+        button{width:100%;border:0;background:#8b5cf6;color:white;border-radius:16px;padding:17px;font-weight:900;font-size:16px;cursor:pointer;margin-top:8px;position:relative}
+        .error{background:#7f1d1d;color:#fecaca;padding:14px;border-radius:14px;margin-bottom:18px;font-weight:700;position:relative}
+        .note{color:#64748b;font-size:13px;line-height:1.5;margin-top:20px;position:relative}
+    </style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<form class="card" method="post" action="/login">
+    <div class="logo">NEXAS <span>HR</span></div>
+    <div class="subtitle"></div>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="field">
+        <label>User</label>
+        <input type="text" name="username" placeholder="admin" autocomplete="username" required>
+    </div>
+
+    <div class="field">
+        <label>Parola</label>
+        <input type="password" name="password" placeholder="Parola" autocomplete="current-password" required>
+    </div>
+
+    <button type="submit">Intra in aplicatie</button>
+
+    <div class="note">
+        
+    </div>
+</form>
+</body>
+</html>

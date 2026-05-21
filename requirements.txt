@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+jinja2
+python-multipart
+python-dotenv
+openai
+pdfplumber
+python-docx
+pywin32
+openpyxl
+google-api-python-client
+google-auth
+google-auth-oauthlib
+itsdangerous

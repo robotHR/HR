@@ -7,7 +7,6 @@ python-dotenv
 openai
 pdfplumber
 python-docx
-pywin32
 openpyxl
 google-api-python-client
 google-auth

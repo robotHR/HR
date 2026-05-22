@@ -14,13 +14,12 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
-# from app.services.cv_parser import process_cvs_for_job  # Deprecated - using V2 system now
+from app.services.multi_job_analyzer import MultiJobAnalyzer
 from app.services.gmail_service import (
     download_cv_attachments,
     send_interview_email,
     send_rejection_email
 )
-from app.services.multi_job_analyzer import MultiJobAnalyzer
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -874,7 +873,13 @@ async def analyze_job(target_job: str = Form(...)):
     after_id = get_max_candidate_id()
     final_files = get_final_cv_files()
 
-    # result = process_cvs_for_job(target_job)  # DEPRECATED - using V2 system
+    analyzer = MultiJobAnalyzer()
+    results = analyzer.analyze_all_cvs_for_jobs([target_job])
+    result = {
+        "ok": True,
+        "message": f"Analiza finalizata. Candidati salvati: {len(results.get(target_job, []))}",
+        "saved": len(results.get(target_job, []))
+    }
 
     mark_new_candidates_batch(
         after_id=after_id,
@@ -906,11 +911,17 @@ async def gmail_and_analyze(target_job: str = Form(...)):
         )
 
     moved_files = temporarily_keep_only_files(downloaded_files)
-try:
-    pass  # TODO: Migrate to V2 system
-    # analysis_result = process_cvs_for_job(target_job)
-finally:
-    restore_temp_files(moved_files)
+
+    try:
+        analyzer = MultiJobAnalyzer()
+        results = analyzer.analyze_all_cvs_for_jobs([target_job])
+        analysis_result = {
+            "ok": True,
+            "message": f"Analiza finalizata. Candidati salvati: {len(results.get(target_job, []))}",
+            "saved": len(results.get(target_job, []))
+        }
+    finally:
+        restore_temp_files(moved_files)
 
     mark_new_candidates_batch(
         after_id=after_id,
@@ -926,9 +937,6 @@ finally:
         f"CV-uri deja existente: {gmail_result['skipped_count']}. "
         f"{analysis_result.get('message', '')}"
     )
-
-    finally:
-    restore_temp_files(moved_files)
 
     return RedirectResponse(url=f"/?message={message}", status_code=303)
 
@@ -974,29 +982,3 @@ async def debug_db():
             for candidate in candidates
         ]
     })
-
-@router.post("/analyze-multi-jobs")
-async def analyze_multi_jobs(request: Request, jobs_input: str = Form(...)):
-    """
-    Analiză multi-job
-    Input: "Casier, Sofer TIR, Lucrator Depozit"
-    Output: Ranking-uri per job cu 7-score breakdown
-    """
-    try:
-        analyzer = MultiJobAnalyzer()
-        job_list = [j.strip() for j in jobs_input.split(",")]
-        results = analyzer.analyze_all_cvs_for_jobs(job_list)
-        
-        # Export la CSV
-        csv_path = analyzer.export_to_csv(results, f"app/static/analysis_results.csv")
-        
-        return templates.TemplateResponse("analysis_results.html", {
-            "request": request,
-            "results": results,
-            "csv_path": csv_path
-        })
-    except Exception as e:
-        return templates.TemplateResponse("error.html", {
-            "request": request,
-            "error": str(e)
-        })

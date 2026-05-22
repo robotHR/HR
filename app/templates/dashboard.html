@@ -81,7 +81,7 @@
         .tag-red,.tag.low{background:rgba(248,113,113,.1);color:var(--red);border:.5px solid rgba(248,113,113,.22)}
         .tag-default{background:rgba(99,102,241,.12);color:#c4b5fd;border:.5px solid rgba(99,102,241,.28)}
         .label,.key{color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;margin-top:12px;margin-bottom:5px;position:relative;z-index:1;font-weight:800}
-        .text,.val,.summary{color:rgba(255,255,255,.74);line-height:1.48;font-size:13px;position:relative;z-index:1}.summary{max-height:86px;overflow:hidden}
+        .text,.val,.summary{color:rgba(255,255,255,.74);line-height:1.48;font-size:13px;position:relative;z-index:1}.summary{max-height:none;overflow:visible;white-space:normal}
         .empty{background:rgba(255,255,255,.035);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:28px;color:rgba(255,255,255,.55);font-size:15px}
         .score-bar-wrap{width:66px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}.score-bar-fill{height:100%;border-radius:2px}
         .risk-panel{display:grid;gap:9px;margin:13px 0;position:relative;z-index:1}.risk-row{display:grid;grid-template-columns:108px 1fr 56px;gap:9px;align-items:center}.risk-name{font-size:11px;color:rgba(255,255,255,.5)}.risk-track{height:7px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.risk-fill{height:100%;border-radius:999px}.risk-low{width:32%;background:var(--green)}.risk-medium{width:62%;background:var(--yellow)}.risk-high{width:100%;background:var(--red)}.risk-unknown{width:18%;background:#64748b}.risk-value{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase}
@@ -136,7 +136,7 @@
         <div class="stats-row">
             <div class="stat-card"><div class="stat-label">Total candidati</div><div class="stat-value">{{ total }}</div></div>
             <div class="stat-card"><div class="stat-label">Joburi active</div><div class="stat-value">{{ jobs|length }}</div></div>
-            <div class="stat-card"><div class="stat-label">Flux principal</div><div class="stat-value">Gmail</div></div>
+            <div class="stat-card"><div class="stat-label">Surse CV</div><div class="stat-value">Gmail <span>+ upload</span></div></div>
             <div class="stat-card"><div class="stat-label">Mod analiza</div><div class="stat-value">AI <span>multi-job</span></div></div>
         </div>
 
@@ -147,12 +147,18 @@
                 <button type="submit" class="btn-gmail">Gmail + Analizeaza</button>
             </form>
 
+            <form action="/upload-cv-uri" method="post" enctype="multipart/form-data" class="input-row loading-form" data-title="Se incarca si se analizeaza CV-urile" data-text="Agentul salveaza CV-urile incarcate manual si le potriveste cu posturile introduse.">
+                <input type="text" name="target_job" placeholder="Posturi pentru CV-urile incarcate manual" required>
+                <input type="file" name="cv_files" accept=".pdf,.doc,.docx" multiple required>
+                <button type="submit" class="btn-main">Incarca CV-uri</button>
+            </form>
+
             <form action="/analizeaza-job" method="post" class="input-row loading-form" data-title="Se analizeaza CV-urile existente" data-text="Agentul reanalizeaza CV-urile existente si decide pentru ce post este potrivit fiecare candidat.">
                 <input type="text" name="target_job" placeholder="Analizeaza CV-urile existente pentru mai multe posturi" required>
                 <button type="submit" class="btn-secondary">Analizeaza existente</button>
             </form>
 
-            <div class="helper-text">Separa posturile cu virgula. Exemplu: Casier, Sofer TIR, Contabil.</div>
+            <div class="helper-text">Separa posturile cu virgula. Poti analiza CV-uri din Gmail, CV-uri incarcate manual sau CV-uri deja existente.</div>
 
             <div class="danger-row">
                 <form action="/sterge-baza" method="post"><button type="submit" class="btn-danger">Curata dashboard</button></form>
@@ -188,8 +194,6 @@
                             <div class="label">Post potrivit candidatului</div><div class="text">{{ candidate.position or "Nespecificat" }}</div>
                             <div class="label">Companii / institutii</div><div class="text">{{ candidate.companies or "Nespecificat" }}</div>
                             <div class="label">Rezumat AI</div><div class="text summary">{{ clean_summary(candidate.summary) }}</div>
-                            <div class="label">Skill-uri</div><div class="text">{{ candidate.skills or "Nespecificat" }}</div>
-
                             <div class="card-actions">
                                 <a class="btn-link btn-details" href="/candidat/{{ candidate.id }}">Vezi detalii</a>
                                 <a class="btn-link btn-cv" href="/cv/{{ candidate.id }}" target="_blank">Deschide CV</a>

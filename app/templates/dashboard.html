@@ -184,9 +184,10 @@
                             </div>
 
                             <div class="decision">{{ decision_text(candidate) }}</div>
-                            <div class="label">Post potrivit</div><div class="text">{{ candidate.job_title or job_title }}</div>
-                            <div class="label">Pozitie detectata</div><div class="text">{{ candidate.position or "Nespecificat" }}</div>
-                            <div class="label">Rezumat AI</div><div class="text summary">{{ candidate.summary or "Fara rezumat" }}</div>
+                            <div class="label">Post cautat</div><div class="text">{{ candidate.job_title or job_title }}</div>
+                            <div class="label">Post potrivit candidatului</div><div class="text">{{ candidate.position or "Nespecificat" }}</div>
+                            <div class="label">Companii / institutii</div><div class="text">{{ candidate.companies or "Nespecificat" }}</div>
+                            <div class="label">Rezumat AI</div><div class="text summary">{{ clean_summary(candidate.summary) }}</div>
                             <div class="label">Skill-uri</div><div class="text">{{ candidate.skills or "Nespecificat" }}</div>
 
                             <div class="card-actions">

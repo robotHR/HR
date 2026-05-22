@@ -152,7 +152,7 @@
                     <div class="info">
                         <div class="row"><div class="key">Telefon</div><div class="val">{{ candidate.phone or "Nespecificat" }}</div></div>
                         <div class="row"><div class="key">Email</div><div class="val">{{ candidate.email or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Pozitie detectata</div><div class="val">{{ candidate.position or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Post potrivit candidatului</div><div class="val">{{ candidate.position or "Nespecificat" }}</div></div>
                         <div class="row"><div class="key">Experienta</div><div class="val">{{ candidate.experience or "Nespecificat" }}</div></div>
                         <div class="row"><div class="key">Companii</div><div class="val">{{ candidate.companies or "Nespecificat" }}</div></div>
                         <div class="row"><div class="key">CV fisier</div><div class="val">{{ candidate.cv_file or "Nespecificat" }}</div></div>
@@ -207,7 +207,7 @@
                     </div>
                 </section>
 
-                <section class="panel" style="grid-column:1/-1"><h2>Rezumat AI / Observatii</h2><div class="summary">{{ candidate.summary or "Fara rezumat" }}</div></section>
+                <section class="panel" style="grid-column:1/-1"><h2>Rezumat AI / Observatii</h2><div class="summary">{{ clean_summary(candidate.summary) }}</div></section>
             </div>
         {% endif %}
     </main>

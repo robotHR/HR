@@ -942,12 +942,12 @@ async def analyze_job(target_job: str = Form(...)):
 
 
 @router.post("/upload-cv-uri")
-async def upload_cv_files(
-    target_job: str = Form(...),
-    cv_files: list[UploadFile] = File(...)
-):
-    batch_id = str(int(time.time()))
-    after_id = get_max_candidate_id()
+async def upload_cv_files(cv_files: list[UploadFile] = File(...)):
+    """
+    Incarca manual CV-uri in app/uploads, fara analiza imediata.
+    Analiza se face ulterior din butonul "Analizeaza existente".
+    Asa poti incarca CV-uri azi, de mai multe ori, si cauta joburi maine.
+    """
     uploaded_files = []
     skipped_files = []
 
@@ -977,25 +977,10 @@ async def upload_cv_files(
             status_code=303
         )
 
-    moved_files = temporarily_keep_only_files(set(uploaded_files))
-
-    try:
-        analysis_result = process_cvs_for_job(target_job)
-    finally:
-        restore_temp_files(moved_files)
-
-    mark_new_candidates_batch(
-        after_id=after_id,
-        batch_id=batch_id,
-        visible=1,
-        only_files=set(uploaded_files),
-        hide_final_files=True
-    )
-
     message = (
         f"CV-uri incarcate manual: {len(uploaded_files)}. "
         f"Fisiere ignorate: {len(skipped_files)}. "
-        f"{analysis_result.get('message', '')}"
+        "CV-urile au fost salvate. Le poti analiza ulterior din butonul Analizeaza existente."
     )
 
     return RedirectResponse(url=f"/?message={message}", status_code=303)

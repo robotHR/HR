@@ -874,7 +874,7 @@ async def analyze_job(target_job: str = Form(...)):
     after_id = get_max_candidate_id()
     final_files = get_final_cv_files()
 
-    result = process_cvs_for_job(target_job)
+    # result = process_cvs_for_job(target_job)  # DEPRECATED - using V2 system
 
     mark_new_candidates_batch(
         after_id=after_id,
@@ -908,7 +908,7 @@ async def gmail_and_analyze(target_job: str = Form(...)):
     moved_files = temporarily_keep_only_files(downloaded_files)
 
     try:
-        analysis_result = process_cvs_for_job(target_job)
+        # analysis_result = process_cvs_for_job(target_job)  # DEPRECATED - using V2 system
     finally:
         restore_temp_files(moved_files)
 

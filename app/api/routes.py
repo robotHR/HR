@@ -927,6 +927,9 @@ finally:
         f"{analysis_result.get('message', '')}"
     )
 
+    finally:
+    restore_temp_files(moved_files)
+
     return RedirectResponse(url=f"/?message={message}", status_code=303)
 
 

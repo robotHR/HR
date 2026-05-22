@@ -4,99 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXAS HR</title>
-
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#050914;color:white;font-family:Arial,sans-serif}
-        .layout{display:flex;min-height:100vh}
-        .sidebar{width:280px;background:#0f172a;padding:38px;position:fixed;top:0;left:0;bottom:0}
-        .logo{font-size:48px;font-weight:900;line-height:1.08;margin-bottom:60px}
-        .nav{display:flex;flex-direction:column;gap:26px}
-        .nav a{color:#dbeafe;text-decoration:none;font-size:22px}.nav a.logout-link{color:#fecaca;margin-top:22px}
-        .main{margin-left:280px;padding:48px;width:calc(100% - 280px)}
-        .title{font-size:62px;font-weight:950;margin-bottom:18px}
-        .subtitle{color:#94a3b8;font-size:18px;margin-bottom:35px}
-        .message{background:#0f172a;border:1px solid rgba(139,92,246,.35);color:#ddd6fe;padding:18px 22px;border-radius:18px;margin-bottom:25px;font-size:17px}
-        .actions{background:#0f172a;border:1px solid rgba(255,255,255,.06);border-radius:26px;padding:24px;margin-bottom:32px}
-        .actions h2{margin-bottom:16px;font-size:26px}
-        .forms{display:grid;grid-template-columns:1fr;gap:16px}
-        .form-row{display:flex;gap:14px}
-        .form-row input{flex:1;background:#020817;border:1px solid rgba(255,255,255,.12);color:white;padding:18px;border-radius:16px;font-size:16px}
-        .form-row button,.danger button,.delete-all button{border:0;border-radius:16px;padding:18px 24px;color:white;font-weight:700;cursor:pointer;font-size:16px}
-        .form-row button:disabled,.danger button:disabled,.delete-all button:disabled{opacity:.65;cursor:not-allowed}
-        .btn-main{background:#8b5cf6}
-        .btn-gmail{background:#2563eb}
-        .danger{margin-top:4px}
-        .danger button{background:#7f1d1d}
-        .delete-all{margin-top:10px}
-        .delete-all button{background:#450a0a}
-        .help{color:#94a3b8;font-size:14px;margin-top:-6px}
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:38px}
-        .stat{background:#101827;border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:22px}
-        .stat small{color:#94a3b8}
-        .stat strong{display:block;font-size:34px;margin-top:8px;color:#a78bfa}
-        .job-block{margin-bottom:44px}
-        .job-title{font-size:30px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);text-transform:uppercase}
-        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px}
-        .card{background:#111827;border:1px solid rgba(255,255,255,.06);border-radius:28px;padding:30px;min-height:520px;position:relative;overflow:hidden}
-        .card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.22),transparent 35%);pointer-events:none}
-        .score{position:absolute;top:24px;right:24px;width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;z-index:1}
-        .score-green{background:#22c55e}
-        .score-yellow{background:#f59e0b}
-        .score-red{background:#ef4444}
-        .score-default{background:#8b5cf6}
-        .name{font-size:28px;font-weight:900;padding-right:92px;margin-bottom:18px;position:relative;z-index:1}
-        .tag{display:inline-block;padding:10px 16px;border-radius:999px;margin-bottom:20px;position:relative;z-index:1;font-weight:700}
-        .tag-green{background:#14532d;color:#bbf7d0}
-        .tag-yellow{background:#78350f;color:#fde68a}
-        .tag-red{background:#7f1d1d;color:#fecaca}
-        .tag-default{background:#1f2937;color:#e0e7ff}
-        .label{color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:12px;margin-top:16px;margin-bottom:7px;position:relative;z-index:1}
-        .text{color:#f8fafc;line-height:1.45;font-size:16px;position:relative;z-index:1}
-        .summary{max-height:128px;overflow:hidden}
-        .empty{background:#111827;border-radius:26px;padding:38px;color:#cbd5e1;font-size:20px}
-        .risk-panel{display:grid;gap:12px;margin:18px 0;position:relative;z-index:1}
-        .risk-row{display:grid;grid-template-columns:130px 1fr 72px;align-items:center;gap:12px}
-        .risk-name{color:#cbd5e1;font-size:13px}
-        .risk-track{height:10px;background:#020817;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
-        .risk-fill{height:100%;border-radius:999px}
-        .risk-low{width:32%;background:#22c55e}
-        .risk-medium{width:62%;background:#f59e0b}
-        .risk-high{width:100%;background:#ef4444}
-        .risk-unknown{width:18%;background:#64748b}
-        .risk-value{font-size:12px;color:#e5e7eb;text-transform:uppercase}
-        .card-actions{display:flex;gap:12px;margin-top:22px;position:relative;z-index:1;flex-wrap:wrap}
-        .btn-link{display:inline-flex;align-items:center;justify-content:center;padding:13px 16px;border-radius:14px;text-decoration:none;font-weight:800;font-size:14px}
-        .btn-details{background:#8b5cf6;color:white}
-        .btn-cv{background:#1f2937;color:#dbeafe;border:1px solid rgba(255,255,255,.10)}
-        .decision{background:rgba(15,23,42,.8);border:1px solid rgba(255,255,255,.08);padding:14px;border-radius:16px;margin-top:16px;position:relative;z-index:1;color:#dbeafe;font-size:14px;line-height:1.45}
-
-        .loading-overlay{position:fixed;inset:0;background:rgba(2,6,23,.88);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}
-        .loading-box{width:min(580px,100%);background:#0f172a;border:1px solid rgba(139,92,246,.35);box-shadow:0 30px 100px rgba(0,0,0,.45);border-radius:30px;padding:36px;text-align:center}
-        .loader{width:82px;height:82px;border-radius:50%;border:8px solid rgba(255,255,255,.12);border-top-color:#8b5cf6;margin:0 auto 24px;animation:spin 1s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .loading-box h2{font-size:34px;margin-bottom:12px}
-        .loading-box p{color:#cbd5e1;line-height:1.6;font-size:17px;margin-bottom:18px}
-        .timer{font-size:42px;font-weight:900;color:#a78bfa;margin-bottom:18px}
-        .progress{height:12px;width:100%;background:#020817;border-radius:999px;overflow:hidden;margin-top:18px;border:1px solid rgba(255,255,255,.08)}
-        .progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#7c3aed,#a78bfa);animation:progressMove 12s ease-in-out infinite}
-        @keyframes progressMove{0%{width:8%}50%{width:78%}100%{width:94%}}
-        .loading-note{margin-top:16px;color:#94a3b8;font-size:14px}
-        .loading-steps{display:grid;gap:10px;margin-top:22px;text-align:left}
-        .loading-step{background:#020817;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;color:#dbeafe;font-size:14px}
-
-        @media(max-width:900px){
-            .layout{display:block}
-            .sidebar{position:relative;width:100%;height:auto}
-            .main{margin-left:0;width:100%;padding:28px}
-            .title{font-size:42px}
-            .form-row{flex-direction:column}
+        :root{
+            --bg:#070b16;
+            --panel:#0a0f1e;
+            --panel-2:#080d1a;
+            --card:rgba(255,255,255,.035);
+            --line:rgba(255,255,255,.075);
+            --line-2:rgba(255,255,255,.11);
+            --text:#f8fafc;
+            --muted:rgba(255,255,255,.42);
+            --soft:rgba(255,255,255,.62);
+            --purple:#6366f1;
+            --purple-2:#8b5cf6;
+            --green:#34d399;
+            --yellow:#fbbf24;
+            --red:#f87171;
+            --radius-lg:22px;
+            --radius-md:14px;
         }
-    </style>
+        body{background:radial-gradient(circle at top right,rgba(99,102,241,.18),transparent 34%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100vh}
+        .dashboard-wrap,.layout{display:flex;min-height:100vh;background:linear-gradient(180deg,#0a0f1e,#070b16)}
+        .sidebar{width:210px;background:rgba(8,13,26,.94);border-right:.5px solid rgba(255,255,255,.07);padding:24px 0;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:10}
+        .sidebar-logo,.logo-box{padding:0 20px 24px;border-bottom:.5px solid rgba(255,255,255,.07);margin-bottom:16px}
+        .logo,.logo-text{font-size:22px;font-weight:800;letter-spacing:-.5px;color:#fff;line-height:1.05}
+        .logo .accent,.logo-text .accent{color:#a78bfa}
+        .logo-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+        .nav{display:flex;flex-direction:column;gap:2px;padding:0 0 12px}
+        .nav a,.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,.48);text-decoration:none;border-left:2px solid transparent;transition:.2s ease}
+        .nav a.active,.nav a:hover,.nav-item.active{color:#fff;background:rgba(99,102,241,.12);border-left-color:var(--purple)}
+        .nav a.logout-link{margin-top:auto;color:#fca5a5}
+        .main{margin-left:210px;width:calc(100% - 210px);padding:28px;overflow:auto}
+        .page-title,.title{font-size:24px;font-weight:700;color:#fff;margin-bottom:5px;letter-spacing:-.4px}
+        .page-sub,.subtitle{font-size:13px;color:var(--muted);margin-bottom:24px}
+        .message,.notice{background:rgba(99,102,241,.13);border:.5px solid rgba(99,102,241,.35);color:#ddd6fe;padding:13px 16px;border-radius:var(--radius-md);margin-bottom:18px;font-size:13px}
+        .notice.err,.err{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fecaca}
+        .stats-row,.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+        .stat-card,.stat{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-md);padding:16px;min-height:88px}
+        .stat-label,.stat small{display:block;font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
+        .stat-value,.stat strong{font-size:26px;font-weight:650;color:#fff}
+        .stat-value span{font-size:12px;color:var(--green);margin-left:6px;font-weight:500}
+        .search-card,.actions,.panel,.filters,.table-card,.hero{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+        .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(99,102,241,.11),rgba(255,255,255,.025))}
+        .hero:before,.card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.22),transparent 38%);pointer-events:none}
+        .search-card-title,.section-title,.actions h2,.panel h2,.filters h2{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
+        .input-row,.form-row{display:flex;gap:10px;margin-bottom:12px}
+        input,select,textarea,.fake-input{width:100%;background:rgba(255,255,255,.055);border:.5px solid var(--line-2);border-radius:var(--radius-md);padding:11px 14px;font-size:13px;color:rgba(255,255,255,.85);outline:none}
+        textarea{min-height:120px;resize:vertical;line-height:1.5}
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.26)}
+        button,.btn,.btn-link{border:0;border-radius:var(--radius-md);padding:11px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+        button:disabled{opacity:.6;cursor:not-allowed}
+        .btn-primary,.btn-main,.btn-details{background:var(--purple);color:#fff}
+        .btn-secondary,.btn-cv,.btn-clear,.btn-dark{background:rgba(139,92,246,.15);color:#c4b5fd;border:.5px solid rgba(139,92,246,.28)}
+        .btn-gmail,.btn-blue{background:#2563eb;color:#fff}
+        .btn-green,.btn-export{background:#16a34a;color:#fff}
+        .btn-danger,.danger button,.delete-all button,.btn-red{background:rgba(239,68,68,.10);color:#f87171;border:.5px solid rgba(239,68,68,.22)}
+        .btn-edit{background:rgba(251,191,36,.13);color:#fbbf24;border:.5px solid rgba(251,191,36,.25)}
+        .helper-text,.help,.edit-note,.small{font-size:12px;color:rgba(255,255,255,.36);line-height:1.5}
+        .danger-row,.card-actions,.actions-inline,.filter-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+        .job-block{margin-bottom:28px}
+        .job-title{font-size:13px;font-weight:800;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
+        .card,.candidate-card{background:rgba(255,255,255,.032);border:.5px solid rgba(255,255,255,.07);border-radius:var(--radius-md);padding:16px;position:relative;overflow:hidden}
+        .candidate-card{display:flex;align-items:center;gap:13px;margin-bottom:8px}
+        .avatar{width:38px;height:38px;border-radius:50%;background:rgba(99,102,241,.2);border:.5px solid rgba(99,102,241,.38);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#c4b5fd;flex-shrink:0}
+        .name,.cand-name{font-size:15px;font-weight:800;color:rgba(255,255,255,.9);position:relative;z-index:1}
+        .card .name{padding-right:82px;margin-bottom:10px;font-size:17px}
+        .cand-meta{font-size:11px;color:rgba(255,255,255,.33);margin-top:2px}
+        .score{position:absolute;top:16px;right:16px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;z-index:1;color:#07111f}
+        .score-badge{margin-left:auto;display:flex;align-items:center;gap:8px}.score-num{font-size:20px;font-weight:800}.score-num.top{color:var(--green)}.score-num.mid{color:var(--yellow)}.score-num.low{color:var(--red)}
+        .score-green,.top{background:var(--green)}.score-yellow,.mid{background:var(--yellow)}.score-red,.low{background:var(--red)}.score-default{background:#a78bfa;color:#fff}
+        .tag{display:inline-block;font-size:10px;padding:4px 9px;border-radius:999px;font-weight:800;position:relative;z-index:1;text-transform:uppercase}
+        .tag-green,.tag.top{background:rgba(52,211,153,.1);color:var(--green);border:.5px solid rgba(52,211,153,.22)}
+        .tag-yellow,.tag.mid{background:rgba(251,191,36,.1);color:var(--yellow);border:.5px solid rgba(251,191,36,.22)}
+        .tag-red,.tag.low{background:rgba(248,113,113,.1);color:var(--red);border:.5px solid rgba(248,113,113,.22)}
+        .tag-default{background:rgba(99,102,241,.12);color:#c4b5fd;border:.5px solid rgba(99,102,241,.28)}
+        .label,.key{color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;margin-top:12px;margin-bottom:5px;position:relative;z-index:1;font-weight:800}
+        .text,.val,.summary{color:rgba(255,255,255,.74);line-height:1.48;font-size:13px;position:relative;z-index:1}.summary{max-height:86px;overflow:hidden}
+        .empty{background:rgba(255,255,255,.035);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:28px;color:rgba(255,255,255,.55);font-size:15px}
+        .score-bar-wrap{width:66px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}.score-bar-fill{height:100%;border-radius:2px}
+        .risk-panel{display:grid;gap:9px;margin:13px 0;position:relative;z-index:1}.risk-row{display:grid;grid-template-columns:108px 1fr 56px;gap:9px;align-items:center}.risk-name{font-size:11px;color:rgba(255,255,255,.5)}.risk-track{height:7px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.risk-fill{height:100%;border-radius:999px}.risk-low{width:32%;background:var(--green)}.risk-medium{width:62%;background:var(--yellow)}.risk-high{width:100%;background:var(--red)}.risk-unknown{width:18%;background:#64748b}.risk-value{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase}
+        .decision{background:rgba(15,23,42,.72);border:.5px solid rgba(255,255,255,.08);padding:11px;border-radius:12px;margin-top:11px;position:relative;z-index:1;color:#dbeafe;font-size:12px;line-height:1.45}
+        table{width:100%;border-collapse:collapse}th{text-align:left;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;padding:14px;border-bottom:.5px solid rgba(255,255,255,.08);background:rgba(2,6,23,.38)}td{padding:14px;border-bottom:.5px solid rgba(255,255,255,.055);vertical-align:top}tr:hover{background:rgba(99,102,241,.055)}.table-card{padding:0;overflow:hidden}.table-card .btn{padding:9px 12px}.job{font-weight:800;color:#dbeafe;font-size:13px}.score-cell{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#07111f}
+        .bar-row{display:grid;grid-template-columns:140px 1fr 52px;gap:12px;align-items:center;margin-bottom:14px}.bar-label{color:#dbeafe;font-weight:700;font-size:13px}.bar-track{height:10px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6366f1,#a78bfa)}.bar-fill.green{background:var(--green)}.bar-fill.yellow{background:var(--yellow)}.bar-fill.red{background:var(--red)}.bar-value{text-align:right;color:#cbd5e1;font-weight:800;font-size:12px}
+        .info{display:grid;gap:12px}.row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding-bottom:12px;border-bottom:.5px solid rgba(255,255,255,.06)}.workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.step{background:rgba(2,6,23,.55);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}.step small{display:block;color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.step strong{font-size:13px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}label{color:#a78bfa;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:800}.hidden{display:none}.timeline{display:grid;gap:10px}.event{display:grid;grid-template-columns:16px 1fr;gap:12px;background:rgba(2,6,23,.52);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:13px}.dot{width:11px;height:11px;border-radius:50%;margin-top:4px;background:#64748b}.dot-green{background:var(--green)}.dot-yellow{background:var(--yellow)}.dot-red{background:var(--red)}.date{color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.event h3{font-size:13px;margin-bottom:5px}.event p{font-size:12px;color:rgba(255,255,255,.65);line-height:1.45}.danger-box{border-color:rgba(239,68,68,.3);background:rgba(127,29,29,.1)}
+        .loading-overlay{position:fixed;inset:0;background:rgba(2,6,23,.9);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}.loading-box{width:min(560px,100%);background:#0a0f1e;border:.5px solid rgba(99,102,241,.35);box-shadow:0 30px 100px rgba(0,0,0,.5);border-radius:28px;padding:34px;text-align:center}.loader{width:72px;height:72px;border-radius:50%;border:7px solid rgba(255,255,255,.12);border-top-color:var(--purple);margin:0 auto 22px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.loading-box h2{font-size:27px;margin-bottom:10px}.loading-box p{color:#cbd5e1;line-height:1.6;font-size:15px;margin-bottom:16px}.timer{font-size:36px;font-weight:900;color:#a78bfa;margin-bottom:14px}.progress{height:10px;width:100%;background:#020817;border-radius:999px;overflow:hidden;margin-top:16px;border:.5px solid rgba(255,255,255,.08)}.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a78bfa);animation:progressMove 12s ease-in-out infinite}@keyframes progressMove{0%{width:8%}50%{width:78%}100%{width:94%}}.loading-steps{display:grid;gap:9px;margin-top:19px;text-align:left}.loading-step{background:#020817;border:.5px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#dbeafe;font-size:13px}.loading-note{margin-top:14px;color:rgba(255,255,255,.38);font-size:12px}
+        @media(max-width:1100px){.stats-row,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.table-card{overflow-x:auto}table{min-width:880px}.workflow{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:820px){.dashboard-wrap,.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:22px}.page-title,.title{font-size:28px}.input-row,.form-row,.filter-grid{grid-template-columns:1fr;flex-direction:column}.stats-row,.stats{grid-template-columns:1fr}.row,.form-grid{grid-template-columns:1fr}.score{position:relative;top:auto;right:auto;margin:12px 0}.card .name{padding-right:0}.risk-row{grid-template-columns:1fr}.workflow{grid-template-columns:1fr}}
+</style>
 </head>
-
 <body>
-
 <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-box">
         <div class="loader"></div>
@@ -105,64 +103,62 @@
         <div class="timer" id="timerText">00:00</div>
         <div class="progress"><div class="progress-bar"></div></div>
         <div class="loading-steps">
-            <div class="loading-step" id="step1">1. Verifica fisierele CV</div>
-            <div class="loading-step" id="step2">2. Extrage textul din documente</div>
-            <div class="loading-step" id="step3">3. Ruleaza analiza AI</div>
-            <div class="loading-step" id="step4">4. Salveaza rezultatele in dashboard</div>
+            <div class="loading-step">1. Verifica fisierele CV</div>
+            <div class="loading-step">2. Extrage textul din documente</div>
+            <div class="loading-step">3. Ruleaza analiza AI</div>
+            <div class="loading-step">4. Salveaza rezultatele in dashboard</div>
         </div>
         <div class="loading-note">Nu inchide pagina. Analiza poate dura 1-3 minute.</div>
     </div>
 </div>
-
 <div class="layout">
+
     <aside class="sidebar">
-        <div class="logo">NEXAS<br>HR</div>
+        <div class="sidebar-logo">
+            <div class="logo-text">NEX<span class="accent">A</span>S</div>
+            <div class="logo-sub">HR Platform</div>
+        </div>
         <nav class="nav">
-            <a href="/">Dashboard</a>
-            <a href="/candidati">Candidati</a>
-            <a href="/analytics">Analytics</a>
+            <a class="active" href="/">Dashboard</a>
+            <a class="" href="/candidati">Candidati</a>
+            <a class="" href="/analytics">Analytics</a>
             <a class="logout-link" href="/logout">Logout</a>
         </nav>
     </aside>
 
+
     <main class="main">
-        <h1 class="title">Dashboard Recrutare AI</h1>
-        <div class="subtitle">Candidati activi in dashboard: {{ total }}</div>
+        <h1 class="page-title">Dashboard Recrutare AI</h1>
+        <div class="page-sub">Candidati activi in dashboard: {{ total }} · Analiza CV pe mai multe joburi</div>
 
-        {% if message %}
-            <div class="message">{{ message }}</div>
-        {% endif %}
+        {% if message %}<div class="message">{{ message }}</div>{% endif %}
 
-        <section class="actions">
-            <h2>Cauta job nou</h2>
-
-            <div class="forms">
-                <form action="/gmail-si-analiza" method="post" class="form-row loading-form" data-title="Se verifica Gmail si se analizeaza CV-urile noi" data-text="Agentul cauta CV-uri noi in Gmail, le descarca si analizeaza doar fisierele noi.">
-                    <input type="text" name="target_job" placeholder="Ex: Lucrator depozit, manipulare marfa, picking" required>
-                    <button type="submit" class="btn-gmail">Verifica Gmail + Analizeaza CV-uri noi</button>
-                </form>
-
-                <div class="help">Flux complet: Gmail -> doar CV-uri noi -> analiza AI -> dashboard.</div>
-
-                <form action="/analizeaza-job" method="post" class="form-row loading-form" data-title="Se analizeaza CV-urile existente" data-text="Agentul analizeaza CV-urile existente, fara candidatii marcati Angajat sau Potrivit altor roluri.">
-                    <input type="text" name="target_job" placeholder="Analizeaza CV-urile existente, fara cei angajati sau refuzati" required>
-                    <button type="submit" class="btn-main">Analizeaza CV-urile existente</button>
-                </form>
-            </div>
-
-            <form action="/sterge-baza" method="post" class="danger">
-                <button type="submit">Curata dashboard</button>
-            </form>
-
-            <form action="/sterge-definitiv" method="post" class="delete-all" onsubmit="return confirm('Sigur vrei sa stergi definitiv toti candidatii si istoricul?')">
-                <button type="submit">Sterge definitiv baza de date</button>
-            </form>
-        </section>
-
-        <div class="stats">
-            <div class="stat"><small>Total in dashboard</small><strong>{{ total }}</strong></div>
-            <div class="stat"><small>Categorii job active</small><strong>{{ jobs|length }}</strong></div>
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-label">Total candidati</div><div class="stat-value">{{ total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Joburi active</div><div class="stat-value">{{ jobs|length }}</div></div>
+            <div class="stat-card"><div class="stat-label">Flux principal</div><div class="stat-value">Gmail</div></div>
+            <div class="stat-card"><div class="stat-label">Mod analiza</div><div class="stat-value">AI <span>multi-job</span></div></div>
         </div>
+
+        <section class="search-card">
+            <div class="search-card-title">Cauta posturi noi</div>
+            <form action="/gmail-si-analiza" method="post" class="input-row loading-form" data-title="Se verifica Gmail si se analizeaza CV-urile noi" data-text="Agentul cauta CV-uri noi in Gmail, le descarca si le potriveste cu posturile introduse.">
+                <input type="text" name="target_job" placeholder="Casier, Sofer TIR, Lucrator Depozit, Vanzator, Contabil" required>
+                <button type="submit" class="btn-gmail">Gmail + Analizeaza</button>
+            </form>
+
+            <form action="/analizeaza-job" method="post" class="input-row loading-form" data-title="Se analizeaza CV-urile existente" data-text="Agentul reanalizeaza CV-urile existente si decide pentru ce post este potrivit fiecare candidat.">
+                <input type="text" name="target_job" placeholder="Analizeaza CV-urile existente pentru mai multe posturi" required>
+                <button type="submit" class="btn-secondary">Analizeaza existente</button>
+            </form>
+
+            <div class="helper-text">Separa posturile cu virgula. Exemplu: Casier, Sofer TIR, Contabil.</div>
+
+            <div class="danger-row">
+                <form action="/sterge-baza" method="post"><button type="submit" class="btn-danger">Curata dashboard</button></form>
+                <form action="/sterge-definitiv" method="post" onsubmit="return confirm('Sigur vrei sa stergi definitiv toti candidatii si istoricul?')"><button type="submit" class="btn-danger">Sterge baza de date</button></form>
+            </div>
+        </section>
 
         {% if total == 0 %}
             <div class="empty">Dashboardul este gol. Candidatii vechi raman in pagina Candidati.</div>
@@ -170,48 +166,28 @@
 
         {% for job_title, job_candidates in jobs.items() %}
             <section class="job-block">
-                <h2 class="job-title">{{ job_title }}</h2>
-
+                <h2 class="job-title">Top candidati · {{ job_title }}</h2>
                 <div class="grid">
                     {% for candidate in job_candidates %}
                         {% set over_risk = extract_risk(candidate.summary, "Risc supracalificare") %}
                         {% set level_risk = extract_risk(candidate.summary, "Nepotrivire nivel") %}
 
                         <article class="card">
-                            <div class="score {% if candidate.status == 'ADMIS' or candidate.status == 'ANGAJAT' %}score-green{% elif candidate.status == 'DE ANALIZAT' or candidate.status == 'SELECTAT' or candidate.status == 'INTERVIU' %}score-yellow{% elif candidate.status == 'RESPINS' or candidate.status == 'REFUZAT' %}score-red{% else %}score-default{% endif %}">
-                                {{ candidate.score }}
-                            </div>
+                            <div class="score {% if candidate.status == 'ADMIS' or candidate.status == 'ANGAJAT' %}score-green{% elif candidate.status == 'DE ANALIZAT' or candidate.status == 'SELECTAT' or candidate.status == 'INTERVIU' %}score-yellow{% elif candidate.status == 'RESPINS' or candidate.status == 'REFUZAT' %}score-red{% else %}score-default{% endif %}">{{ candidate.score or 0 }}</div>
 
                             <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
-
-                            <div class="tag tag-{{ status_class(candidate.status) }}">
-                                {{ status_display(candidate.status) }}
-                            </div>
+                            <div class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</div>
 
                             <div class="risk-panel">
-                                <div class="risk-row">
-                                    <div class="risk-name">Supracalificare</div>
-                                    <div class="risk-track"><div class="risk-fill risk-{{ over_risk }}"></div></div>
-                                    <div class="risk-value">{{ risk_label(over_risk) }}</div>
-                                </div>
-
-                                <div class="risk-row">
-                                    <div class="risk-name">Nepotrivire nivel</div>
-                                    <div class="risk-track"><div class="risk-fill risk-{{ level_risk }}"></div></div>
-                                    <div class="risk-value">{{ risk_label(level_risk) }}</div>
-                                </div>
+                                <div class="risk-row"><div class="risk-name">Supracalificare</div><div class="risk-track"><div class="risk-fill risk-{{ over_risk }}"></div></div><div class="risk-value">{{ risk_label(over_risk) }}</div></div>
+                                <div class="risk-row"><div class="risk-name">Nepotrivire nivel</div><div class="risk-track"><div class="risk-fill risk-{{ level_risk }}"></div></div><div class="risk-value">{{ risk_label(level_risk) }}</div></div>
                             </div>
 
                             <div class="decision">{{ decision_text(candidate) }}</div>
-
-                            <div class="label">Pozitie detectata</div>
-                            <div class="text">{{ candidate.position or "Nespecificat" }}</div>
-
-                            <div class="label">Rezumat AI</div>
-                            <div class="text summary">{{ candidate.summary or "Fara rezumat" }}</div>
-
-                            <div class="label">Skill-uri</div>
-                            <div class="text">{{ candidate.skills or "Nespecificat" }}</div>
+                            <div class="label">Post potrivit</div><div class="text">{{ candidate.job_title or job_title }}</div>
+                            <div class="label">Pozitie detectata</div><div class="text">{{ candidate.position or "Nespecificat" }}</div>
+                            <div class="label">Rezumat AI</div><div class="text summary">{{ candidate.summary or "Fara rezumat" }}</div>
+                            <div class="label">Skill-uri</div><div class="text">{{ candidate.skills or "Nespecificat" }}</div>
 
                             <div class="card-actions">
                                 <a class="btn-link btn-details" href="/candidat/{{ candidate.id }}">Vezi detalii</a>
@@ -223,52 +199,32 @@
             </section>
         {% endfor %}
     </main>
-</div>
 
+</div>
 <script>
     const loadingForms = document.querySelectorAll(".loading-form");
     const loadingOverlay = document.getElementById("loadingOverlay");
     const loadingTitle = document.getElementById("loadingTitle");
     const loadingText = document.getElementById("loadingText");
     const timerText = document.getElementById("timerText");
-
     let timerInterval = null;
     let seconds = 0;
-
     function formatTime(totalSeconds){
         const minutes = Math.floor(totalSeconds / 60);
         const secs = totalSeconds % 60;
         return String(minutes).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
     }
-
     function startLoading(form){
         loadingTitle.innerText = form.dataset.title || "Se analizeaza CV-urile";
         loadingText.innerText = form.dataset.text || "Agentul proceseaza datele.";
         loadingOverlay.style.display = "flex";
-
-        document.querySelectorAll("button").forEach(function(button){
-            button.disabled = true;
-        });
-
+        document.querySelectorAll("button").forEach(function(button){ button.disabled = true; });
         seconds = 0;
         timerText.innerText = "00:00";
-
-        if(timerInterval){
-            clearInterval(timerInterval);
-        }
-
-        timerInterval = setInterval(function(){
-            seconds += 1;
-            timerText.innerText = formatTime(seconds);
-        }, 1000);
+        if(timerInterval){ clearInterval(timerInterval); }
+        timerInterval = setInterval(function(){ seconds += 1; timerText.innerText = formatTime(seconds); }, 1000);
     }
-
-    loadingForms.forEach(function(form){
-        form.addEventListener("submit", function(){
-            startLoading(form);
-        });
-    });
+    loadingForms.forEach(function(form){ form.addEventListener("submit", function(){ startLoading(form); }); });
 </script>
-
 </body>
 </html>

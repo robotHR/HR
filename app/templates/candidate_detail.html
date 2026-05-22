@@ -6,233 +6,219 @@
     <title>Detalii candidat | NEXAS HR</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#050914;color:white;font-family:Arial,sans-serif;padding:42px}
-        .wrap{max-width:1180px;margin:0 auto}
-        .back{color:#c4b5fd;text-decoration:none;font-weight:800}
-        .top{margin-bottom:28px}
-        .notice{padding:16px 18px;border-radius:16px;margin-bottom:18px;font-weight:700}
-        .ok{background:#14532d;color:#bbf7d0}
-        .err{background:#7f1d1d;color:#fecaca}
-        .hero,.panel{background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:28px;padding:30px}
-        .hero{background:#0f172a;position:relative;overflow:hidden}
-        .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.28),transparent 38%);pointer-events:none}
-        h1{font-size:48px;margin-bottom:12px;position:relative}
-        .sub{color:#94a3b8;font-size:18px;position:relative}
-        .score{position:absolute;right:34px;top:34px;width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:950}
-        .score-green{background:#22c55e}
-        .score-yellow{background:#f59e0b}
-        .score-red{background:#ef4444}
-        .score-default{background:#8b5cf6}
-        .tag{display:inline-block;margin-top:18px;padding:12px 18px;border-radius:999px;font-weight:900;position:relative}
-        .tag-green{background:#14532d;color:#bbf7d0}
-        .tag-yellow{background:#78350f;color:#fde68a}
-        .tag-red{background:#7f1d1d;color:#fecaca}
-        .tag-default{background:#1f2937;color:#e0e7ff}
-        .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:24px}
-        .panel h2{font-size:24px;margin-bottom:18px}
-        .info{display:grid;gap:14px}
-        .row{display:grid;grid-template-columns:160px 1fr;gap:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06)}
-        .key{color:#a78bfa;text-transform:uppercase;font-size:12px;letter-spacing:.08em}
-        .val{color:#f8fafc;line-height:1.5}
-        .actions{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;position:relative}
-        .btn{display:inline-flex;text-decoration:none;padding:15px 18px;border-radius:16px;font-weight:900;border:0;cursor:pointer;font-size:15px}
-        .btn-primary{background:#8b5cf6;color:white}
-        .btn-secondary{background:#1f2937;color:#dbeafe;border:1px solid rgba(255,255,255,.10)}
-        .btn-blue{background:#2563eb;color:white}
-        .btn-green{background:#16a34a;color:white}
-        .btn-red{background:#dc2626;color:white}
-        .btn-dark{background:#334155;color:white}
-        .btn-edit{background:#f59e0b;color:#111827}
-        .summary{font-size:17px;line-height:1.7;color:#e5e7eb}
-        .not-found{background:#111827;border-radius:24px;padding:30px;color:#fecaca}
-        .workflow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px}
-        .step{background:#020817;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px}
-        .step small{display:block;color:#94a3b8;margin-bottom:6px}
-        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-        .field{display:grid;gap:8px}
-        .field.full{grid-column:1/-1}
-        label{color:#a78bfa;text-transform:uppercase;font-size:12px;letter-spacing:.08em;font-weight:800}
-        input,select,textarea{width:100%;background:#020817;border:1px solid rgba(255,255,255,.12);color:white;padding:14px 15px;border-radius:14px;font-size:15px}
-        textarea{min-height:130px;resize:vertical;line-height:1.5}
-        .edit-note{color:#94a3b8;margin-bottom:16px;line-height:1.5}
-        .timeline{display:grid;gap:14px}
-        .event{display:grid;grid-template-columns:18px 1fr;gap:14px;background:#020817;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
-        .dot{width:14px;height:14px;border-radius:50%;margin-top:4px;background:#64748b}
-        .dot-green{background:#22c55e}
-        .dot-yellow{background:#f59e0b}
-        .dot-red{background:#ef4444}
-        .dot-default{background:#64748b}
-        .event h3{font-size:16px;margin-bottom:6px}
-        .event p{color:#cbd5e1;line-height:1.5}
-        .date{color:#94a3b8;font-size:12px;margin-bottom:6px}
-        .danger-box{border:1px solid rgba(239,68,68,.35);background:rgba(127,29,29,.18)}
-        .hidden{display:none}
-        @media(max-width:900px){body{padding:22px}.grid{grid-template-columns:1fr}.score{position:relative;right:auto;top:auto;margin-top:18px}.row{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
-    </style>
+        :root{
+            --bg:#070b16;
+            --panel:#0a0f1e;
+            --panel-2:#080d1a;
+            --card:rgba(255,255,255,.035);
+            --line:rgba(255,255,255,.075);
+            --line-2:rgba(255,255,255,.11);
+            --text:#f8fafc;
+            --muted:rgba(255,255,255,.42);
+            --soft:rgba(255,255,255,.62);
+            --purple:#6366f1;
+            --purple-2:#8b5cf6;
+            --green:#34d399;
+            --yellow:#fbbf24;
+            --red:#f87171;
+            --radius-lg:22px;
+            --radius-md:14px;
+        }
+        body{background:radial-gradient(circle at top right,rgba(99,102,241,.18),transparent 34%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100vh}
+        .dashboard-wrap,.layout{display:flex;min-height:100vh;background:linear-gradient(180deg,#0a0f1e,#070b16)}
+        .sidebar{width:210px;background:rgba(8,13,26,.94);border-right:.5px solid rgba(255,255,255,.07);padding:24px 0;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:10}
+        .sidebar-logo,.logo-box{padding:0 20px 24px;border-bottom:.5px solid rgba(255,255,255,.07);margin-bottom:16px}
+        .logo,.logo-text{font-size:22px;font-weight:800;letter-spacing:-.5px;color:#fff;line-height:1.05}
+        .logo .accent,.logo-text .accent{color:#a78bfa}
+        .logo-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+        .nav{display:flex;flex-direction:column;gap:2px;padding:0 0 12px}
+        .nav a,.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,.48);text-decoration:none;border-left:2px solid transparent;transition:.2s ease}
+        .nav a.active,.nav a:hover,.nav-item.active{color:#fff;background:rgba(99,102,241,.12);border-left-color:var(--purple)}
+        .nav a.logout-link{margin-top:auto;color:#fca5a5}
+        .main{margin-left:210px;width:calc(100% - 210px);padding:28px;overflow:auto}
+        .page-title,.title{font-size:24px;font-weight:700;color:#fff;margin-bottom:5px;letter-spacing:-.4px}
+        .page-sub,.subtitle{font-size:13px;color:var(--muted);margin-bottom:24px}
+        .message,.notice{background:rgba(99,102,241,.13);border:.5px solid rgba(99,102,241,.35);color:#ddd6fe;padding:13px 16px;border-radius:var(--radius-md);margin-bottom:18px;font-size:13px}
+        .notice.err,.err{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fecaca}
+        .stats-row,.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+        .stat-card,.stat{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-md);padding:16px;min-height:88px}
+        .stat-label,.stat small{display:block;font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
+        .stat-value,.stat strong{font-size:26px;font-weight:650;color:#fff}
+        .stat-value span{font-size:12px;color:var(--green);margin-left:6px;font-weight:500}
+        .search-card,.actions,.panel,.filters,.table-card,.hero{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+        .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(99,102,241,.11),rgba(255,255,255,.025))}
+        .hero:before,.card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.22),transparent 38%);pointer-events:none}
+        .search-card-title,.section-title,.actions h2,.panel h2,.filters h2{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
+        .input-row,.form-row{display:flex;gap:10px;margin-bottom:12px}
+        input,select,textarea,.fake-input{width:100%;background:rgba(255,255,255,.055);border:.5px solid var(--line-2);border-radius:var(--radius-md);padding:11px 14px;font-size:13px;color:rgba(255,255,255,.85);outline:none}
+        textarea{min-height:120px;resize:vertical;line-height:1.5}
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.26)}
+        button,.btn,.btn-link{border:0;border-radius:var(--radius-md);padding:11px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+        button:disabled{opacity:.6;cursor:not-allowed}
+        .btn-primary,.btn-main,.btn-details{background:var(--purple);color:#fff}
+        .btn-secondary,.btn-cv,.btn-clear,.btn-dark{background:rgba(139,92,246,.15);color:#c4b5fd;border:.5px solid rgba(139,92,246,.28)}
+        .btn-gmail,.btn-blue{background:#2563eb;color:#fff}
+        .btn-green,.btn-export{background:#16a34a;color:#fff}
+        .btn-danger,.danger button,.delete-all button,.btn-red{background:rgba(239,68,68,.10);color:#f87171;border:.5px solid rgba(239,68,68,.22)}
+        .btn-edit{background:rgba(251,191,36,.13);color:#fbbf24;border:.5px solid rgba(251,191,36,.25)}
+        .helper-text,.help,.edit-note,.small{font-size:12px;color:rgba(255,255,255,.36);line-height:1.5}
+        .danger-row,.card-actions,.actions-inline,.filter-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+        .job-block{margin-bottom:28px}
+        .job-title{font-size:13px;font-weight:800;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
+        .card,.candidate-card{background:rgba(255,255,255,.032);border:.5px solid rgba(255,255,255,.07);border-radius:var(--radius-md);padding:16px;position:relative;overflow:hidden}
+        .candidate-card{display:flex;align-items:center;gap:13px;margin-bottom:8px}
+        .avatar{width:38px;height:38px;border-radius:50%;background:rgba(99,102,241,.2);border:.5px solid rgba(99,102,241,.38);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#c4b5fd;flex-shrink:0}
+        .name,.cand-name{font-size:15px;font-weight:800;color:rgba(255,255,255,.9);position:relative;z-index:1}
+        .card .name{padding-right:82px;margin-bottom:10px;font-size:17px}
+        .cand-meta{font-size:11px;color:rgba(255,255,255,.33);margin-top:2px}
+        .score{position:absolute;top:16px;right:16px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;z-index:1;color:#07111f}
+        .score-badge{margin-left:auto;display:flex;align-items:center;gap:8px}.score-num{font-size:20px;font-weight:800}.score-num.top{color:var(--green)}.score-num.mid{color:var(--yellow)}.score-num.low{color:var(--red)}
+        .score-green,.top{background:var(--green)}.score-yellow,.mid{background:var(--yellow)}.score-red,.low{background:var(--red)}.score-default{background:#a78bfa;color:#fff}
+        .tag{display:inline-block;font-size:10px;padding:4px 9px;border-radius:999px;font-weight:800;position:relative;z-index:1;text-transform:uppercase}
+        .tag-green,.tag.top{background:rgba(52,211,153,.1);color:var(--green);border:.5px solid rgba(52,211,153,.22)}
+        .tag-yellow,.tag.mid{background:rgba(251,191,36,.1);color:var(--yellow);border:.5px solid rgba(251,191,36,.22)}
+        .tag-red,.tag.low{background:rgba(248,113,113,.1);color:var(--red);border:.5px solid rgba(248,113,113,.22)}
+        .tag-default{background:rgba(99,102,241,.12);color:#c4b5fd;border:.5px solid rgba(99,102,241,.28)}
+        .label,.key{color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;margin-top:12px;margin-bottom:5px;position:relative;z-index:1;font-weight:800}
+        .text,.val,.summary{color:rgba(255,255,255,.74);line-height:1.48;font-size:13px;position:relative;z-index:1}.summary{max-height:86px;overflow:hidden}
+        .empty{background:rgba(255,255,255,.035);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:28px;color:rgba(255,255,255,.55);font-size:15px}
+        .score-bar-wrap{width:66px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}.score-bar-fill{height:100%;border-radius:2px}
+        .risk-panel{display:grid;gap:9px;margin:13px 0;position:relative;z-index:1}.risk-row{display:grid;grid-template-columns:108px 1fr 56px;gap:9px;align-items:center}.risk-name{font-size:11px;color:rgba(255,255,255,.5)}.risk-track{height:7px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.risk-fill{height:100%;border-radius:999px}.risk-low{width:32%;background:var(--green)}.risk-medium{width:62%;background:var(--yellow)}.risk-high{width:100%;background:var(--red)}.risk-unknown{width:18%;background:#64748b}.risk-value{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase}
+        .decision{background:rgba(15,23,42,.72);border:.5px solid rgba(255,255,255,.08);padding:11px;border-radius:12px;margin-top:11px;position:relative;z-index:1;color:#dbeafe;font-size:12px;line-height:1.45}
+        table{width:100%;border-collapse:collapse}th{text-align:left;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;padding:14px;border-bottom:.5px solid rgba(255,255,255,.08);background:rgba(2,6,23,.38)}td{padding:14px;border-bottom:.5px solid rgba(255,255,255,.055);vertical-align:top}tr:hover{background:rgba(99,102,241,.055)}.table-card{padding:0;overflow:hidden}.table-card .btn{padding:9px 12px}.job{font-weight:800;color:#dbeafe;font-size:13px}.score-cell{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#07111f}
+        .bar-row{display:grid;grid-template-columns:140px 1fr 52px;gap:12px;align-items:center;margin-bottom:14px}.bar-label{color:#dbeafe;font-weight:700;font-size:13px}.bar-track{height:10px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6366f1,#a78bfa)}.bar-fill.green{background:var(--green)}.bar-fill.yellow{background:var(--yellow)}.bar-fill.red{background:var(--red)}.bar-value{text-align:right;color:#cbd5e1;font-weight:800;font-size:12px}
+        .info{display:grid;gap:12px}.row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding-bottom:12px;border-bottom:.5px solid rgba(255,255,255,.06)}.workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.step{background:rgba(2,6,23,.55);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}.step small{display:block;color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.step strong{font-size:13px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}label{color:#a78bfa;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:800}.hidden{display:none}.timeline{display:grid;gap:10px}.event{display:grid;grid-template-columns:16px 1fr;gap:12px;background:rgba(2,6,23,.52);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:13px}.dot{width:11px;height:11px;border-radius:50%;margin-top:4px;background:#64748b}.dot-green{background:var(--green)}.dot-yellow{background:var(--yellow)}.dot-red{background:var(--red)}.date{color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.event h3{font-size:13px;margin-bottom:5px}.event p{font-size:12px;color:rgba(255,255,255,.65);line-height:1.45}.danger-box{border-color:rgba(239,68,68,.3);background:rgba(127,29,29,.1)}
+        .loading-overlay{position:fixed;inset:0;background:rgba(2,6,23,.9);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}.loading-box{width:min(560px,100%);background:#0a0f1e;border:.5px solid rgba(99,102,241,.35);box-shadow:0 30px 100px rgba(0,0,0,.5);border-radius:28px;padding:34px;text-align:center}.loader{width:72px;height:72px;border-radius:50%;border:7px solid rgba(255,255,255,.12);border-top-color:var(--purple);margin:0 auto 22px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.loading-box h2{font-size:27px;margin-bottom:10px}.loading-box p{color:#cbd5e1;line-height:1.6;font-size:15px;margin-bottom:16px}.timer{font-size:36px;font-weight:900;color:#a78bfa;margin-bottom:14px}.progress{height:10px;width:100%;background:#020817;border-radius:999px;overflow:hidden;margin-top:16px;border:.5px solid rgba(255,255,255,.08)}.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a78bfa);animation:progressMove 12s ease-in-out infinite}@keyframes progressMove{0%{width:8%}50%{width:78%}100%{width:94%}}.loading-steps{display:grid;gap:9px;margin-top:19px;text-align:left}.loading-step{background:#020817;border:.5px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#dbeafe;font-size:13px}.loading-note{margin-top:14px;color:rgba(255,255,255,.38);font-size:12px}
+        @media(max-width:1100px){.stats-row,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.table-card{overflow-x:auto}table{min-width:880px}.workflow{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:820px){.dashboard-wrap,.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:22px}.page-title,.title{font-size:28px}.input-row,.form-row,.filter-grid{grid-template-columns:1fr;flex-direction:column}.stats-row,.stats{grid-template-columns:1fr}.row,.form-grid{grid-template-columns:1fr}.score{position:relative;top:auto;right:auto;margin:12px 0}.card .name{padding-right:0}.risk-row{grid-template-columns:1fr}.workflow{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<div class="wrap">
-    <div class="top" style="display:flex;justify-content:space-between;gap:16px;align-items:center;"><a class="back" href="/">Inapoi la dashboard</a><a class="back" style="color:#fecaca;" href="/logout">Logout</a></div>
-    {% if message %}<div class="notice ok">{{ message }}</div>{% endif %}
-    {% if error %}<div class="notice err">{{ error }}</div>{% endif %}
+<div class="layout">
 
-    {% if not candidate %}
-        <div class="not-found">Candidatul nu a fost gasit.</div>
-    {% else %}
-        <section class="hero">
-            <h1>{{ candidate.name or "Candidat necunoscut" }}</h1>
-            <div class="sub">{{ candidate.job_title or "Job nespecificat" }}</div>
-
-            <div class="score {% if candidate.status == 'ADMIS' or candidate.status == 'ANGAJAT' %}score-green{% elif candidate.status == 'DE ANALIZAT' or candidate.status == 'SELECTAT' or candidate.status == 'INTERVIU' %}score-yellow{% elif candidate.status == 'RESPINS' or candidate.status == 'REFUZAT' or candidate.status == 'EXCLUS' %}score-red{% else %}score-default{% endif %}">
-                {{ candidate.score }}
-            </div>
-
-            <div class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</div>
-
-            <div class="workflow">
-                <div class="step"><small>Pas 1</small><strong>Analiza CV</strong></div>
-                <div class="step"><small>Pas 2</small><strong>Selectare</strong></div>
-                <div class="step"><small>Pas 3</small><strong>Interviu</strong></div>
-                <div class="step"><small>Pas 4</small><strong>Decizie finala</strong></div>
-            </div>
-
-            <div class="actions">
-                <a class="btn btn-primary" href="/cv/{{ candidate.id }}" target="_blank">Deschide CV original</a>
-                <a class="btn btn-secondary" href="/">Inapoi la lista</a>
-
-                <button class="btn btn-edit" type="button" onclick="toggleEdit()">✎ Editare</button>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/selecteaza">
-                    <button class="btn btn-dark" type="submit">Marcheaza Potential Candidat</button>
-                </form>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/trimite-interviu">
-                    <button class="btn btn-blue" type="submit">Trimite mail interviu</button>
-                </form>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/refuza">
-                    <button class="btn btn-red" type="submit">Potrivit altor roluri</button>
-                </form>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/angajeaza">
-                    <button class="btn btn-green" type="submit">Marcheaza angajat</button>
-                </form>
-            </div>
-        </section>
-
-        <div class="grid">
-            <section class="panel">
-                <h2>Profil candidat</h2>
-                <div class="info">
-                    <div class="row"><div class="key">Telefon</div><div class="val">{{ candidate.phone or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">Email</div><div class="val">{{ candidate.email or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">Pozitie detectata</div><div class="val">{{ candidate.position or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">Experienta</div><div class="val">{{ candidate.experience or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">Companii</div><div class="val">{{ candidate.companies or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">CV fisier</div><div class="val">{{ candidate.cv_file or "Nespecificat" }}</div></div>
-                </div>
-            </section>
-
-            <section class="panel hidden" id="editPanel">
-                <h2>Editare manuala candidat</h2>
-                <div class="edit-note">Corecteaza emailul, telefonul, numele, statusul si observatiile.</div>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/salveaza" class="form-grid">
-                    <div class="field"><label>Nume</label><input type="text" name="name" value="{{ candidate.name or '' }}"></div>
-                    <div class="field"><label>Email</label><input type="email" name="email" value="{{ candidate.email or '' }}"></div>
-                    <div class="field"><label>Telefon</label><input type="text" name="phone" value="{{ candidate.phone or '' }}"></div>
-
-                    <div class="field">
-                        <label>Status</label>
-                        <select name="status">
-                            {% for item in ["NOU","ADMIS","DE ANALIZAT","RESPINS","SELECTAT","INTERVIU","REFUZAT","ANGAJAT","EXCLUS"] %}
-                                <option value="{{ item }}" {% if candidate.status == item %}selected{% endif %}>{{ status_display(item) }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="field"><label>Pozitie detectata</label><input type="text" name="position" value="{{ candidate.position or '' }}"></div>
-                    <div class="field"><label>Experienta</label><input type="text" name="experience" value="{{ candidate.experience or '' }}"></div>
-                    <div class="field full"><label>Skill-uri</label><textarea name="skills">{{ candidate.skills or '' }}</textarea></div>
-                    <div class="field full"><label>Rezumat / observatii HR</label><textarea name="summary">{{ candidate.summary or '' }}</textarea></div>
-                    <div class="field full"><button class="btn btn-green" type="submit">Salveaza modificarile</button></div>
-                </form>
-            </section>
-
-            <section class="panel">
-                <h2>Adauga nota HR</h2>
-                <div class="edit-note">Notele se salveaza in istoricul candidatului.</div>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/nota" class="form-grid">
-                    <div class="field full">
-                        <label>Nota HR</label>
-                        <textarea name="note" placeholder="Ex: L-am sunat. A avut atitudine nepotrivita. Nu recomandam contactari viitoare."></textarea>
-                    </div>
-                    <div class="field full"><button class="btn btn-blue" type="submit">Salveaza nota HR</button></div>
-                </form>
-            </section>
-
-            <section class="panel danger-box">
-                <h2>Candidat Exclus</h2>
-                <div class="edit-note">
-                    Foloseste acest buton pentru candidati cu atitudine nepotrivita. Nu se trimite email. Candidatul dispare din dashboard si ramane doar in arhiva Candidati.
-                </div>
-
-                <form method="post" action="/candidat/{{ candidate.id }}/exclude" class="form-grid" onsubmit="return confirm('Sigur vrei sa marchezi acest candidat ca EXCLUS? Nu se trimite email.')">
-                    <div class="field full">
-                        <label>Motiv excludere</label>
-                        <textarea name="reason" placeholder="Ex: Atitudine agresiva la telefon, limbaj nepotrivit, nu recomandam contactare viitoare."></textarea>
-                    </div>
-                    <div class="field full"><button class="btn btn-red" type="submit">Candidat Exclus</button></div>
-                </form>
-            </section>
-
-            <section class="panel">
-                <h2>Istoric actiuni</h2>
-                {% if events|length == 0 %}
-                    <div class="summary">Nu exista actiuni inregistrate.</div>
-                {% else %}
-                    <div class="timeline">
-                        {% for event in events %}
-                            <div class="event">
-                                <div class="dot dot-{{ event_class(event.event_type) }}"></div>
-                                <div>
-                                    <div class="date">{{ format_event_date(event.created_at) }}</div>
-                                    <h3>{{ event.title }}</h3>
-                                    <p>{{ event.description or "" }}</p>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </section>
-
-            <section class="panel">
-                <h2>Skill-uri si observatii</h2>
-                <div class="info">
-                    <div class="row"><div class="key">Skill-uri</div><div class="val">{{ candidate.skills or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">Puncte forte</div><div class="val">{{ candidate.strengths or "Nespecificat" }}</div></div>
-                    <div class="row"><div class="key">Gap-uri</div><div class="val">{{ candidate.weaknesses or "Nespecificat" }}</div></div>
-                </div>
-            </section>
-
-            <section class="panel" style="grid-column:1/-1">
-                <h2>Rezumat AI / Observatii</h2>
-                <div class="summary">{{ candidate.summary or "Fara rezumat" }}</div>
-            </section>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-text">NEX<span class="accent">A</span>S</div>
+            <div class="logo-sub">HR Platform</div>
         </div>
-    {% endif %}
-</div>
+        <nav class="nav">
+            <a class="" href="/">Dashboard</a>
+            <a class="active" href="/candidati">Candidati</a>
+            <a class="" href="/analytics">Analytics</a>
+            <a class="logout-link" href="/logout">Logout</a>
+        </nav>
+    </aside>
 
+
+    <main class="main">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px">
+            <a class="btn btn-secondary" href="/">Inapoi la dashboard</a>
+            <a class="btn btn-danger" href="/logout">Logout</a>
+        </div>
+
+        {% if message %}<div class="notice ok">{{ message }}</div>{% endif %}
+        {% if error %}<div class="notice err">{{ error }}</div>{% endif %}
+
+        {% if not candidate %}
+            <div class="empty">Candidatul nu a fost gasit.</div>
+        {% else %}
+            <section class="hero">
+                <h1 class="page-title" style="font-size:32px">{{ candidate.name or "Candidat necunoscut" }}</h1>
+                <div class="page-sub">{{ candidate.job_title or "Job nespecificat" }}</div>
+                <div class="score {% if candidate.status == 'ADMIS' or candidate.status == 'ANGAJAT' %}score-green{% elif candidate.status == 'DE ANALIZAT' or candidate.status == 'SELECTAT' or candidate.status == 'INTERVIU' %}score-yellow{% elif candidate.status == 'RESPINS' or candidate.status == 'REFUZAT' or candidate.status == 'EXCLUS' %}score-red{% else %}score-default{% endif %}">{{ candidate.score }}</div>
+                <div class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</div>
+
+                <div class="workflow">
+                    <div class="step"><small>Pas 1</small><strong>Analiza CV</strong></div>
+                    <div class="step"><small>Pas 2</small><strong>Selectare</strong></div>
+                    <div class="step"><small>Pas 3</small><strong>Interviu</strong></div>
+                    <div class="step"><small>Pas 4</small><strong>Decizie finala</strong></div>
+                </div>
+
+                <div class="actions-inline">
+                    <a class="btn btn-primary" href="/cv/{{ candidate.id }}" target="_blank">Deschide CV original</a>
+                    <button class="btn btn-edit" type="button" onclick="toggleEdit()">Editare</button>
+                    <form method="post" action="/candidat/{{ candidate.id }}/selecteaza"><button class="btn btn-dark" type="submit">Potential Candidat</button></form>
+                    <form method="post" action="/candidat/{{ candidate.id }}/trimite-interviu"><button class="btn btn-blue" type="submit">Trimite mail interviu</button></form>
+                    <form method="post" action="/candidat/{{ candidate.id }}/refuza"><button class="btn btn-red" type="submit">Potrivit altor roluri</button></form>
+                    <form method="post" action="/candidat/{{ candidate.id }}/angajeaza"><button class="btn btn-green" type="submit">Marcheaza angajat</button></form>
+                </div>
+            </section>
+
+            <div class="grid">
+                <section class="panel">
+                    <h2>Profil candidat</h2>
+                    <div class="info">
+                        <div class="row"><div class="key">Telefon</div><div class="val">{{ candidate.phone or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Email</div><div class="val">{{ candidate.email or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Pozitie detectata</div><div class="val">{{ candidate.position or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Experienta</div><div class="val">{{ candidate.experience or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Companii</div><div class="val">{{ candidate.companies or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">CV fisier</div><div class="val">{{ candidate.cv_file or "Nespecificat" }}</div></div>
+                    </div>
+                </section>
+
+                <section class="panel hidden" id="editPanel">
+                    <h2>Editare manuala candidat</h2>
+                    <div class="edit-note">Corecteaza emailul, telefonul, numele, statusul si observatiile.</div>
+                    <form method="post" action="/candidat/{{ candidate.id }}/salveaza" class="form-grid">
+                        <div class="field"><label>Nume</label><input type="text" name="name" value="{{ candidate.name or '' }}"></div>
+                        <div class="field"><label>Email</label><input type="email" name="email" value="{{ candidate.email or '' }}"></div>
+                        <div class="field"><label>Telefon</label><input type="text" name="phone" value="{{ candidate.phone or '' }}"></div>
+                        <div class="field"><label>Status</label><select name="status">{% for item in ["NOU","ADMIS","DE ANALIZAT","RESPINS","SELECTAT","INTERVIU","REFUZAT","ANGAJAT","EXCLUS"] %}<option value="{{ item }}" {% if candidate.status == item %}selected{% endif %}>{{ status_display(item) }}</option>{% endfor %}</select></div>
+                        <div class="field"><label>Pozitie detectata</label><input type="text" name="position" value="{{ candidate.position or '' }}"></div>
+                        <div class="field"><label>Experienta</label><input type="text" name="experience" value="{{ candidate.experience or '' }}"></div>
+                        <div class="field full"><label>Skill-uri</label><textarea name="skills">{{ candidate.skills or '' }}</textarea></div>
+                        <div class="field full"><label>Rezumat / observatii HR</label><textarea name="summary">{{ candidate.summary or '' }}</textarea></div>
+                        <div class="field full"><button class="btn btn-green" type="submit">Salveaza modificarile</button></div>
+                    </form>
+                </section>
+
+                <section class="panel">
+                    <h2>Adauga nota HR</h2>
+                    <div class="edit-note">Notele se salveaza in istoricul candidatului.</div>
+                    <form method="post" action="/candidat/{{ candidate.id }}/nota" class="form-grid">
+                        <div class="field full"><label>Nota HR</label><textarea name="note" placeholder="Ex: L-am sunat. A avut atitudine nepotrivita. Nu recomandam contactari viitoare."></textarea></div>
+                        <div class="field full"><button class="btn btn-blue" type="submit">Salveaza nota HR</button></div>
+                    </form>
+                </section>
+
+                <section class="panel danger-box">
+                    <h2>Candidat exclus</h2>
+                    <div class="edit-note">Foloseste acest buton pentru candidati cu atitudine nepotrivita. Nu se trimite email.</div>
+                    <form method="post" action="/candidat/{{ candidate.id }}/exclude" class="form-grid" onsubmit="return confirm('Sigur vrei sa marchezi acest candidat ca EXCLUS? Nu se trimite email.')">
+                        <div class="field full"><label>Motiv excludere</label><textarea name="reason" placeholder="Ex: Atitudine agresiva la telefon, limbaj nepotrivit."></textarea></div>
+                        <div class="field full"><button class="btn btn-red" type="submit">Candidat Exclus</button></div>
+                    </form>
+                </section>
+
+                <section class="panel">
+                    <h2>Istoric actiuni</h2>
+                    {% if events|length == 0 %}<div class="summary">Nu exista actiuni inregistrate.</div>{% else %}<div class="timeline">{% for event in events %}<div class="event"><div class="dot dot-{{ event_class(event.event_type) }}"></div><div><div class="date">{{ format_event_date(event.created_at) }}</div><h3>{{ event.title }}</h3><p>{{ event.description or "" }}</p></div></div>{% endfor %}</div>{% endif %}
+                </section>
+
+                <section class="panel">
+                    <h2>Skill-uri si observatii</h2>
+                    <div class="info">
+                        <div class="row"><div class="key">Skill-uri</div><div class="val">{{ candidate.skills or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Puncte forte</div><div class="val">{{ candidate.strengths or "Nespecificat" }}</div></div>
+                        <div class="row"><div class="key">Gap-uri</div><div class="val">{{ candidate.weaknesses or "Nespecificat" }}</div></div>
+                    </div>
+                </section>
+
+                <section class="panel" style="grid-column:1/-1"><h2>Rezumat AI / Observatii</h2><div class="summary">{{ candidate.summary or "Fara rezumat" }}</div></section>
+            </div>
+        {% endif %}
+    </main>
 <script>
 function toggleEdit(){
     const panel = document.getElementById("editPanel");
     panel.classList.toggle("hidden");
-    if(!panel.classList.contains("hidden")){
-        panel.scrollIntoView({behavior:"smooth", block:"start"});
-    }
+    if(!panel.classList.contains("hidden")){ panel.scrollIntoView({behavior:"smooth", block:"start"}); }
 }
 </script>
 
+</div>
 </body>
 </html>

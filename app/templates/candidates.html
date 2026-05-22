@@ -4,113 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candidati | NEXAS HR</title>
-
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#050914;color:white;font-family:Arial,sans-serif}
-        .layout{display:flex;min-height:100vh}
-        .sidebar{width:280px;background:#0f172a;padding:38px;position:fixed;top:0;left:0;bottom:0}
-        .logo{font-size:48px;font-weight:900;line-height:1.08;margin-bottom:60px}
-        .nav{display:flex;flex-direction:column;gap:26px}
-        .nav a{color:#dbeafe;text-decoration:none;font-size:22px}.nav a.logout-link{color:#fecaca;margin-top:22px}
-        .nav a.active{color:white;font-weight:900}.nav a.logout-link{color:#fecaca;margin-top:22px}
-        .main{margin-left:280px;padding:48px;width:calc(100% - 280px)}
-        .title{font-size:62px;font-weight:950;margin-bottom:14px}
-        .subtitle{color:#94a3b8;font-size:18px;margin-bottom:34px}
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:28px}
-        .stat{background:#101827;border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:20px}
-        .stat small{display:block;color:#94a3b8;margin-bottom:8px}
-        .stat strong{font-size:30px;color:#a78bfa}
-        .filters{background:#0f172a;border:1px solid rgba(255,255,255,.07);border-radius:26px;padding:22px;margin-bottom:28px}
-        .filter-grid{display:grid;grid-template-columns:2fr 1fr 1.4fr 1fr auto;gap:14px}
-        input,select{width:100%;background:#020817;border:1px solid rgba(255,255,255,.12);color:white;padding:15px 16px;border-radius:15px;font-size:15px}
-        button,.btn{border:0;text-decoration:none;border-radius:15px;padding:15px 18px;color:white;font-weight:900;cursor:pointer;font-size:15px;display:inline-flex;align-items:center;justify-content:center}
-        .btn-primary{background:#8b5cf6}
-        .btn-cv{background:#2563eb}
-        .btn-clear{background:#334155}
-        .btn-export{background:#16a34a}
-        .filter-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
-        .table-card{background:#0f172a;border:1px solid rgba(255,255,255,.07);border-radius:28px;overflow:hidden}
-        table{width:100%;border-collapse:collapse}
-        th{text-align:left;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:12px;padding:18px;border-bottom:1px solid rgba(255,255,255,.08);background:#0b1220}
-        td{padding:18px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
-        tr:hover{background:rgba(139,92,246,.06)}
-        .name{font-weight:900;font-size:18px}
-        .small{color:#94a3b8;font-size:13px;margin-top:5px}
-        .score{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:20px}
-        .score-green{background:#22c55e}
-        .score-yellow{background:#f59e0b}
-        .score-red{background:#ef4444}
-        .tag{display:inline-block;padding:9px 12px;border-radius:999px;font-weight:900;font-size:12px}
-        .tag-green{background:#14532d;color:#bbf7d0}
-        .tag-yellow{background:#78350f;color:#fde68a}
-        .tag-red{background:#7f1d1d;color:#fecaca}
-        .tag-default{background:#1f2937;color:#e0e7ff}
-        .actions{display:flex;gap:10px;flex-wrap:wrap}
-        .empty{background:#111827;border-radius:26px;padding:38px;color:#cbd5e1;font-size:20px}
-        .job{font-weight:800;color:#dbeafe}
-        .summary{max-width:430px;color:#cbd5e1;line-height:1.45;font-size:14px;max-height:62px;overflow:hidden}
-        @media(max-width:1050px){
-            .layout{display:block}
-            .sidebar{position:relative;width:100%;height:auto}
-            .main{margin-left:0;width:100%;padding:28px}
-            .title{font-size:42px}
-            .filter-grid{grid-template-columns:1fr}
-            .table-card{overflow-x:auto}
-            table{min-width:980px}
+        :root{
+            --bg:#070b16;
+            --panel:#0a0f1e;
+            --panel-2:#080d1a;
+            --card:rgba(255,255,255,.035);
+            --line:rgba(255,255,255,.075);
+            --line-2:rgba(255,255,255,.11);
+            --text:#f8fafc;
+            --muted:rgba(255,255,255,.42);
+            --soft:rgba(255,255,255,.62);
+            --purple:#6366f1;
+            --purple-2:#8b5cf6;
+            --green:#34d399;
+            --yellow:#fbbf24;
+            --red:#f87171;
+            --radius-lg:22px;
+            --radius-md:14px;
         }
-    </style>
+        body{background:radial-gradient(circle at top right,rgba(99,102,241,.18),transparent 34%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100vh}
+        .dashboard-wrap,.layout{display:flex;min-height:100vh;background:linear-gradient(180deg,#0a0f1e,#070b16)}
+        .sidebar{width:210px;background:rgba(8,13,26,.94);border-right:.5px solid rgba(255,255,255,.07);padding:24px 0;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:10}
+        .sidebar-logo,.logo-box{padding:0 20px 24px;border-bottom:.5px solid rgba(255,255,255,.07);margin-bottom:16px}
+        .logo,.logo-text{font-size:22px;font-weight:800;letter-spacing:-.5px;color:#fff;line-height:1.05}
+        .logo .accent,.logo-text .accent{color:#a78bfa}
+        .logo-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+        .nav{display:flex;flex-direction:column;gap:2px;padding:0 0 12px}
+        .nav a,.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,.48);text-decoration:none;border-left:2px solid transparent;transition:.2s ease}
+        .nav a.active,.nav a:hover,.nav-item.active{color:#fff;background:rgba(99,102,241,.12);border-left-color:var(--purple)}
+        .nav a.logout-link{margin-top:auto;color:#fca5a5}
+        .main{margin-left:210px;width:calc(100% - 210px);padding:28px;overflow:auto}
+        .page-title,.title{font-size:24px;font-weight:700;color:#fff;margin-bottom:5px;letter-spacing:-.4px}
+        .page-sub,.subtitle{font-size:13px;color:var(--muted);margin-bottom:24px}
+        .message,.notice{background:rgba(99,102,241,.13);border:.5px solid rgba(99,102,241,.35);color:#ddd6fe;padding:13px 16px;border-radius:var(--radius-md);margin-bottom:18px;font-size:13px}
+        .notice.err,.err{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fecaca}
+        .stats-row,.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+        .stat-card,.stat{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-md);padding:16px;min-height:88px}
+        .stat-label,.stat small{display:block;font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
+        .stat-value,.stat strong{font-size:26px;font-weight:650;color:#fff}
+        .stat-value span{font-size:12px;color:var(--green);margin-left:6px;font-weight:500}
+        .search-card,.actions,.panel,.filters,.table-card,.hero{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+        .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(99,102,241,.11),rgba(255,255,255,.025))}
+        .hero:before,.card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.22),transparent 38%);pointer-events:none}
+        .search-card-title,.section-title,.actions h2,.panel h2,.filters h2{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
+        .input-row,.form-row{display:flex;gap:10px;margin-bottom:12px}
+        input,select,textarea,.fake-input{width:100%;background:rgba(255,255,255,.055);border:.5px solid var(--line-2);border-radius:var(--radius-md);padding:11px 14px;font-size:13px;color:rgba(255,255,255,.85);outline:none}
+        textarea{min-height:120px;resize:vertical;line-height:1.5}
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.26)}
+        button,.btn,.btn-link{border:0;border-radius:var(--radius-md);padding:11px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+        button:disabled{opacity:.6;cursor:not-allowed}
+        .btn-primary,.btn-main,.btn-details{background:var(--purple);color:#fff}
+        .btn-secondary,.btn-cv,.btn-clear,.btn-dark{background:rgba(139,92,246,.15);color:#c4b5fd;border:.5px solid rgba(139,92,246,.28)}
+        .btn-gmail,.btn-blue{background:#2563eb;color:#fff}
+        .btn-green,.btn-export{background:#16a34a;color:#fff}
+        .btn-danger,.danger button,.delete-all button,.btn-red{background:rgba(239,68,68,.10);color:#f87171;border:.5px solid rgba(239,68,68,.22)}
+        .btn-edit{background:rgba(251,191,36,.13);color:#fbbf24;border:.5px solid rgba(251,191,36,.25)}
+        .helper-text,.help,.edit-note,.small{font-size:12px;color:rgba(255,255,255,.36);line-height:1.5}
+        .danger-row,.card-actions,.actions-inline,.filter-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+        .job-block{margin-bottom:28px}
+        .job-title{font-size:13px;font-weight:800;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
+        .card,.candidate-card{background:rgba(255,255,255,.032);border:.5px solid rgba(255,255,255,.07);border-radius:var(--radius-md);padding:16px;position:relative;overflow:hidden}
+        .candidate-card{display:flex;align-items:center;gap:13px;margin-bottom:8px}
+        .avatar{width:38px;height:38px;border-radius:50%;background:rgba(99,102,241,.2);border:.5px solid rgba(99,102,241,.38);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#c4b5fd;flex-shrink:0}
+        .name,.cand-name{font-size:15px;font-weight:800;color:rgba(255,255,255,.9);position:relative;z-index:1}
+        .card .name{padding-right:82px;margin-bottom:10px;font-size:17px}
+        .cand-meta{font-size:11px;color:rgba(255,255,255,.33);margin-top:2px}
+        .score{position:absolute;top:16px;right:16px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;z-index:1;color:#07111f}
+        .score-badge{margin-left:auto;display:flex;align-items:center;gap:8px}.score-num{font-size:20px;font-weight:800}.score-num.top{color:var(--green)}.score-num.mid{color:var(--yellow)}.score-num.low{color:var(--red)}
+        .score-green,.top{background:var(--green)}.score-yellow,.mid{background:var(--yellow)}.score-red,.low{background:var(--red)}.score-default{background:#a78bfa;color:#fff}
+        .tag{display:inline-block;font-size:10px;padding:4px 9px;border-radius:999px;font-weight:800;position:relative;z-index:1;text-transform:uppercase}
+        .tag-green,.tag.top{background:rgba(52,211,153,.1);color:var(--green);border:.5px solid rgba(52,211,153,.22)}
+        .tag-yellow,.tag.mid{background:rgba(251,191,36,.1);color:var(--yellow);border:.5px solid rgba(251,191,36,.22)}
+        .tag-red,.tag.low{background:rgba(248,113,113,.1);color:var(--red);border:.5px solid rgba(248,113,113,.22)}
+        .tag-default{background:rgba(99,102,241,.12);color:#c4b5fd;border:.5px solid rgba(99,102,241,.28)}
+        .label,.key{color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;margin-top:12px;margin-bottom:5px;position:relative;z-index:1;font-weight:800}
+        .text,.val,.summary{color:rgba(255,255,255,.74);line-height:1.48;font-size:13px;position:relative;z-index:1}.summary{max-height:86px;overflow:hidden}
+        .empty{background:rgba(255,255,255,.035);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:28px;color:rgba(255,255,255,.55);font-size:15px}
+        .score-bar-wrap{width:66px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}.score-bar-fill{height:100%;border-radius:2px}
+        .risk-panel{display:grid;gap:9px;margin:13px 0;position:relative;z-index:1}.risk-row{display:grid;grid-template-columns:108px 1fr 56px;gap:9px;align-items:center}.risk-name{font-size:11px;color:rgba(255,255,255,.5)}.risk-track{height:7px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.risk-fill{height:100%;border-radius:999px}.risk-low{width:32%;background:var(--green)}.risk-medium{width:62%;background:var(--yellow)}.risk-high{width:100%;background:var(--red)}.risk-unknown{width:18%;background:#64748b}.risk-value{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase}
+        .decision{background:rgba(15,23,42,.72);border:.5px solid rgba(255,255,255,.08);padding:11px;border-radius:12px;margin-top:11px;position:relative;z-index:1;color:#dbeafe;font-size:12px;line-height:1.45}
+        table{width:100%;border-collapse:collapse}th{text-align:left;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;padding:14px;border-bottom:.5px solid rgba(255,255,255,.08);background:rgba(2,6,23,.38)}td{padding:14px;border-bottom:.5px solid rgba(255,255,255,.055);vertical-align:top}tr:hover{background:rgba(99,102,241,.055)}.table-card{padding:0;overflow:hidden}.table-card .btn{padding:9px 12px}.job{font-weight:800;color:#dbeafe;font-size:13px}.score-cell{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#07111f}
+        .bar-row{display:grid;grid-template-columns:140px 1fr 52px;gap:12px;align-items:center;margin-bottom:14px}.bar-label{color:#dbeafe;font-weight:700;font-size:13px}.bar-track{height:10px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6366f1,#a78bfa)}.bar-fill.green{background:var(--green)}.bar-fill.yellow{background:var(--yellow)}.bar-fill.red{background:var(--red)}.bar-value{text-align:right;color:#cbd5e1;font-weight:800;font-size:12px}
+        .info{display:grid;gap:12px}.row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding-bottom:12px;border-bottom:.5px solid rgba(255,255,255,.06)}.workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.step{background:rgba(2,6,23,.55);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}.step small{display:block;color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.step strong{font-size:13px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}label{color:#a78bfa;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:800}.hidden{display:none}.timeline{display:grid;gap:10px}.event{display:grid;grid-template-columns:16px 1fr;gap:12px;background:rgba(2,6,23,.52);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:13px}.dot{width:11px;height:11px;border-radius:50%;margin-top:4px;background:#64748b}.dot-green{background:var(--green)}.dot-yellow{background:var(--yellow)}.dot-red{background:var(--red)}.date{color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.event h3{font-size:13px;margin-bottom:5px}.event p{font-size:12px;color:rgba(255,255,255,.65);line-height:1.45}.danger-box{border-color:rgba(239,68,68,.3);background:rgba(127,29,29,.1)}
+        .loading-overlay{position:fixed;inset:0;background:rgba(2,6,23,.9);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}.loading-box{width:min(560px,100%);background:#0a0f1e;border:.5px solid rgba(99,102,241,.35);box-shadow:0 30px 100px rgba(0,0,0,.5);border-radius:28px;padding:34px;text-align:center}.loader{width:72px;height:72px;border-radius:50%;border:7px solid rgba(255,255,255,.12);border-top-color:var(--purple);margin:0 auto 22px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.loading-box h2{font-size:27px;margin-bottom:10px}.loading-box p{color:#cbd5e1;line-height:1.6;font-size:15px;margin-bottom:16px}.timer{font-size:36px;font-weight:900;color:#a78bfa;margin-bottom:14px}.progress{height:10px;width:100%;background:#020817;border-radius:999px;overflow:hidden;margin-top:16px;border:.5px solid rgba(255,255,255,.08)}.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a78bfa);animation:progressMove 12s ease-in-out infinite}@keyframes progressMove{0%{width:8%}50%{width:78%}100%{width:94%}}.loading-steps{display:grid;gap:9px;margin-top:19px;text-align:left}.loading-step{background:#020817;border:.5px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#dbeafe;font-size:13px}.loading-note{margin-top:14px;color:rgba(255,255,255,.38);font-size:12px}
+        @media(max-width:1100px){.stats-row,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.table-card{overflow-x:auto}table{min-width:880px}.workflow{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:820px){.dashboard-wrap,.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:22px}.page-title,.title{font-size:28px}.input-row,.form-row,.filter-grid{grid-template-columns:1fr;flex-direction:column}.stats-row,.stats{grid-template-columns:1fr}.row,.form-grid{grid-template-columns:1fr}.score{position:relative;top:auto;right:auto;margin:12px 0}.card .name{padding-right:0}.risk-row{grid-template-columns:1fr}.workflow{grid-template-columns:1fr}}
+</style>
 </head>
-
 <body>
 <div class="layout">
+
     <aside class="sidebar">
-        <div class="logo">NEXAS<br>HR</div>
+        <div class="sidebar-logo">
+            <div class="logo-text">NEX<span class="accent">A</span>S</div>
+            <div class="logo-sub">HR Platform</div>
+        </div>
         <nav class="nav">
-            <a href="/">Dashboard</a>
+            <a class="" href="/">Dashboard</a>
             <a class="active" href="/candidati">Candidati</a>
-            <a href="/analytics">Analytics</a>
+            <a class="" href="/analytics">Analytics</a>
             <a class="logout-link" href="/logout">Logout</a>
         </nav>
     </aside>
 
-    <main class="main">
-        <h1 class="title">Candidati</h1>
-        <div class="subtitle">Arhiva completa cu toti candidatii si statusurile lor.</div>
 
-        <div class="stats">
-            <div class="stat"><small>Total</small><strong>{{ stats.total }}</strong></div>
-            <div class="stat"><small>Afisati</small><strong>{{ stats.filtered }}</strong></div>
-            <div class="stat"><small>Potential</small><strong>{{ stats.de_analizat + stats.selectat }}</strong></div>
-            <div class="stat"><small>Interviu</small><strong>{{ stats.interviu }}</strong></div>
-            <div class="stat"><small>Angajati</small><strong>{{ stats.angajat }}</strong></div>
-            <div class="stat"><small>Alte roluri</small><strong>{{ stats.refuzat }}</strong></div>
-            <div class="stat"><small>Exclusi</small><strong>{{ stats.exclus }}</strong></div>
+    <main class="main">
+        <h1 class="page-title">Candidati</h1>
+        <div class="page-sub">Arhiva completa cu toti candidatii si statusurile lor.</div>
+
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">{{ stats.total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Afisati</div><div class="stat-value">{{ stats.filtered }}</div></div>
+            <div class="stat-card"><div class="stat-label">Potential</div><div class="stat-value">{{ stats.de_analizat + stats.selectat }}</div></div>
+            <div class="stat-card"><div class="stat-label">Interviu</div><div class="stat-value">{{ stats.interviu }}</div></div>
+            <div class="stat-card"><div class="stat-label">Angajati</div><div class="stat-value">{{ stats.angajat }}</div></div>
+            <div class="stat-card"><div class="stat-label">Alte roluri</div><div class="stat-value">{{ stats.refuzat }}</div></div>
+            <div class="stat-card"><div class="stat-label">Exclusi</div><div class="stat-value">{{ stats.exclus }}</div></div>
         </div>
 
         <section class="filters">
-            <form method="get" action="/candidati" class="filter-grid" id="filterForm">
+            <h2>Filtre candidati</h2>
+            <form method="get" action="/candidati" class="filter-grid" id="filterForm" style="display:grid;grid-template-columns:2fr 1fr 1.4fr 1fr auto;gap:10px">
                 <input type="text" name="q" value="{{ q }}" placeholder="Cauta dupa nume, email, telefon sau fisier CV">
-
-                <select name="status">
-                    <option value="">Toate statusurile</option>
-                    {% for item in all_statuses %}
-                        <option value="{{ item }}" {% if item == status %}selected{% endif %}>{{ status_display(item) }}</option>
-                    {% endfor %}
-                </select>
-
-                <select name="job">
-                    <option value="">Toate joburile</option>
-                    {% for item in all_jobs %}
-                        <option value="{{ item }}" {% if item == job %}selected{% endif %}>{{ item }}</option>
-                    {% endfor %}
-                </select>
-
+                <select name="status"><option value="">Toate statusurile</option>{% for item in all_statuses %}<option value="{{ item }}" {% if item == status %}selected{% endif %}>{{ status_display(item) }}</option>{% endfor %}</select>
+                <select name="job"><option value="">Toate joburile</option>{% for item in all_jobs %}<option value="{{ item }}" {% if item == job %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
                 <input type="number" name="min_score" value="{{ min_score }}" min="0" max="100" placeholder="Scor minim">
-
                 <button class="btn-primary" type="submit">Filtreaza</button>
             </form>
-
             <div class="filter-actions">
                 <a class="btn btn-clear" href="/candidati">Reseteaza filtrele</a>
                 <a class="btn btn-export" href="/candidati/export?q={{ q }}&status={{ status }}&job={{ job }}&min_score={{ min_score }}">Export Excel</a>
@@ -122,43 +145,16 @@
         {% else %}
             <section class="table-card">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Candidat</th>
-                            <th>Job</th>
-                            <th>Scor</th>
-                            <th>Status</th>
-                            <th>Rezumat</th>
-                            <th>Actiuni</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Candidat</th><th>Job</th><th>Scor</th><th>Status</th><th>Rezumat</th><th>Actiuni</th></tr></thead>
                     <tbody>
                         {% for candidate in candidates %}
                             <tr>
-                                <td>
-                                    <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
-                                    <div class="small">{{ candidate.email or "Email lipsa" }}</div>
-                                    <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
-                                </td>
-                                <td>
-                                    <div class="job">{{ candidate.job_title or "Nespecificat" }}</div>
-                                    <div class="small">{{ candidate.position or "Pozitie nedetectata" }}</div>
-                                </td>
-                                <td>
-                                    <div class="score {% if candidate.score >= 70 %}score-green{% elif candidate.score >= 45 %}score-yellow{% else %}score-red{% endif %}">
-                                        {{ candidate.score or 0 }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
-                                </td>
+                                <td><div class="name">{{ candidate.name or "Candidat necunoscut" }}</div><div class="small">{{ candidate.email or "Email lipsa" }}</div><div class="small">{{ candidate.phone or "Telefon lipsa" }}</div></td>
+                                <td><div class="job">{{ candidate.job_title or "Nespecificat" }}</div><div class="small">{{ candidate.position or "Pozitie nedetectata" }}</div></td>
+                                <td><div class="score-cell {% if candidate.score >= 70 %}score-green{% elif candidate.score >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ candidate.score or 0 }}</div></td>
+                                <td><span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span></td>
                                 <td><div class="summary">{{ candidate.summary or "Fara rezumat" }}</div></td>
-                                <td>
-                                    <div class="actions">
-                                        <a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a>
-                                        <a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a>
-                                    </div>
-                                </td>
+                                <td><div class="actions-inline"><a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a><a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a></div></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -166,6 +162,7 @@
             </section>
         {% endif %}
     </main>
+
 </div>
 </body>
 </html>

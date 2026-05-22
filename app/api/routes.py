@@ -908,9 +908,10 @@ async def gmail_and_analyze(target_job: str = Form(...)):
     moved_files = temporarily_keep_only_files(downloaded_files)
 
     try:
-        # analysis_result = process_cvs_for_job(target_job)  # DEPRECATED - using V2 system
-    finally:
-        restore_temp_files(moved_files)
+    pass  # TODO: Migrate to V2 system
+    # analysis_result = process_cvs_for_job(target_job)
+finally:
+    restore_temp_files(moved_files)
 
     mark_new_candidates_batch(
         after_id=after_id,

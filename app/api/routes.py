@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import time
 from collections import Counter, defaultdict
@@ -43,6 +44,9 @@ def ensure_candidate_extra_columns():
         if "visible_in_dashboard" not in existing:
             conn.execute(text("ALTER TABLE candidates ADD COLUMN visible_in_dashboard INTEGER DEFAULT 1"))
             conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
+
+        if "companies" not in existing:
+            conn.execute(text("ALTER TABLE candidates ADD COLUMN companies TEXT"))
 
 
 ensure_candidate_extra_columns()
@@ -266,6 +270,24 @@ def extract_risk(summary, risk_name):
         return "high"
 
     return "unknown"
+
+
+def clean_summary(summary):
+    value = summary or ""
+    value = re.sub(
+        r"\bRisc\s+supracalificare\s*:\s*(low|medium|high|unknown|scazut|mediu|ridicat|necunoscut)\s*\.?\s*",
+        "",
+        value,
+        flags=re.IGNORECASE
+    )
+    value = re.sub(
+        r"\bNepotrivire\s+nivel\s*:\s*(low|medium|high|unknown|scazut|mediu|ridicat|necunoscut)\s*\.?\s*",
+        "",
+        value,
+        flags=re.IGNORECASE
+    )
+    value = re.sub(r"\s+", " ", value).strip()
+    return value or "Fara rezumat"
 
 
 def risk_label(value):
@@ -568,6 +590,7 @@ def generate_candidates_excel(candidates):
 
 templates.env.globals["extract_risk"] = extract_risk
 templates.env.globals["risk_label"] = risk_label
+templates.env.globals["clean_summary"] = clean_summary
 templates.env.globals["decision_text"] = decision_text
 templates.env.globals["status_class"] = status_class
 templates.env.globals["status_display"] = status_display

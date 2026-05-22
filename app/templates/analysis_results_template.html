@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Agent - Multi-Job Analysis Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #60a5fa;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        .job-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .job-header {
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            padding: 20px;
+            border-bottom: 2px solid #1e40af;
+        }
+        
+        .job-header h2 {
+            font-size: 24px;
+            color: #f0f9ff;
+        }
+        
+        .candidates-container {
+            padding: 0;
+        }
+        
+        .candidate-card {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .candidate-card:last-child {
+            border-bottom: none;
+        }
+        
+        .candidate-info h3 {
+            font-size: 18px;
+            color: #f1f5f9;
+            margin-bottom: 10px;
+        }
+        
+        .candidate-meta {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+        
+        .candidate-meta span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .candidate-meta strong {
+            color: #60a5fa;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .score-top {
+            background-color: #10b981;
+            color: #f0fdf4;
+        }
+        
+        .score-potential {
+            background-color: #f59e0b;
+            color: #fffbeb;
+        }
+        
+        .score-low {
+            background-color: #ef4444;
+            color: #fef2f2;
+        }
+        
+        .subscores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .subscore {
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .subscore-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .subscore-value {
+            font-size: 20px;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+        
+        .subscore-bar {
+            width: 100%;
+            height: 4px;
+            background: #334155;
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .subscore-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            border-radius: 2px;
+        }
+        
+        .export-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        
+        .export-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 0 10px;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .export-btn:hover {
+            background: #2563eb;
+        }
+        
+        .recommendation {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        
+        .recommendation.hire {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .recommendation.consider {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .recommendation.reject {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .no-data {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            border-radius: 50%;
+            font-weight: bold;
+            color: white;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        
+        .candidate-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .final-score {
+            font-size: 28px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+        
+        @media (max-width: 768px) {
+            .candidate-card {
+                grid-template-columns: 1fr;
+            }
+            
+            .subscores-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 HR Agent - Multi-Job Analysis</h1>
+            <p>Detailed candidate evaluation across multiple positions</p>
+        </div>
+        
+        <!-- Results will be dynamically inserted here -->
+        <div id="results-container">
+            <!-- Jobs will be rendered here -->
+        </div>
+        
+        <div class="export-section">
+            <h3>📊 Export Results</h3>
+            <button class="export-btn" onclick="exportToCSV()">Export to CSV</button>
+            <button class="export-btn" onclick="window.print()">Print/PDF</button>
+        </div>
+    </div>
+
+    <script>
+        // Mock data - replace with actual results
+        const mockResults = {
+            "Casier": [
+                {
+                    "candidate_name": "Daniel Moșu",
+                    "email": "daniel@example.com",
+                    "phone": "0722123456",
+                    "final_score": 85,
+                    "recommendation": "TOP CANDIDATE",
+                    "last_company": "Carrefour",
+                    "years_in_role": 3,
+                    "subscores": {
+                        "direct_experience": 95,
+                        "years_in_role": 80,
+                        "company_level": 90,
+                        "skill_keywords": 78,
+                        "job_stability": 90,
+                        "growth_progression": 40,
+                        "red_flags": 80
+                    }
+                },
+                {
+                    "candidate_name": "Florin Oprea",
+                    "email": "florin@example.com",
+                    "phone": null,
+                    "final_score": 68,
+                    "recommendation": "POTENTIAL CANDIDATE",
+                    "last_company": null,
+                    "years_in_role": null,
+                    "subscores": {
+                        "direct_experience": 75,
+                        "years_in_role": 0,
+                        "company_level": 0,
+                        "skill_keywords": 65,
+                        "job_stability": 0,
+                        "growth_progression": 50,
+                        "red_flags": 50
+                    }
+                }
+            ]
+        };
+
+        function getScoreBadgeClass(score) {
+            if (score >= 80) return 'score-top';
+            if (score >= 65) return 'score-potential';
+            return 'score-low';
+        }
+
+        function getRecommendationClass(recommendation) {
+            if (recommendation === 'TOP CANDIDATE') return 'hire';
+            if (recommendation === 'POTENTIAL CANDIDATE') return 'consider';
+            return 'reject';
+        }
+
+        function renderResults(results) {
+            const container = document.getElementById('results-container');
+            
+            Object.entries(results).forEach((entry, jobIndex) => {
+                const [jobTitle, candidates] = entry;
+                
+                let jobHTML = `
+                    <div class="job-section">
+                        <div class="job-header">
+                            <h2>${jobTitle}</h2>
+                        </div>
+                        <div class="candidates-container">
+                `;
+                
+                if (!candidates || candidates.length === 0) {
+                    jobHTML += `<div class="no-data">No candidates analyzed for this position</div>`;
+                } else {
+                    candidates.forEach((candidate, rank) => {
+                        const subscores = candidate.subscores || {};
+                        const avgScore = Math.round(Object.values(subscores).reduce((a, b) => a + b, 0) / Object.keys(subscores).length);
+                        
+                        jobHTML += `
+                            <div class="candidate-card">
+                                <div class="candidate-info">
+                                    <div class="candidate-header">
+                                        <div class="rank-badge">#${rank + 1}</div>
+                                        <div>
+                                            <h3>${candidate.candidate_name}</h3>
+                                            <div class="final-score">${candidate.final_score}/100</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="score-badge ${getScoreBadgeClass(candidate.final_score)}">
+                                        ${candidate.recommendation}
+                                    </div>
+                                    
+                                    <div class="candidate-meta">
+                                        ${candidate.email ? `<span><strong>Email:</strong> ${candidate.email}</span>` : ''}
+                                        ${candidate.phone ? `<span><strong>Phone:</strong> ${candidate.phone}</span>` : ''}
+                                        ${candidate.last_company ? `<span><strong>Company:</strong> ${candidate.last_company}</span>` : ''}
+                                        ${candidate.years_in_role ? `<span><strong>Experience:</strong> ${candidate.years_in_role} years</span>` : '<span><strong>Experience:</strong> Not specified</span>'}
+                                    </div>
+                                </div>
+                                
+                                <div class="subscores">
+                                    <div style="margin-bottom: 10px; font-weight: 600; color: #cbd5e1;">Score Breakdown</div>
+                                    <div class="subscores-grid">
+                                        <div class="subscore">
+                                            <div class="subscore-label">Direct Experience</div>
+                                            <div class="subscore-value">${subscores.direct_experience || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.direct_experience || 0}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="subscore">
+                                            <div class="subscore-label">Years in Role</div>
+                                            <div class="subscore-value">${subscores.years_in_role || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.years_in_role || 0}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="subscore">
+                                            <div class="subscore-label">Company Level</div>
+                                            <div class="subscore-value">${subscores.company_level || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.company_level || 0}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="subscore">
+                                            <div class="subscore-label">Skills Match</div>
+                                            <div class="subscore-value">${subscores.skill_keywords || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.skill_keywords || 0}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="subscore">
+                                            <div class="subscore-label">Job Stability</div>
+                                            <div class="subscore-value">${subscores.job_stability || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.job_stability || 0}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="subscore">
+                                            <div class="subscore-label">Growth Potential</div>
+                                            <div class="subscore-value">${subscores.growth_progression || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.growth_progression || 0}%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="subscore">
+                                            <div class="subscore-label">CV Quality</div>
+                                            <div class="subscore-value">${subscores.red_flags || 0}</div>
+                                            <div class="subscore-bar">
+                                                <div class="subscore-bar-fill" style="width: ${subscores.red_flags || 0}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                jobHTML += `
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += jobHTML;
+            });
+        }
+
+        function exportToCSV() {
+            alert('CSV export functionality - will be implemented in backend');
+        }
+
+        // Render results on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderResults(mockResults);
+        });
+    </script>
+</body>
+</html>

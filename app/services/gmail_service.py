@@ -76,6 +76,28 @@ def _unique_path(folder, filename):
     return os.path.join(folder, candidate), candidate
 
 
+def _attachment_already_exists(folder, filename):
+    """
+    Verifica daca atasamentul exista deja in uploads.
+    Evita descarcarea aceluiasi CV la fiecare rulare Gmail.
+    """
+    base, ext = os.path.splitext(filename)
+
+    if os.path.exists(os.path.join(folder, filename)):
+        return True
+
+    pattern = re.compile(rf"^{re.escape(base)}(_\d+)?{re.escape(ext)}$", re.IGNORECASE)
+
+    try:
+        for existing_file in os.listdir(folder):
+            if pattern.match(existing_file):
+                return True
+    except FileNotFoundError:
+        return False
+
+    return False
+
+
 def filename_is_cv(filename):
     lower_name = (filename or "").lower().strip()
 
@@ -172,6 +194,10 @@ def _download_attachments_from_message(mail, message_id, downloaded, skipped):
             skipped.append(filename)
             continue
 
+        if _attachment_already_exists(UPLOAD_FOLDER, filename):
+            skipped.append(filename)
+            continue
+
         filepath, final_filename = _unique_path(UPLOAD_FOLDER, filename)
 
         with open(filepath, "wb") as file:
@@ -198,7 +224,18 @@ def download_cv_attachments(max_results=20):
     try:
         mail = _connect_imap()
 
-        status, data = mail.search(None, "HAS", "ATTACHMENT")
+        # Gmail IMAP nu accepta stabil comanda: HAS ATTACHMENT.
+        # Folosim X-GM-RAW, adica sintaxa Gmail reala.
+        # Cauta doar emailuri recente cu atasamente, ca sa reducem timpul de procesare.
+        try:
+            status, data = mail.search(
+                None,
+                "X-GM-RAW",
+                '"has:attachment newer_than:30d"'
+            )
+        except imaplib.IMAP4.error:
+            status, data = mail.search(None, "ALL")
+
         if status != "OK":
             status, data = mail.search(None, "ALL")
 

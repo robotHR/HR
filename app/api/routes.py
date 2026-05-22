@@ -16,6 +16,8 @@ from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.services.cv_parser import process_cvs_for_job
 from app.services.gmail_service import (
+
+from app.services.multi_job_analyzer import MultiJobAnalyzer
     download_cv_attachments,
     send_interview_email,
     send_rejection_email
@@ -970,3 +972,29 @@ async def debug_db():
             for candidate in candidates
         ]
     })
+
+@router.post("/analyze-multi-jobs")
+async def analyze_multi_jobs(request: Request, jobs_input: str = Form(...)):
+    """
+    Analiză multi-job
+    Input: "Casier, Sofer TIR, Lucrator Depozit"
+    Output: Ranking-uri per job cu 7-score breakdown
+    """
+    try:
+        analyzer = MultiJobAnalyzer()
+        job_list = [j.strip() for j in jobs_input.split(",")]
+        results = analyzer.analyze_all_cvs_for_jobs(job_list)
+        
+        # Export la CSV
+        csv_path = analyzer.export_to_csv(results, f"app/static/analysis_results.csv")
+        
+        return templates.TemplateResponse("analysis_results.html", {
+            "request": request,
+            "results": results,
+            "csv_path": csv_path
+        })
+    except Exception as e:
+        return templates.TemplateResponse("error.html", {
+            "request": request,
+            "error": str(e)
+        })

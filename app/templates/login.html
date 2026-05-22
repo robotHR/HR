@@ -13,21 +13,18 @@
             background:#050914;
             color:white;
             font-family:Arial,sans-serif;
-            overflow-x:hidden;
         }
 
         .bg{
             position:fixed;
             inset:0;
             background:
-                radial-gradient(circle at top right,rgba(139,92,246,.32),transparent 36%),
-                radial-gradient(circle at bottom left,rgba(37,99,235,.22),transparent 34%),
-                linear-gradient(135deg,#050914 0%,#080d1a 52%,#120b2b 100%);
+                radial-gradient(circle at top right, rgba(139,92,246,.28), transparent 35%),
+                radial-gradient(circle at bottom left, rgba(37,99,235,.18), transparent 34%);
             pointer-events:none;
-            z-index:0;
         }
 
-        .login-page{
+        .page{
             position:relative;
             z-index:1;
             min-height:100vh;
@@ -35,35 +32,35 @@
             flex-direction:column;
             align-items:center;
             justify-content:flex-start;
-            padding:44px 22px 70px;
+            padding:20px 16px 40px;
         }
 
-        .hero-logo{
-            width:min(1180px,94vw);
-            margin:0 auto 34px;
+        .hero-image{
+            width:min(1180px, 96vw);
+            margin:0 auto 26px;
             display:flex;
             justify-content:center;
-            align-items:center;
         }
 
-        .hero-logo img{
+        .hero-image img{
             width:100%;
-            max-height:300px;
-            object-fit:cover;
-            object-position:center;
-            border-radius:30px;
-            border:1px solid rgba(255,255,255,.12);
-            box-shadow:0 35px 120px rgba(0,0,0,.58);
+            height:auto;
+            max-height:320px;
+            object-fit:contain;
             display:block;
+            border-radius:28px;
+            border:1px solid rgba(255,255,255,.08);
+            box-shadow:0 30px 100px rgba(0,0,0,.45);
+            background:#0b1220;
         }
 
         .card{
-            width:min(460px,100%);
-            background:rgba(15,23,42,.94);
-            border:1px solid rgba(255,255,255,.09);
+            width:min(460px, 100%);
+            background:#0f172a;
+            border:1px solid rgba(255,255,255,.08);
             border-radius:32px;
             padding:38px;
-            box-shadow:0 30px 100px rgba(0,0,0,.48);
+            box-shadow:0 30px 100px rgba(0,0,0,.45);
             position:relative;
             overflow:hidden;
         }
@@ -72,7 +69,7 @@
             content:"";
             position:absolute;
             inset:0;
-            background:radial-gradient(circle at top right,rgba(139,92,246,.22),transparent 42%);
+            background:radial-gradient(circle at top right, rgba(139,92,246,.20), transparent 40%);
             pointer-events:none;
         }
 
@@ -82,17 +79,18 @@
             line-height:1;
             margin-bottom:12px;
             position:relative;
-            letter-spacing:-1px;
         }
 
-        .logo span{color:#a78bfa}
+        .logo span{
+            color:#a78bfa;
+        }
 
         .subtitle{
             color:#94a3b8;
-            line-height:1.5;
-            margin-bottom:30px;
+            line-height:1.55;
+            margin-bottom:28px;
             position:relative;
-            font-size:14px;
+            font-size:15px;
         }
 
         .field{
@@ -123,7 +121,6 @@
         input:focus{
             outline:none;
             border-color:#8b5cf6;
-            box-shadow:0 0 0 3px rgba(139,92,246,.18);
         }
 
         button{
@@ -140,7 +137,9 @@
             position:relative;
         }
 
-        button:hover{background:#9568ff}
+        button:hover{
+            background:#9a6cf7;
+        }
 
         .error{
             background:#7f1d1d;
@@ -157,32 +156,68 @@
             font-size:13px;
             line-height:1.5;
             margin-top:20px;
-            position:relative;
             text-align:center;
+            position:relative;
         }
 
-        @media(max-width:760px){
-            .login-page{
-                padding:24px 16px 44px;
+        @media (min-width: 1400px){
+            .hero-image img{
+                max-height:360px;
+            }
+        }
+
+        @media (max-width: 900px){
+            .page{
+                padding:16px 14px 30px;
             }
 
-            .hero-logo{
-                width:100%;
-                margin-bottom:24px;
+            .hero-image{
+                width:min(100%, 94vw);
+                margin-bottom:18px;
             }
 
-            .hero-logo img{
-                max-height:190px;
+            .hero-image img{
+                max-height:220px;
                 border-radius:22px;
             }
 
             .card{
+                width:min(460px, 100%);
                 padding:30px 22px;
                 border-radius:26px;
             }
 
             .logo{
                 font-size:36px;
+            }
+
+            .subtitle{
+                font-size:14px;
+            }
+        }
+
+        @media (max-width: 520px){
+            .hero-image img{
+                max-height:170px;
+                border-radius:18px;
+            }
+
+            .card{
+                padding:24px 18px;
+            }
+
+            .logo{
+                font-size:32px;
+            }
+
+            input{
+                padding:14px;
+                font-size:15px;
+            }
+
+            button{
+                padding:15px;
+                font-size:15px;
             }
         }
     </style>
@@ -191,8 +226,8 @@
 <body>
 <div class="bg"></div>
 
-<main class="login-page">
-    <div class="hero-logo">
+<div class="page">
+    <div class="hero-image">
         <img src="/static/images/LOGO%20NEXAS.jpg" alt="NEXAS HR Platform">
     </div>
 
@@ -218,6 +253,6 @@
 
         <div class="note">NEXAS HR Platform</div>
     </form>
-</main>
+</div>
 </body>
 </html>

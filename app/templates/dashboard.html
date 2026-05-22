@@ -147,8 +147,7 @@
                 <button type="submit" class="btn-gmail">Gmail + Analizeaza</button>
             </form>
 
-            <form action="/upload-cv-uri" method="post" enctype="multipart/form-data" class="input-row loading-form" data-title="Se incarca si se analizeaza CV-urile" data-text="Agentul salveaza CV-urile incarcate manual si le potriveste cu posturile introduse.">
-                <input type="text" name="target_job" placeholder="Posturi pentru CV-urile incarcate manual" required>
+            <form action="/upload-cv-uri" method="post" enctype="multipart/form-data" class="input-row loading-form" data-title="Se incarca CV-urile" data-text="Agentul salveaza CV-urile incarcate manual. Le poti analiza ulterior pentru orice post.">
                 <input type="file" name="cv_files" accept=".pdf,.doc,.docx" multiple required>
                 <button type="submit" class="btn-main">Incarca CV-uri</button>
             </form>
@@ -158,7 +157,7 @@
                 <button type="submit" class="btn-secondary">Analizeaza existente</button>
             </form>
 
-            <div class="helper-text">Separa posturile cu virgula. Poti analiza CV-uri din Gmail, CV-uri incarcate manual sau CV-uri deja existente.</div>
+            <div class="helper-text">Incarca CV-uri manual fara sa alegi jobul. Apoi foloseste Analizeaza existente pentru unul sau mai multe posturi, separate cu virgula.</div>
 
             <div class="danger-row">
                 <form action="/sterge-baza" method="post"><button type="submit" class="btn-danger">Curata dashboard</button></form>

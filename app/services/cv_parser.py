@@ -197,6 +197,10 @@ def build_prompt(text, target_job):
   "candidate_name": "",
   "email": "",
   "phone": "",
+  "companies": [],
+  "positions_held": [],
+  "current_position": "",
+  "recommended_role_for_candidate": "",
   "target_position": "",
   "job_domain": "",
   "years_experience": 0,
@@ -232,6 +236,12 @@ def build_prompt(text, target_job):
         "PROFIL JOB DEDICAT DIN config/job_profiles.json:\n" + profile_json + "\n\n"
         f"REGULA PERMIS: {license_rule}\n\n"
         "REGULI OBLIGATORII:\n"
+        "- Extrage companiile/institutiile unde a lucrat candidatul si pune-le in companies. Nu inventa companii. Daca nu apar clar, lasa lista goala.\n"
+        "- Extrage functiile ocupate si pune-le in positions_held.\n"
+        "- current_position = ultima functie sau functia dominanta din CV.\n"
+        "- recommended_role_for_candidate = rolul real potrivit candidatului, pe baza CV-ului. Nu copia automat postul cautat.\n"
+        "- Daca postul cautat este Senior Logistics Coordinator, dar CV-ul este de Rector, recommended_role_for_candidate trebuie sa fie Rector / Coordonator academic / Management educational, nu Senior Logistics Coordinator.\n"
+        "- summary trebuie sa fie un rezumat HR curat. Nu include in summary textele: Risc supracalificare, Nepotrivire nivel, overqualification_risk, level_mismatch. Acestea exista separat in JSON.\n"
         "- Respecta must_have, nice_to_have, reject_if_missing, red_flags si max_score_rules.\n"
         "- Alege candidatul potrivit pentru postul cautat, nu candidatul cu cel mai impresionant CV.\n"
         "- Pentru roluri operationale, entry-level sau repetitive, penalizeaza supracalificarea.\n"
@@ -300,7 +310,7 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
     if profile.get("domain") in operational_domains and any(w in combined for w in high_level):
         data["score"] = min(clean_score(data.get("score",0)), 35)
         data["recommendation"] = "REJECT"
-        data["summary"] = "Risc mare de supracalificare. " + as_text(data.get("summary",""))
+        data["summary"] = set_summary_risk(data.get("summary",""), over_risk="high", level_risk="high")
     req = detect_required_license(target_job, profile)
     if req:
         r = req.lower()
@@ -308,19 +318,80 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
         if not found:
             data["score"] = min(clean_score(data.get("score",0)), 30)
             data["recommendation"] = "REJECT"
-            data["summary"] = f"Lipseste confirmarea clara pentru permis categoria {req}. " + as_text(data.get("summary",""))
+            clean_visible = strip_risk_text(data.get("summary",""))
+            data["summary"] = set_summary_risk(f"Lipseste confirmarea clara pentru permis categoria {req}. {clean_visible}", over_risk="high", level_risk="high")
     return data
+
+
+def strip_risk_text(value):
+    text = as_text(value).strip()
+    text = re.sub(r"\bRisc\s+supracalificare\s*:\s*(low|medium|high|unknown|scazut|mediu|ridicat|necunoscut)\s*\.?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bNepotrivire\s+nivel\s*:\s*(low|medium|high|unknown|scazut|mediu|ridicat|necunoscut)\s*\.?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\boverqualification_risk\s*:\s*(low|medium|high|unknown)\s*\.?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\blevel_mismatch\s*:\s*(low|medium|high|unknown)\s*\.?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def set_summary_risk(summary, over_risk=None, level_risk=None):
+    text = as_text(summary)
+    over = over_risk or "unknown"
+    level = level_risk or "unknown"
+
+    current_over = re.search(r"Risc supracalificare:\s*(low|medium|high|unknown)", text, flags=re.IGNORECASE)
+    current_level = re.search(r"Nepotrivire nivel:\s*(low|medium|high|unknown)", text, flags=re.IGNORECASE)
+
+    if current_over:
+        text = re.sub(r"Risc supracalificare:\s*(low|medium|high|unknown)", f"Risc supracalificare: {over}", text, flags=re.IGNORECASE)
+    else:
+        text = f"Risc supracalificare: {over}. " + text
+
+    if current_level:
+        text = re.sub(r"Nepotrivire nivel:\s*(low|medium|high|unknown)", f"Nepotrivire nivel: {level}", text, flags=re.IGNORECASE)
+    else:
+        parts = text.split(".", 1)
+        if len(parts) == 2 and "Risc supracalificare:" in parts[0]:
+            text = parts[0] + f". Nepotrivire nivel: {level}." + parts[1]
+        else:
+            text = f"Nepotrivire nivel: {level}. " + text
+
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def first_value(*values):
+    for value in values:
+        text = as_text(value).strip()
+        if text:
+            return text
+    return ""
+
 
 def normalize_data(data, file, target_job, cv_text, profile):
     score = clean_score(data.get("final_score", data.get("fit_percentage", 0)))
     rec = normalize_recommendation(data.get("recommendation",""), score)
     name = data.get("candidate_name") or data.get("name") or data.get("full_name") or filename_to_name(file)
-    summary = "Risc supracalificare: " + as_text(data.get("overqualification_risk","unknown")) + ". Nepotrivire nivel: " + as_text(data.get("level_mismatch","unknown")) + ". " + as_text(data.get("summary", data.get("match_analysis","")))
+
+    over_risk = as_text(data.get("overqualification_risk", "unknown")).lower() or "unknown"
+    level_risk = as_text(data.get("level_mismatch", "unknown")).lower() or "unknown"
+
+    clean_ai_summary = strip_risk_text(data.get("summary", data.get("match_analysis", "")))
+    if not clean_ai_summary:
+        clean_ai_summary = "Rezumat indisponibil. Verifica manual CV-ul."
+
+    summary = f"Risc supracalificare: {over_risk}. Nepotrivire nivel: {level_risk}. {clean_ai_summary}"
+
+    recommended_role = first_value(
+        data.get("recommended_role_for_candidate"),
+        data.get("current_position"),
+        data.get("target_position"),
+        data.get("position")
+    )
+
     normalized = {
         "name": name,
         "email": data.get("email",""),
         "phone": data.get("phone",""),
-        "position": data.get("target_position", data.get("position","")),
+        "position": recommended_role,
         "years_experience": data.get("years_experience",""),
         "skills": data.get("transferable_skills", data.get("skills","")),
         "companies": data.get("companies",""),

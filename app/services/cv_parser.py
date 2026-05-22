@@ -199,6 +199,7 @@ def build_prompt(text, target_job):
   "phone": "",
   "target_position": "",
   "job_domain": "",
+  "last_company": "",
   "years_experience": 0,
   "years_relevant_domain": 0,
   "experience_score": 0,
@@ -223,7 +224,16 @@ def build_prompt(text, target_job):
   "risk_level": "low|medium|high|critical",
   "retention_probability": 0,
   "wage_alignment": "aligned|higher|lower|unknown",
-  "summary": ""
+  "summary": "",
+  "subscores": {
+    "direct_experience": 0,
+    "years_in_role": 0,
+    "company_level": 0,
+    "skill_keywords": 0,
+    "job_stability": 0,
+    "growth_progression": 0,
+    "cv_quality": 0
+  }
 }
 """
     return (
@@ -244,6 +254,15 @@ def build_prompt(text, target_job):
         "- Nu confunda sofer categoria B cu sofer categoria C.\n\n"
         "SCORING:\n"
         "85-100 STRONG_YES, 70-84 YES, 55-69 MAYBE, 40-54 NO, sub 40 REJECT.\n\n"
+        "SUBSCORES - Completeaza STRICT doar cu ce gasesti explicit in CV (0 daca nu gasesti):\n"
+        "- direct_experience: 0-100. 95=postul exact mentionat in CV, 75=post similar, 0=nementionat.\n"
+        "- years_in_role: 0-100. 95=5+ani, 80=3-5ani, 60=1-3ani, 30=sub1an, 0=nespecificat.\n"
+        "- company_level: 0-100. 90=companie internationala mare(Carrefour/Metro/DHL), 75=companie nationala, 50=companie medie, 0=nespecificata.\n"
+        "- skill_keywords: 0-100. Procentul din must_have gasit explicit in CV.\n"
+        "- job_stability: 0-100. 90=3+ani aceeasi companie, 75=1-3ani stabil, 30=schimbari dese, 0=necunoscut.\n"
+        "- growth_progression: 0-100. 80=promovare vizibila, 50=roluri laterale, 30=un singur rol, 0=necunoscut.\n"
+        "- cv_quality: 0-100. 90=CV detaliat si clar, 50=CV generic, 0=CV incomplet.\n"
+        "IMPORTANT: last_company = ultima companie mentionata explicit in CV (sau '' daca nu gasesti).\n\n"
         "Raspunde STRICT in JSON valid, fara markdown, folosind schema:\n" + schema + "\nCV:\n" + text[:10000]
     )
 
@@ -359,6 +378,33 @@ def save_candidate_to_db(data, file, target_job):
         print("EROARE LA SALVARE IN DB:", e)
 
 def process_cvs_for_job(target_job):
+    # Multi-job support: "Casier, Sofer TIR" → ["Casier", "Sofer TIR"]
+    job_list = [j.strip() for j in target_job.split(",") if j.strip()]
+    if not job_list:
+        return {"ok": False, "message": "Nu ai completat postul.", "saved": 0}
+
+    # Dacă e un singur job, comportament exact ca înainte
+    if len(job_list) == 1:
+        return _process_single_job(job_list[0])
+
+    # Dacă sunt mai multe joburi, procesăm fiecare
+    all_results = {}
+    total_saved = 0
+    for job in job_list:
+        result = _process_single_job(job)
+        all_results[job] = result.get("results", [])
+        total_saved += result.get("saved", 0)
+
+    return {
+        "ok": True,
+        "message": f"Analiza finalizata pentru {len(job_list)} posturi. Candidati salvati: {total_saved}",
+        "saved": total_saved,
+        "multi_job": True,
+        "results_per_job": all_results
+    }
+
+
+def _process_single_job(target_job):
     target_job = target_job.strip()
     if not target_job:
         return {"ok":False,"message":"Nu ai completat postul.","saved":0}

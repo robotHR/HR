@@ -14,7 +14,7 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
-from app.services.cv_parser import process_cvs_for_job
+# from app.services.cv_parser import process_cvs_for_job  # Deprecated - using V2 system now
 from app.services.gmail_service import (
     download_cv_attachments,
     send_interview_email,

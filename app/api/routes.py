@@ -5,7 +5,7 @@ import time
 from collections import Counter, defaultdict
 from io import BytesIO
 
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import inspect, text
@@ -27,6 +27,34 @@ templates = Jinja2Templates(directory="app/templates")
 
 UPLOAD_FOLDER = "app/uploads"
 TERMINAL_STATUSES = ["REFUZAT", "ANGAJAT", "EXCLUS"]
+ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".docx", ".doc"}
+
+
+def safe_upload_filename(filename):
+    filename = filename or f"cv_{int(time.time())}.pdf"
+    filename = filename.replace("\\", "_").replace("/", "_")
+    filename = re.sub(r"[^A-Za-z0-9._() -]+", "_", filename)
+    filename = re.sub(r"\s+", " ", filename).strip()
+    return filename or f"cv_{int(time.time())}.pdf"
+
+
+def unique_upload_path(filename):
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    filename = safe_upload_filename(filename)
+    base, ext = os.path.splitext(filename)
+    candidate = filename
+    index = 1
+
+    while os.path.exists(os.path.join(UPLOAD_FOLDER, candidate)):
+        candidate = f"{base}_{index}{ext}"
+        index += 1
+
+    return os.path.join(UPLOAD_FOLDER, candidate), candidate
+
+
+def is_allowed_cv_file(filename):
+    ext = os.path.splitext(filename or "")[1].lower()
+    return ext in ALLOWED_UPLOAD_EXTENSIONS
 
 
 def ensure_candidate_extra_columns():
@@ -909,6 +937,66 @@ async def analyze_job(target_job: str = Form(...)):
     message = result.get("message", "Analiza finalizata.")
     if final_files:
         message += " Candidatii marcati Angajat, Exclus sau Potrivit altor roluri nu mai apar in dashboard."
+
+    return RedirectResponse(url=f"/?message={message}", status_code=303)
+
+
+@router.post("/upload-cv-uri")
+async def upload_cv_files(
+    target_job: str = Form(...),
+    cv_files: list[UploadFile] = File(...)
+):
+    batch_id = str(int(time.time()))
+    after_id = get_max_candidate_id()
+    uploaded_files = []
+    skipped_files = []
+
+    for upload in cv_files:
+        original_name = safe_upload_filename(upload.filename)
+
+        if not is_allowed_cv_file(original_name):
+            skipped_files.append(original_name)
+            continue
+
+        content = await upload.read()
+
+        if not content:
+            skipped_files.append(original_name)
+            continue
+
+        file_path, final_name = unique_upload_path(original_name)
+
+        with open(file_path, "wb") as output_file:
+            output_file.write(content)
+
+        uploaded_files.append(final_name)
+
+    if not uploaded_files:
+        return RedirectResponse(
+            url="/?message=Nu s-a incarcat niciun CV valid. Acceptam PDF, DOCX si DOC.",
+            status_code=303
+        )
+
+    moved_files = temporarily_keep_only_files(set(uploaded_files))
+
+    try:
+        analysis_result = process_cvs_for_job(target_job)
+    finally:
+        restore_temp_files(moved_files)
+
+    mark_new_candidates_batch(
+        after_id=after_id,
+        batch_id=batch_id,
+        visible=1,
+        only_files=set(uploaded_files),
+        hide_final_files=True
+    )
+
+    message = (
+        f"CV-uri incarcate manual: {len(uploaded_files)}. "
+        f"Fisiere ignorate: {len(skipped_files)}. "
+        f"{analysis_result.get('message', '')}"
+    )
 
     return RedirectResponse(url=f"/?message={message}", status_code=303)
 

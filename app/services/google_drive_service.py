@@ -7,7 +7,7 @@ from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
 
 GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 
-SERVICE_ACCOUNT_FILE = "service_account.json"
+SERVICE_ACCOUNT_FILE = "app/service_account.json"
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 

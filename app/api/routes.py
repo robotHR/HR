@@ -16,6 +16,8 @@ from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.services.cv_parser import process_cvs_for_job
+from app.services.google_drive_service import upload_cv_to_drive
+
 from app.services.gmail_service import (
     download_cv_attachments,
     send_interview_email,
@@ -25,7 +27,7 @@ from app.services.gmail_service import (
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/var/data/uploads")
+UPLOAD_FOLDER = "app/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 TERMINAL_STATUSES = ["REFUZAT", "ANGAJAT", "EXCLUS"]
 ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".docx", ".doc"}
@@ -788,10 +790,10 @@ async def open_candidate_cv(candidate_id: int):
     if not candidate or not candidate.cv_file:
         return JSONResponse({"error": "CV-ul nu a fost gasit pentru acest candidat."}, status_code=404)
 
-    file_path = os.path.join(UPLOAD_FOLDER, candidate.cv_file)
+    file_path = os.path.join("app", "uploads", candidate.cv_file)
 
     if not os.path.exists(file_path):
-        return JSONResponse({"error": "Fisierul CV nu exista in folderul de upload."}, status_code=404)
+        return JSONResponse({"error": "Fisierul CV nu exista in app/uploads."}, status_code=404)
 
     return FileResponse(path=file_path, filename=candidate.cv_file, media_type="application/pdf")
 

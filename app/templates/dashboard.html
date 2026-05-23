@@ -1069,10 +1069,9 @@
                     <div>
                         <h3>CV-uri din Gmail</h3>
                         <p>Agentul cauta CV-uri noi in Gmail, le descarca si le analizeaza pentru posturile introduse.</p>
-                        <form action="/gmail-si-analiza" method="post" class="loading-form" data-title="Se verifica Gmail si se analizeaza CV-urile noi" data-text="Agentul cauta CV-uri noi in Gmail, le descarca si le potriveste cu posturile introduse.">
+                        <form action="/gmail-si-analiza" method="post" class="loading-form" data-title="Se verifica Gmail" data-text="Agentul cauta CV-uri in Gmail si le salveaza in platforma. Analiza se face separat din Potrivire pe job.">
                             <div class="form-line">
-                                <input type="text" name="target_job" placeholder="Ex: Casier, Sofer TIR, Contabil" required>
-                                <button type="submit" class="btn-gmail">Gmail + Analizeaza</button>
+                                <button type="submit" class="btn-gmail">Importa CV-uri din Gmail</button>
                             </div>
                         </form>
                     </div>
@@ -1105,7 +1104,7 @@
                 </form>
 
                 <div class="helper-text">
-                    Incarca CV-uri manual fara sa alegi jobul. Apoi foloseste Analizeaza existente pentru unul sau mai multe posturi, separate cu virgula.
+                    Importa CV-uri din Gmail sau incarca manual CV-uri. Apoi foloseste Analizeaza existente pentru toate CV-urile salvate.
                 </div>
             </div>
 

@@ -990,9 +990,20 @@ async def upload_cv_files(cv_files: list[UploadFile] = File(...)):
 
 
 @router.post("/gmail-si-analiza")
-async def gmail_and_analyze(target_job: str = Form(...)):
-    batch_id = str(int(time.time()))
-    after_id = get_max_candidate_id()
+async def gmail_and_analyze():
+
+    gmail_result = download_cv_attachments(max_results=30)
+
+    message = (
+        f"Gmail verificat. "
+        f"CV-uri noi descarcate: {gmail_result['downloaded_count']}. "
+        f"CV-uri deja existente: {gmail_result['skipped_count']}."
+    )
+
+    return RedirectResponse(
+        url=f"/?message={message}",
+        status_code=303
+    )
 
     gmail_result = download_cv_attachments(max_results=30)
     downloaded_files = set(gmail_result.get("downloaded", []))

@@ -972,6 +972,8 @@ async def upload_cv_files(cv_files: list[UploadFile] = File(...)):
         with open(file_path, "wb") as output_file:
             output_file.write(content)
 
+        upload_cv_to_drive(file_path, final_name)
+
         uploaded_files.append(final_name)
 
     if not uploaded_files:
@@ -1004,39 +1006,6 @@ async def gmail_and_analyze():
         url=f"/?message={message}",
         status_code=303
     )
-
-    gmail_result = download_cv_attachments(max_results=30)
-    downloaded_files = set(gmail_result.get("downloaded", []))
-
-    if not downloaded_files:
-        return RedirectResponse(
-            url="/?message=Gmail verificat. Nu exista CV-uri noi descarcate.",
-            status_code=303
-        )
-
-    moved_files = temporarily_keep_only_files(downloaded_files)
-
-    try:
-        analysis_result = process_cvs_for_job(target_job)
-    finally:
-        restore_temp_files(moved_files)
-
-    mark_new_candidates_batch(
-        after_id=after_id,
-        batch_id=batch_id,
-        visible=1,
-        only_files=downloaded_files,
-        hide_final_files=True
-    )
-
-    message = (
-        f"Gmail verificat. "
-        f"CV-uri noi descarcate: {gmail_result['downloaded_count']}. "
-        f"CV-uri deja existente: {gmail_result['skipped_count']}. "
-        f"{analysis_result.get('message', '')}"
-    )
-
-    return RedirectResponse(url=f"/?message={message}", status_code=303)
 
 
 @router.post("/sterge-baza")

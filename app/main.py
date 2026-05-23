@@ -10,6 +10,7 @@ from app.core.database import Base, engine
 
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
+from app.models.cv_analysis_model import CvAnalysis
 
 Base.metadata.create_all(bind=engine)
 

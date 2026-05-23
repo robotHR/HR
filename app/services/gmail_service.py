@@ -12,7 +12,8 @@ except ImportError:
     resend = None
 
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "app/uploads")
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/var/data/uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 GMAIL_EMAIL = os.getenv("GMAIL_EMAIL")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
@@ -208,7 +209,7 @@ def _download_attachments_from_message(mail, message_id, downloaded, skipped):
 
 def download_cv_attachments(max_results=20):
     """
-    Citeste ultimele emailuri din Gmail prin IMAP si descarca atasamentele CV in UPLOAD_FOLDER.
+    Citeste ultimele emailuri din Gmail prin IMAP si descarca atasamentele CV in app/uploads.
 
     Necesita in Render:
     GMAIL_EMAIL

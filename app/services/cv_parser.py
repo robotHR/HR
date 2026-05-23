@@ -19,7 +19,7 @@ from app.models.candidate_model import Candidate
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "app/uploads")
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/var/data/uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 JOB_PROFILES_PATH = "config/job_profiles.json"
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY"))
@@ -437,22 +437,10 @@ def process_cvs_for_job(target_job):
     profile = match_job_profile(target_job) or build_fallback_profile(target_job)
     print("Profil job folosit:", profile.get("job_title"), "-", profile.get("domain"))
     saved, results = 0, []
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    cv_files = [
-        file for file in os.listdir(UPLOAD_FOLDER)
-        if file.lower().endswith((".pdf", ".docx", ".doc"))
-        and os.path.isfile(os.path.join(UPLOAD_FOLDER, file))
-    ]
+    for file in os.listdir(UPLOAD_FOLDER):
+        if not file.lower().endswith((".pdf", ".docx", ".doc")):
+            continue
 
-    if not cv_files:
-        return {
-            "ok": False,
-            "message": f"Nu am gasit CV-uri in folderul de upload: {UPLOAD_FOLDER}",
-            "saved": 0,
-            "results": []
-        }
-
-    for file in cv_files:
         path = os.path.join(UPLOAD_FOLDER, file)
         print("\n" + "="*70); print(f"Processing: {file}"); print("="*70)
 

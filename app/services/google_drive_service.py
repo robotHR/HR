@@ -18,6 +18,7 @@ credentials = service_account.Credentials.from_service_account_file(
 
 drive_service = build("drive", "v3", credentials=credentials)
 
+
 def upload_cv_to_drive(local_file_path, filename):
 
     existing = drive_service.files().list(
@@ -34,19 +35,24 @@ def upload_cv_to_drive(local_file_path, filename):
     }
 
     with open(local_file_path, "rb") as f:
-        media = MediaIoBaseUpload(
-            io.BytesIO(f.read()),
-            mimetype="application/octet-stream",
-            resumable=True
-        )
+        file_content = f.read()
 
-        uploaded_file = drive_service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields="id,name"
-        ).execute()
+    # resumable=False => fisierul se salveaza in quota folderului (contul tau),
+    # nu in quota service account-ului (care nu are storage)
+    media = MediaIoBaseUpload(
+        io.BytesIO(file_content),
+        mimetype="application/octet-stream",
+        resumable=False
+    )
+
+    uploaded_file = drive_service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id,name"
+    ).execute()
 
     return uploaded_file
+
 
 def list_cv_files():
 
@@ -58,6 +64,7 @@ def list_cv_files():
     ).execute()
 
     return results.get("files", [])
+
 
 def download_cv_file(file_id, destination_path):
 
@@ -90,7 +97,6 @@ def stream_cv_from_drive(filename):
             return None, None
 
         file_id = files[0]["id"]
-        mime = files[0].get("mimeType", "application/octet-stream")
 
         ext = os.path.splitext(filename)[1].lower()
         if ext == ".pdf":
@@ -99,6 +105,8 @@ def stream_cv_from_drive(filename):
             mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         elif ext == ".doc":
             mime = "application/msword"
+        else:
+            mime = "application/octet-stream"
 
         request = drive_service.files().get_media(fileId=file_id)
         buffer = io.BytesIO()

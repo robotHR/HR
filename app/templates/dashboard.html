@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <title>NEXAS HR | Dashboard</title>
 
     <style>
@@ -38,7 +40,7 @@
                 radial-gradient(circle at bottom left, rgba(109,40,217,.22), transparent 34%),
                 linear-gradient(180deg,#070817 0%, #050714 46%, #080318 100%);
             color:var(--text);
-            font-family:Inter,Arial,sans-serif;
+            font-family:'DM Sans',sans-serif;
             overflow-x:hidden;
         }
 
@@ -234,7 +236,7 @@
         }
 
         .hero-title{
-            font-size:clamp(38px,5vw,78px);
+            font-size:clamp(26px,3vw,42px);
             line-height:.94;
             letter-spacing:-3px;
             font-weight:950;
@@ -919,13 +921,18 @@
 
         @media(max-width:520px){
             .nav{grid-template-columns:1fr}
-            .hero-title{font-size:38px}
+            .hero-title{font-size:26px}
             .feature-pill{width:100%;justify-content:center}
             .source-card{grid-template-columns:1fr}
             .card-head{grid-template-columns:1fr}
             .score{width:58px;height:58px}
         }
-    </style>
+    
+        .accordion-header{cursor:pointer;user-select:none;transition:.15s}
+        .accordion-header:hover{background:rgba(255,255,255,.03);border-radius:12px}
+        .accordion-chevron.open{transform:rotate(180deg)}
+
+</style>
 </head>
 
 <body>
@@ -960,11 +967,7 @@
             <a class="logout-link" href="/logout">↪ Logout</a>
         </nav>
 
-        <div class="sidebar-card">
-            <div class="sidebar-card-icon">⇪</div>
-            <strong>Import CV-uri</strong>
-            <p>Din Gmail sau incarcare manuala. Totul ramane intr-un singur loc.</p>
-        </div>
+
     </aside>
 
     <main class="main">
@@ -983,11 +986,7 @@
                         CV-uri din Gmail sau incarcare manuala. Cauti jobul. Vezi candidatii potriviti.
                     </div>
 
-                    <div class="feature-pills">
-                        <div class="feature-pill"><i>G</i> Gmail</div>
-                        <div class="feature-pill"><i>⇪</i> Upload CV</div>
-                        <div class="feature-pill"><i>✦</i> AI Matching</div>
-                    </div>
+
                 </div>
 
                 <div class="hero-panel">
@@ -1068,10 +1067,11 @@
                     <div class="source-icon">M</div>
                     <div>
                         <h3>CV-uri din Gmail</h3>
-                        <p>Agentul cauta CV-uri noi in Gmail si le descarca. CV-urile deja existente nu se re-descarca. Analiza se face separat din sectiunea de mai jos.</p>
-                        <form action="/descarca-gmail" method="post" class="loading-form" data-title="Se verifica Gmail" data-text="Agentul cauta CV-uri noi in Gmail. CV-urile deja descarcate sunt sarite automat.">
+                        <p>Agentul cauta CV-uri noi in Gmail, le descarca si le analizeaza pentru posturile introduse.</p>
+                        <form action="/gmail-si-analiza" method="post" class="loading-form" data-title="Se verifica Gmail si se analizeaza CV-urile noi" data-text="Agentul cauta CV-uri noi in Gmail, le descarca si le potriveste cu posturile introduse.">
                             <div class="form-line">
-                                <button type="submit" class="btn-gmail">Descarca CV-uri din Gmail</button>
+                                <input type="text" name="target_job" placeholder="Ex: Casier, Sofer TIR, Contabil" required>
+                                <button type="submit" class="btn-gmail">Gmail + Analizeaza</button>
                             </div>
                         </form>
                     </div>
@@ -1124,12 +1124,15 @@
 
         {% for job_title, job_candidates in jobs.items() %}
             <section class="job-block">
-                <div class="job-title-row">
+                <div class="job-title-row accordion-header" onclick="toggleAccordion(this)">
                     <h2 class="job-title">Top candidati <span>· {{ job_title }}</span></h2>
-                    <div class="job-count">{{ job_candidates|length }} rezultate</div>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div class="job-count">{{ job_candidates|length }} rezultate</div>
+                        <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:rgba(255,255,255,.4);transition:transform .25s"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
                 </div>
 
-                <div class="grid">
+                <div class="grid accordion-body" style="display:none">
                     {% for candidate in job_candidates %}
                         {% set over_risk = extract_risk(candidate.summary, "Risc supracalificare") %}
                         {% set level_risk = extract_risk(candidate.summary, "Nepotrivire nivel") %}
@@ -1239,5 +1242,16 @@
         });
     });
 </script>
+
+<script>
+function toggleAccordion(header) {
+    const body = header.nextElementSibling;
+    const chevron = header.querySelector('.accordion-chevron');
+    const isOpen = body.style.display !== 'none';
+    body.style.display = isOpen ? 'none' : 'grid';
+    if (chevron) chevron.classList.toggle('open', !isOpen);
+}
+</script>
+
 </body>
 </html>

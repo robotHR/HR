@@ -25,7 +25,7 @@ from app.services.gmail_service import (
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "app/uploads")
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/var/data/uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 TERMINAL_STATUSES = ["REFUZAT", "ANGAJAT", "EXCLUS"]
 ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".docx", ".doc"}
@@ -791,7 +791,7 @@ async def open_candidate_cv(candidate_id: int):
     file_path = os.path.join(UPLOAD_FOLDER, candidate.cv_file)
 
     if not os.path.exists(file_path):
-        return JSONResponse({"error": f"Fisierul CV nu exista in folderul de upload: {UPLOAD_FOLDER}"}, status_code=404)
+        return JSONResponse({"error": "Fisierul CV nu exista in folderul de upload."}, status_code=404)
 
     return FileResponse(path=file_path, filename=candidate.cv_file, media_type="application/pdf")
 
@@ -988,19 +988,39 @@ async def upload_cv_files(cv_files: list[UploadFile] = File(...)):
 
 
 @router.post("/gmail-si-analiza")
-async def gmail_and_analyze():
-    """
-    Importa CV-uri din Gmail si le salveaza in acelasi folder folosit de upload-ul manual.
-    Nu mai analizeaza doar CV-urile noi din Gmail.
-    Analiza se face separat din butonul "Analizeaza existente", pe toate CV-urile salvate.
-    """
+async def gmail_and_analyze(target_job: str = Form(...)):
+    batch_id = str(int(time.time()))
+    after_id = get_max_candidate_id()
+
     gmail_result = download_cv_attachments(max_results=30)
+    downloaded_files = set(gmail_result.get("downloaded", []))
+
+    if not downloaded_files:
+        return RedirectResponse(
+            url="/?message=Gmail verificat. Nu exista CV-uri noi descarcate.",
+            status_code=303
+        )
+
+    moved_files = temporarily_keep_only_files(downloaded_files)
+
+    try:
+        analysis_result = process_cvs_for_job(target_job)
+    finally:
+        restore_temp_files(moved_files)
+
+    mark_new_candidates_batch(
+        after_id=after_id,
+        batch_id=batch_id,
+        visible=1,
+        only_files=downloaded_files,
+        hide_final_files=True
+    )
 
     message = (
         f"Gmail verificat. "
-        f"CV-uri noi descarcate: {gmail_result.get('downloaded_count', 0)}. "
-        f"CV-uri deja existente: {gmail_result.get('skipped_count', 0)}. "
-        "Acum poti folosi Potrivire pe job pentru toate CV-urile salvate."
+        f"CV-uri noi descarcate: {gmail_result['downloaded_count']}. "
+        f"CV-uri deja existente: {gmail_result['skipped_count']}. "
+        f"{analysis_result.get('message', '')}"
     )
 
     return RedirectResponse(url=f"/?message={message}", status_code=303)

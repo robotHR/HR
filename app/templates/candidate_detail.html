@@ -4,221 +4,757 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalii candidat | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         :root{
-            --bg:#070b16;
-            --panel:#0a0f1e;
-            --panel-2:#080d1a;
-            --card:rgba(255,255,255,.035);
-            --line:rgba(255,255,255,.075);
+            --bg:#07091a;
+            --sidebar:#07091a;
+            --surface:#0e1228;
+            --surface-2:#111530;
+            --card:#131729;
+            --line:rgba(255,255,255,.07);
             --line-2:rgba(255,255,255,.11);
-            --text:#f8fafc;
-            --muted:rgba(255,255,255,.42);
-            --soft:rgba(255,255,255,.62);
-            --purple:#6366f1;
-            --purple-2:#8b5cf6;
-            --green:#34d399;
-            --yellow:#fbbf24;
+            --text:#f1f5ff;
+            --muted:rgba(200,210,255,.45);
+            --soft:rgba(200,210,255,.65);
+            --purple:#7c6ef7;
+            --purple-2:#a78bfa;
+            --purple-glow:rgba(124,110,247,.18);
+            --green:#2dd4bf;
+            --green-2:rgba(45,212,191,.12);
+            --yellow:#f59e0b;
+            --yellow-2:rgba(245,158,11,.12);
             --red:#f87171;
-            --radius-lg:22px;
-            --radius-md:14px;
+            --red-2:rgba(248,113,113,.12);
+            --radius-xl:20px;
+            --radius-lg:14px;
+            --radius-md:10px;
+            --radius-sm:8px;
         }
-        body{background:radial-gradient(circle at top right,rgba(99,102,241,.18),transparent 34%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100vh}
-        .dashboard-wrap,.layout{display:flex;min-height:100vh;background:linear-gradient(180deg,#0a0f1e,#070b16)}
-        .sidebar{width:210px;background:rgba(8,13,26,.94);border-right:.5px solid rgba(255,255,255,.07);padding:24px 0;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:10}
-        .sidebar-logo,.logo-box{padding:0 20px 24px;border-bottom:.5px solid rgba(255,255,255,.07);margin-bottom:16px}
-        .logo,.logo-text{font-size:22px;font-weight:800;letter-spacing:-.5px;color:#fff;line-height:1.05}
-        .logo .accent,.logo-text .accent{color:#a78bfa}
-        .logo-sub{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
-        .nav{display:flex;flex-direction:column;gap:2px;padding:0 0 12px}
-        .nav a,.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(255,255,255,.48);text-decoration:none;border-left:2px solid transparent;transition:.2s ease}
-        .nav a.active,.nav a:hover,.nav-item.active{color:#fff;background:rgba(99,102,241,.12);border-left-color:var(--purple)}
-        .nav a.logout-link{margin-top:auto;color:#fca5a5}
-        .main{margin-left:210px;width:calc(100% - 210px);padding:28px;overflow:auto}
-        .page-title,.title{font-size:24px;font-weight:700;color:#fff;margin-bottom:5px;letter-spacing:-.4px}
-        .page-sub,.subtitle{font-size:13px;color:var(--muted);margin-bottom:24px}
-        .message,.notice{background:rgba(99,102,241,.13);border:.5px solid rgba(99,102,241,.35);color:#ddd6fe;padding:13px 16px;border-radius:var(--radius-md);margin-bottom:18px;font-size:13px}
-        .notice.err,.err{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fecaca}
-        .stats-row,.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
-        .stat-card,.stat{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-md);padding:16px;min-height:88px}
-        .stat-label,.stat small{display:block;font-size:10px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
-        .stat-value,.stat strong{font-size:26px;font-weight:650;color:#fff}
-        .stat-value span{font-size:12px;color:var(--green);margin-left:6px;font-weight:500}
-        .search-card,.actions,.panel,.filters,.table-card,.hero{background:var(--card);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px;box-shadow:0 24px 80px rgba(0,0,0,.18)}
-        .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(99,102,241,.11),rgba(255,255,255,.025))}
-        .hero:before,.card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(139,92,246,.22),transparent 38%);pointer-events:none}
-        .search-card-title,.section-title,.actions h2,.panel h2,.filters h2{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px}
-        .input-row,.form-row{display:flex;gap:10px;margin-bottom:12px}
-        input,select,textarea,.fake-input{width:100%;background:rgba(255,255,255,.055);border:.5px solid var(--line-2);border-radius:var(--radius-md);padding:11px 14px;font-size:13px;color:rgba(255,255,255,.85);outline:none}
-        textarea{min-height:120px;resize:vertical;line-height:1.5}
-        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.26)}
-        button,.btn,.btn-link{border:0;border-radius:var(--radius-md);padding:11px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-        button:disabled{opacity:.6;cursor:not-allowed}
-        .btn-primary,.btn-main,.btn-details{background:var(--purple);color:#fff}
-        .btn-secondary,.btn-cv,.btn-clear,.btn-dark{background:rgba(139,92,246,.15);color:#c4b5fd;border:.5px solid rgba(139,92,246,.28)}
-        .btn-gmail,.btn-blue{background:#2563eb;color:#fff}
-        .btn-green,.btn-export{background:#16a34a;color:#fff}
-        .btn-danger,.danger button,.delete-all button,.btn-red{background:rgba(239,68,68,.10);color:#f87171;border:.5px solid rgba(239,68,68,.22)}
-        .btn-edit{background:rgba(251,191,36,.13);color:#fbbf24;border:.5px solid rgba(251,191,36,.25)}
-        .helper-text,.help,.edit-note,.small{font-size:12px;color:rgba(255,255,255,.36);line-height:1.5}
-        .danger-row,.card-actions,.actions-inline,.filter-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
-        .job-block{margin-bottom:28px}
-        .job-title{font-size:13px;font-weight:800;color:rgba(255,255,255,.58);text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
-        .card,.candidate-card{background:rgba(255,255,255,.032);border:.5px solid rgba(255,255,255,.07);border-radius:var(--radius-md);padding:16px;position:relative;overflow:hidden}
-        .candidate-card{display:flex;align-items:center;gap:13px;margin-bottom:8px}
-        .avatar{width:38px;height:38px;border-radius:50%;background:rgba(99,102,241,.2);border:.5px solid rgba(99,102,241,.38);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#c4b5fd;flex-shrink:0}
-        .name,.cand-name{font-size:15px;font-weight:800;color:rgba(255,255,255,.9);position:relative;z-index:1}
-        .card .name{padding-right:82px;margin-bottom:10px;font-size:17px}
-        .cand-meta{font-size:11px;color:rgba(255,255,255,.33);margin-top:2px}
-        .score{position:absolute;top:16px;right:16px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;z-index:1;color:#07111f}
-        .score-badge{margin-left:auto;display:flex;align-items:center;gap:8px}.score-num{font-size:20px;font-weight:800}.score-num.top{color:var(--green)}.score-num.mid{color:var(--yellow)}.score-num.low{color:var(--red)}
-        .score-green,.top{background:var(--green)}.score-yellow,.mid{background:var(--yellow)}.score-red,.low{background:var(--red)}.score-default{background:#a78bfa;color:#fff}
-        .tag{display:inline-block;font-size:10px;padding:4px 9px;border-radius:999px;font-weight:800;position:relative;z-index:1;text-transform:uppercase}
-        .tag-green,.tag.top{background:rgba(52,211,153,.1);color:var(--green);border:.5px solid rgba(52,211,153,.22)}
-        .tag-yellow,.tag.mid{background:rgba(251,191,36,.1);color:var(--yellow);border:.5px solid rgba(251,191,36,.22)}
-        .tag-red,.tag.low{background:rgba(248,113,113,.1);color:var(--red);border:.5px solid rgba(248,113,113,.22)}
-        .tag-default{background:rgba(99,102,241,.12);color:#c4b5fd;border:.5px solid rgba(99,102,241,.28)}
-        .label,.key{color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;margin-top:12px;margin-bottom:5px;position:relative;z-index:1;font-weight:800}
-        .text,.val,.summary{color:rgba(255,255,255,.74);line-height:1.48;font-size:13px;position:relative;z-index:1}.summary{max-height:86px;overflow:hidden}
-        .empty{background:rgba(255,255,255,.035);border:.5px solid var(--line);border-radius:var(--radius-lg);padding:28px;color:rgba(255,255,255,.55);font-size:15px}
-        .score-bar-wrap{width:66px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}.score-bar-fill{height:100%;border-radius:2px}
-        .risk-panel{display:grid;gap:9px;margin:13px 0;position:relative;z-index:1}.risk-row{display:grid;grid-template-columns:108px 1fr 56px;gap:9px;align-items:center}.risk-name{font-size:11px;color:rgba(255,255,255,.5)}.risk-track{height:7px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.risk-fill{height:100%;border-radius:999px}.risk-low{width:32%;background:var(--green)}.risk-medium{width:62%;background:var(--yellow)}.risk-high{width:100%;background:var(--red)}.risk-unknown{width:18%;background:#64748b}.risk-value{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase}
-        .decision{background:rgba(15,23,42,.72);border:.5px solid rgba(255,255,255,.08);padding:11px;border-radius:12px;margin-top:11px;position:relative;z-index:1;color:#dbeafe;font-size:12px;line-height:1.45}
-        table{width:100%;border-collapse:collapse}th{text-align:left;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;font-size:10px;padding:14px;border-bottom:.5px solid rgba(255,255,255,.08);background:rgba(2,6,23,.38)}td{padding:14px;border-bottom:.5px solid rgba(255,255,255,.055);vertical-align:top}tr:hover{background:rgba(99,102,241,.055)}.table-card{padding:0;overflow:hidden}.table-card .btn{padding:9px 12px}.job{font-weight:800;color:#dbeafe;font-size:13px}.score-cell{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:#07111f}
-        .bar-row{display:grid;grid-template-columns:140px 1fr 52px;gap:12px;align-items:center;margin-bottom:14px}.bar-label{color:#dbeafe;font-weight:700;font-size:13px}.bar-track{height:10px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#6366f1,#a78bfa)}.bar-fill.green{background:var(--green)}.bar-fill.yellow{background:var(--yellow)}.bar-fill.red{background:var(--red)}.bar-value{text-align:right;color:#cbd5e1;font-weight:800;font-size:12px}
-        .info{display:grid;gap:12px}.row{display:grid;grid-template-columns:140px 1fr;gap:16px;padding-bottom:12px;border-bottom:.5px solid rgba(255,255,255,.06)}.workflow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.step{background:rgba(2,6,23,.55);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}.step small{display:block;color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.step strong{font-size:13px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}label{color:#a78bfa;text-transform:uppercase;font-size:10px;letter-spacing:.08em;font-weight:800}.hidden{display:none}.timeline{display:grid;gap:10px}.event{display:grid;grid-template-columns:16px 1fr;gap:12px;background:rgba(2,6,23,.52);border:.5px solid rgba(255,255,255,.08);border-radius:14px;padding:13px}.dot{width:11px;height:11px;border-radius:50%;margin-top:4px;background:#64748b}.dot-green{background:var(--green)}.dot-yellow{background:var(--yellow)}.dot-red{background:var(--red)}.date{color:rgba(255,255,255,.36);font-size:11px;margin-bottom:5px}.event h3{font-size:13px;margin-bottom:5px}.event p{font-size:12px;color:rgba(255,255,255,.65);line-height:1.45}.danger-box{border-color:rgba(239,68,68,.3);background:rgba(127,29,29,.1)}
-        .loading-overlay{position:fixed;inset:0;background:rgba(2,6,23,.9);backdrop-filter:blur(10px);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px}.loading-box{width:min(560px,100%);background:#0a0f1e;border:.5px solid rgba(99,102,241,.35);box-shadow:0 30px 100px rgba(0,0,0,.5);border-radius:28px;padding:34px;text-align:center}.loader{width:72px;height:72px;border-radius:50%;border:7px solid rgba(255,255,255,.12);border-top-color:var(--purple);margin:0 auto 22px;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.loading-box h2{font-size:27px;margin-bottom:10px}.loading-box p{color:#cbd5e1;line-height:1.6;font-size:15px;margin-bottom:16px}.timer{font-size:36px;font-weight:900;color:#a78bfa;margin-bottom:14px}.progress{height:10px;width:100%;background:#020817;border-radius:999px;overflow:hidden;margin-top:16px;border:.5px solid rgba(255,255,255,.08)}.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a78bfa);animation:progressMove 12s ease-in-out infinite}@keyframes progressMove{0%{width:8%}50%{width:78%}100%{width:94%}}.loading-steps{display:grid;gap:9px;margin-top:19px;text-align:left}.loading-step{background:#020817;border:.5px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#dbeafe;font-size:13px}.loading-note{margin-top:14px;color:rgba(255,255,255,.38);font-size:12px}
-        @media(max-width:1100px){.stats-row,.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.table-card{overflow-x:auto}table{min-width:880px}.workflow{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:820px){.dashboard-wrap,.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:22px}.page-title,.title{font-size:28px}.input-row,.form-row,.filter-grid{grid-template-columns:1fr;flex-direction:column}.stats-row,.stats{grid-template-columns:1fr}.row,.form-grid{grid-template-columns:1fr}.score{position:relative;top:auto;right:auto;margin:12px 0}.card .name{padding-right:0}.risk-row{grid-template-columns:1fr}.workflow{grid-template-columns:1fr}}
-</style>
+        body{
+            background:var(--bg);
+            color:var(--text);
+            font-family:'DM Sans',sans-serif;
+            min-height:100vh;
+        }
+
+        /* ─── LAYOUT ─────────────────────────────── */
+        .layout{display:flex;min-height:100vh}
+
+        /* ─── SIDEBAR ────────────────────────────── */
+        .sidebar{
+            width:220px;flex-shrink:0;
+            background:var(--sidebar);
+            border-right:1px solid var(--line);
+            position:fixed;top:0;bottom:0;left:0;
+            display:flex;flex-direction:column;
+            padding:0;z-index:20;
+        }
+        .sidebar-logo{
+            padding:26px 22px 22px;
+            border-bottom:1px solid var(--line);
+        }
+        .logo-text{
+            font-family:'Syne',sans-serif;
+            font-size:20px;font-weight:800;
+            color:#fff;letter-spacing:-.3px;
+        }
+        .logo-text .accent{color:var(--purple-2)}
+        .logo-sub{
+            font-size:10px;color:var(--muted);
+            letter-spacing:2px;text-transform:uppercase;
+            margin-top:4px;font-weight:500;
+        }
+        .nav{
+            display:flex;flex-direction:column;
+            gap:2px;padding:14px 12px;flex:1;
+        }
+        .nav a{
+            display:flex;align-items:center;gap:10px;
+            padding:10px 12px;font-size:13px;font-weight:500;
+            color:var(--muted);text-decoration:none;
+            border-radius:var(--radius-md);
+            transition:.15s ease;position:relative;
+        }
+        .nav a svg{width:16px;height:16px;opacity:.6;transition:.15s}
+        .nav a:hover{color:#fff;background:rgba(255,255,255,.05)}
+        .nav a:hover svg{opacity:1}
+        .nav a.active{
+            color:#fff;
+            background:rgba(124,110,247,.15);
+        }
+        .nav a.active svg{opacity:1;color:var(--purple-2)}
+        .nav a.active::before{
+            content:'';position:absolute;left:0;top:50%;
+            transform:translateY(-50%);
+            width:3px;height:60%;background:var(--purple-2);
+            border-radius:0 3px 3px 0;
+        }
+        .nav a.logout-link{color:#fca5a5;margin-top:auto}
+        .nav a.logout-link:hover{background:rgba(248,113,113,.08);color:#f87171}
+
+        /* ─── MAIN ───────────────────────────────── */
+        .main{
+            margin-left:220px;
+            width:calc(100% - 220px);
+            min-height:100vh;
+            display:flex;flex-direction:column;
+        }
+
+        /* ─── TOP BAR ────────────────────────────── */
+        .topbar{
+            height:60px;
+            border-bottom:1px solid var(--line);
+            display:flex;align-items:center;
+            padding:0 28px;gap:12px;
+            background:var(--surface);
+            position:sticky;top:0;z-index:10;
+            backdrop-filter:blur(12px);
+        }
+        .back-btn{
+            display:flex;align-items:center;gap:7px;
+            font-size:13px;font-weight:600;color:var(--muted);
+            text-decoration:none;
+            padding:7px 12px;border-radius:var(--radius-md);
+            border:1px solid var(--line-2);
+            background:rgba(255,255,255,.03);
+            transition:.15s;
+        }
+        .back-btn:hover{color:#fff;border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.06)}
+        .back-btn svg{width:14px;height:14px}
+        .topbar-title{
+            font-size:13px;font-weight:600;
+            color:var(--soft);
+            flex:1;
+        }
+        .topbar-right{display:flex;align-items:center;gap:10px}
+        .notif-btn{
+            width:36px;height:36px;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            background:rgba(255,255,255,.04);border:1px solid var(--line-2);
+            cursor:pointer;transition:.15s;color:var(--muted);
+        }
+        .notif-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+        .notif-btn svg{width:16px;height:16px}
+        .user-avatar{
+            width:36px;height:36px;border-radius:50%;
+            background:linear-gradient(135deg,var(--purple),var(--purple-2));
+            display:flex;align-items:center;justify-content:center;
+            font-size:12px;font-weight:800;color:#fff;
+            cursor:pointer;
+        }
+        .actiuni-btn{
+            display:flex;align-items:center;gap:6px;
+            padding:8px 14px;border-radius:var(--radius-md);
+            background:rgba(124,110,247,.12);
+            border:1px solid rgba(124,110,247,.28);
+            color:var(--purple-2);font-size:13px;font-weight:600;
+            cursor:pointer;text-decoration:none;
+            transition:.15s;position:relative;
+        }
+        .actiuni-btn:hover{background:rgba(124,110,247,.2)}
+        .actiuni-btn svg{width:14px;height:14px}
+
+        /* ─── CONTENT AREA ───────────────────────── */
+        .content{padding:28px;display:grid;gap:20px}
+
+        /* ─── NOTICE ─────────────────────────────── */
+        .notice{
+            padding:12px 16px;border-radius:var(--radius-lg);
+            font-size:13px;font-weight:500;
+        }
+        .notice.ok{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);color:#99f6e4}
+        .notice.err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:#fecaca}
+
+        /* ─── HERO CARD ──────────────────────────── */
+        .hero-card{
+            background:var(--surface);
+            border:1px solid var(--line-2);
+            border-radius:var(--radius-xl);
+            padding:28px 32px;
+            position:relative;overflow:hidden;
+        }
+        .hero-card::before{
+            content:'';position:absolute;
+            top:-60px;right:-60px;
+            width:300px;height:300px;
+            background:radial-gradient(circle,rgba(124,110,247,.14),transparent 70%);
+            pointer-events:none;
+        }
+        .hero-top{display:flex;align-items:flex-start;gap:20px}
+        .cand-avatar{
+            width:72px;height:72px;border-radius:50%;flex-shrink:0;
+            background:linear-gradient(135deg,rgba(124,110,247,.3),rgba(167,139,250,.2));
+            border:2px solid rgba(124,110,247,.35);
+            display:flex;align-items:center;justify-content:center;
+            font-family:'Syne',sans-serif;
+            font-size:22px;font-weight:800;color:var(--purple-2);
+        }
+        .hero-info{flex:1}
+        .hero-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+        .hero-name{
+            font-family:'Syne',sans-serif;
+            font-size:24px;font-weight:800;color:#fff;
+            letter-spacing:-.4px;
+        }
+        .status-badge{
+            display:inline-flex;align-items:center;gap:5px;
+            padding:4px 10px;border-radius:999px;
+            font-size:11px;font-weight:700;
+            text-transform:uppercase;letter-spacing:.06em;
+        }
+        .badge-green{background:var(--green-2);color:var(--green);border:1px solid rgba(45,212,191,.25)}
+        .badge-yellow{background:var(--yellow-2);color:var(--yellow);border:1px solid rgba(245,158,11,.25)}
+        .badge-red{background:var(--red-2);color:var(--red);border:1px solid rgba(248,113,113,.25)}
+        .badge-purple{background:rgba(124,110,247,.12);color:var(--purple-2);border:1px solid rgba(124,110,247,.28)}
+        .hero-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:0}
+        .hero-meta-item{
+            display:flex;align-items:center;gap:5px;
+            font-size:12px;color:var(--muted);font-weight:500;
+        }
+        .hero-meta-item svg{width:13px;height:13px}
+        .hero-score{
+            width:64px;height:64px;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            font-size:22px;font-weight:900;flex-shrink:0;
+            color:#07091a;
+        }
+        .score-green{background:linear-gradient(135deg,#2dd4bf,#0d9488)}
+        .score-yellow{background:linear-gradient(135deg,#f59e0b,#d97706)}
+        .score-red{background:linear-gradient(135deg,#f87171,#ef4444)}
+        .score-default{background:linear-gradient(135deg,#a78bfa,#7c6ef7);color:#fff}
+
+        /* ─── ACTION BUTTONS ROW ─────────────────── */
+        .hero-actions{
+            display:flex;gap:10px;flex-wrap:wrap;
+            margin-top:20px;padding-top:20px;
+            border-top:1px solid var(--line);
+        }
+        .btn{
+            display:inline-flex;align-items:center;justify-content:center;gap:7px;
+            padding:10px 18px;border-radius:var(--radius-md);
+            font-size:13px;font-weight:600;cursor:pointer;
+            border:0;text-decoration:none;white-space:nowrap;
+            transition:.15s ease;font-family:'DM Sans',sans-serif;
+        }
+        .btn svg{width:15px;height:15px}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+        .btn-cv{
+            background:linear-gradient(135deg,var(--purple),var(--purple-2));
+            color:#fff;box-shadow:0 4px 20px rgba(124,110,247,.3);
+        }
+        .btn-cv:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,110,247,.4)}
+        .btn-potential{
+            background:rgba(255,255,255,.05);color:var(--soft);
+            border:1px solid var(--line-2);
+        }
+        .btn-potential:hover{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.2)}
+        .btn-email{
+            background:rgba(255,255,255,.05);color:var(--soft);
+            border:1px solid var(--line-2);
+        }
+        .btn-email:hover{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.2)}
+        .btn-edit-sm{
+            background:rgba(245,158,11,.08);color:var(--yellow);
+            border:1px solid rgba(245,158,11,.2);
+        }
+        .btn-edit-sm:hover{background:rgba(245,158,11,.14)}
+        .btn-hire{background:rgba(45,212,191,.1);color:var(--green);border:1px solid rgba(45,212,191,.22)}
+        .btn-hire:hover{background:rgba(45,212,191,.18)}
+        .btn-exclude{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.18)}
+        .btn-exclude:hover{background:rgba(248,113,113,.14)}
+        .btn-interview{background:rgba(37,99,235,.12);color:#93c5fd;border:1px solid rgba(37,99,235,.25)}
+        .btn-interview:hover{background:rgba(37,99,235,.2)}
+        .btn-save-green{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+        .btn-save-green:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,.3)}
+        .btn-save-blue{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff}
+        .btn-save-blue:hover{transform:translateY(-1px)}
+
+        /* ─── TWO COLUMN ─────────────────────────── */
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+        /* ─── PANEL ──────────────────────────────── */
+        .panel{
+            background:var(--surface);
+            border:1px solid var(--line-2);
+            border-radius:var(--radius-xl);
+            padding:22px 24px;
+        }
+        .panel.full{grid-column:1/-1}
+        .panel.danger-box{border-color:rgba(248,113,113,.2);background:rgba(127,29,29,.06)}
+        .panel-title{
+            font-size:11px;font-weight:700;
+            color:var(--muted);text-transform:uppercase;
+            letter-spacing:1.2px;margin-bottom:18px;
+        }
+
+        /* ─── INFO TABLE ─────────────────────────── */
+        .info-table{display:grid;gap:0}
+        .info-row{
+            display:grid;grid-template-columns:160px 1fr;
+            gap:16px;padding:11px 0;
+            border-bottom:1px solid rgba(255,255,255,.05);
+            align-items:start;
+        }
+        .info-row:last-child{border-bottom:0;padding-bottom:0}
+        .info-key{font-size:12px;font-weight:600;color:var(--muted)}
+        .info-val{font-size:13px;color:var(--soft);font-weight:500}
+
+        /* ─── SUMMARY BOX ────────────────────────── */
+        .summary-box{
+            background:rgba(255,255,255,.025);
+            border:1px solid var(--line);
+            border-radius:var(--radius-lg);
+            padding:14px 16px;
+            font-size:13px;color:var(--soft);
+            line-height:1.7;margin-top:6px;
+        }
+
+        /* ─── HISTORY / TIMELINE ─────────────────── */
+        .timeline{display:grid;gap:10px}
+        .event{
+            display:grid;grid-template-columns:26px 1fr;
+            gap:10px;padding:12px 14px;
+            background:rgba(255,255,255,.025);
+            border:1px solid var(--line);
+            border-radius:var(--radius-lg);
+            align-items:start;
+        }
+        .dot-wrap{display:flex;flex-direction:column;align-items:center;padding-top:3px}
+        .dot{width:10px;height:10px;border-radius:50%;background:#475569;flex-shrink:0}
+        .dot-green{background:var(--green)}
+        .dot-yellow{background:var(--yellow)}
+        .dot-red{background:var(--red)}
+        .event-date{font-size:11px;color:var(--muted);margin-bottom:4px}
+        .event-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+        .event-desc{font-size:12px;color:var(--soft);line-height:1.5}
+
+        /* ─── APPS HISTORY ───────────────────────── */
+        .app-list{display:grid;gap:8px}
+        .app-item{
+            display:flex;align-items:center;gap:12px;
+            padding:12px 14px;
+            background:rgba(255,255,255,.025);
+            border:1px solid var(--line);
+            border-radius:var(--radius-lg);
+        }
+        .app-icon{
+            width:34px;height:34px;border-radius:var(--radius-sm);
+            background:rgba(124,110,247,.12);border:1px solid rgba(124,110,247,.2);
+            display:flex;align-items:center;justify-content:center;
+            flex-shrink:0;
+        }
+        .app-icon svg{width:16px;height:16px;color:var(--purple-2)}
+        .app-info{flex:1;min-width:0}
+        .app-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+        .app-meta{font-size:11px;color:var(--muted)}
+        .app-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+        .app-date{font-size:11px;color:var(--muted)}
+
+        /* ─── TAGS ───────────────────────────────── */
+        .tag-list{display:flex;flex-wrap:wrap;gap:7px}
+        .tag-chip{
+            display:inline-flex;align-items:center;
+            padding:5px 12px;border-radius:999px;
+            font-size:12px;font-weight:600;
+            background:rgba(124,110,247,.1);
+            color:var(--purple-2);
+            border:1px solid rgba(124,110,247,.2);
+        }
+
+        /* ─── FORM STUFF ─────────────────────────── */
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .field{display:grid;gap:6px}
+        .field.full{grid-column:1/-1}
+        label{
+            font-size:11px;font-weight:700;color:var(--muted);
+            text-transform:uppercase;letter-spacing:.08em;
+        }
+        input,select,textarea{
+            width:100%;
+            background:rgba(255,255,255,.04);
+            border:1px solid var(--line-2);
+            border-radius:var(--radius-md);
+            padding:10px 12px;
+            font-size:13px;font-weight:500;
+            color:var(--text);
+            outline:none;
+            font-family:'DM Sans',sans-serif;
+            transition:.15s;
+        }
+        input:focus,select:focus,textarea:focus{
+            border-color:rgba(124,110,247,.5);
+            background:rgba(124,110,247,.06);
+        }
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.22)}
+        select option{background:#0e1228}
+        textarea{min-height:110px;resize:vertical;line-height:1.5}
+
+        .edit-note{
+            font-size:12px;color:var(--muted);
+            margin-bottom:14px;line-height:1.5;
+        }
+
+        /* ─── HIDDEN ─────────────────────────────── */
+        .hidden{display:none!important}
+
+        /* ─── CV VIEWER ──────────────────────────── */
+        .cv-section{
+            background:var(--surface);
+            border:1px solid var(--line-2);
+            border-radius:var(--radius-xl);
+            overflow:hidden;
+        }
+        .cv-header{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:16px 24px;
+            border-bottom:1px solid var(--line);
+        }
+        .cv-header-title{font-size:13px;font-weight:700;color:var(--text)}
+        .cv-toggle{
+            font-size:12px;font-weight:600;color:var(--purple-2);
+            cursor:pointer;display:flex;align-items:center;gap:5px;
+            background:none;border:0;font-family:'DM Sans',sans-serif;
+            padding:0;transition:.15s;
+        }
+        .cv-toggle:hover{color:#fff}
+        .cv-toggle svg{width:14px;height:14px;transition:transform .2s}
+        .cv-toggle.open svg{transform:rotate(180deg)}
+        .cv-body{
+            display:none;
+            padding:0;
+        }
+        .cv-body.open{display:block}
+        .cv-body iframe{
+            width:100%;height:780px;border:0;
+            background:#1a1a2e;
+            display:block;
+        }
+        .cv-placeholder{
+            padding:48px;text-align:center;
+            color:var(--muted);font-size:13px;
+        }
+
+        /* ─── EMPTY ──────────────────────────────── */
+        .empty-state{
+            padding:32px;text-align:center;
+            background:var(--surface);
+            border:1px solid var(--line);
+            border-radius:var(--radius-xl);
+            color:var(--muted);font-size:14px;
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────── */
+        @media(max-width:1100px){
+            .two-col,.three-col{grid-template-columns:1fr}
+        }
+        @media(max-width:820px){
+            .sidebar{position:relative;width:100%;height:auto;flex-direction:row}
+            .main{margin-left:0;width:100%}
+            .hero-top{flex-wrap:wrap}
+            .form-grid{grid-template-columns:1fr}
+            .info-row{grid-template-columns:1fr;gap:4px}
+        }
+    </style>
 </head>
 <body>
 <div class="layout">
 
+    <!-- ─── SIDEBAR ──────────────────────── -->
     <aside class="sidebar">
         <div class="sidebar-logo">
-          <div class="logo-text">N<span class="accent">E</span>XAS</div>
+            <div class="logo-text">N<span class="accent">E</span>XAS</div>
             <div class="logo-sub">HR Platform</div>
         </div>
         <nav class="nav">
-            <a class="" href="/">Dashboard</a>
-            <a class="active" href="/candidati">Candidati</a>
-            <a class="" href="/analytics">Analytics</a>
-            <a class="logout-link" href="/logout">Logout</a>
+            <a href="/">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </a>
+            <a class="active" href="/candidati">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Candidati
+            </a>
+            <a href="/analytics">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Analytics
+            </a>
+            <a class="logout-link" href="/logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Logout
+            </a>
         </nav>
     </aside>
 
+    <!-- ─── MAIN ──────────────────────────── -->
+    <div class="main">
 
-    <main class="main">
-        <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px">
-            <a class="btn btn-secondary" href="/">Inapoi la dashboard</a>
-            <a class="btn btn-danger" href="/logout">Logout</a>
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <a class="back-btn" href="/candidati">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Inapoi la candidati
+            </a>
+            <span class="topbar-title">Candidat</span>
+            <div class="topbar-right">
+                <button class="notif-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </button>
+                <div class="user-avatar">HR</div>
+            </div>
         </div>
 
-        {% if message %}<div class="notice ok">{{ message }}</div>{% endif %}
-        {% if error %}<div class="notice err">{{ error }}</div>{% endif %}
+        <!-- CONTENT -->
+        <div class="content">
 
-        {% if not candidate %}
-            <div class="empty">Candidatul nu a fost gasit.</div>
-        {% else %}
-            <section class="hero">
-                <h1 class="page-title" style="font-size:32px">{{ candidate.name or "Candidat necunoscut" }}</h1>
-                <div class="page-sub">{{ candidate.job_title or "Job nespecificat" }}</div>
-                <div class="score {% if candidate.status == 'ADMIS' or candidate.status == 'ANGAJAT' %}score-green{% elif candidate.status == 'DE ANALIZAT' or candidate.status == 'SELECTAT' or candidate.status == 'INTERVIU' %}score-yellow{% elif candidate.status == 'RESPINS' or candidate.status == 'REFUZAT' or candidate.status == 'EXCLUS' %}score-red{% else %}score-default{% endif %}">{{ candidate.score }}</div>
-                <div class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</div>
+            {% if message %}<div class="notice ok">{{ message }}</div>{% endif %}
+            {% if error %}<div class="notice err">{{ error }}</div>{% endif %}
 
-                <div class="workflow">
-                    <div class="step"><small>Pas 1</small><strong>Analiza CV</strong></div>
-                    <div class="step"><small>Pas 2</small><strong>Selectare</strong></div>
-                    <div class="step"><small>Pas 3</small><strong>Interviu</strong></div>
-                    <div class="step"><small>Pas 4</small><strong>Decizie finala</strong></div>
-                </div>
+            {% if not candidate %}
+                <div class="empty-state">Candidatul nu a fost gasit.</div>
+            {% else %}
 
-                <div class="actions-inline">
-                    <a class="btn btn-primary" href="/cv/{{ candidate.id }}" target="_blank">Deschide CV original</a>
-                    <button class="btn btn-edit" type="button" onclick="toggleEdit()">Editare</button>
-                    <form method="post" action="/candidat/{{ candidate.id }}/selecteaza"><button class="btn btn-dark" type="submit">Potential Candidat</button></form>
-                    <form method="post" action="/candidat/{{ candidate.id }}/trimite-interviu"><button class="btn btn-blue" type="submit">Trimite mail interviu</button></form>
-                    <form method="post" action="/candidat/{{ candidate.id }}/refuza"><button class="btn btn-red" type="submit">Potrivit altor roluri</button></form>
-                    <form method="post" action="/candidat/{{ candidate.id }}/angajeaza"><button class="btn btn-green" type="submit">Marcheaza angajat</button></form>
-                </div>
-            </section>
-
-            <div class="grid">
-                <section class="panel">
-                    <h2>Profil candidat</h2>
-                    <div class="info">
-                        <div class="row"><div class="key">Telefon</div><div class="val">{{ candidate.phone or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Email</div><div class="val">{{ candidate.email or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Post potrivit candidatului</div><div class="val">{{ candidate.position or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Experienta</div><div class="val">{{ candidate.experience or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Companii</div><div class="val">{{ candidate.companies or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">CV fisier</div><div class="val">{{ candidate.cv_file or "Nespecificat" }}</div></div>
+            <!-- ─── HERO CARD ─────────────────── -->
+            <div class="hero-card">
+                <div class="hero-top">
+                    <div class="cand-avatar">
+                        {{ (candidate.name or "?")[0] | upper }}{{ (candidate.name or " ?").split(" ")[1][0] | upper if (candidate.name or " ?").split(" ")|length > 1 else "" }}
                     </div>
-                </section>
+                    <div class="hero-info">
+                        <div class="hero-name-row">
+                            <span class="hero-name">{{ candidate.name or "Candidat necunoscut" }}</span>
+                            <span class="status-badge {% if candidate.status in ['ADMIS','ANGAJAT'] %}badge-green{% elif candidate.status in ['DE ANALIZAT','SELECTAT','INTERVIU'] %}badge-yellow{% elif candidate.status in ['RESPINS','REFUZAT','EXCLUS'] %}badge-red{% else %}badge-purple{% endif %}">
+                                {{ status_display(candidate.status) }}
+                            </span>
+                        </div>
+                        <div class="hero-meta">
+                            <span class="hero-meta-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                                {{ candidate.job_title or "Job nespecificat" }}
+                            </span>
+                            {% if candidate.position %}
+                            <span class="hero-meta-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                Post potrivit: {{ candidate.position }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="hero-score {% if candidate.status in ['ADMIS','ANGAJAT'] %}score-green{% elif candidate.status in ['DE ANALIZAT','SELECTAT','INTERVIU'] %}score-yellow{% elif candidate.status in ['RESPINS','REFUZAT','EXCLUS'] %}score-red{% else %}score-default{% endif %}">
+                        {{ candidate.score }}
+                    </div>
+                </div>
 
-                <section class="panel hidden" id="editPanel">
-                    <h2>Editare manuala candidat</h2>
-                    <div class="edit-note">Corecteaza emailul, telefonul, numele, statusul si observatiile.</div>
-                    <form method="post" action="/candidat/{{ candidate.id }}/salveaza" class="form-grid">
-                        <div class="field"><label>Nume</label><input type="text" name="name" value="{{ candidate.name or '' }}"></div>
-                        <div class="field"><label>Email</label><input type="email" name="email" value="{{ candidate.email or '' }}"></div>
-                        <div class="field"><label>Telefon</label><input type="text" name="phone" value="{{ candidate.phone or '' }}"></div>
-                        <div class="field"><label>Status</label><select name="status">{% for item in ["NOU","ADMIS","DE ANALIZAT","RESPINS","SELECTAT","INTERVIU","REFUZAT","ANGAJAT","EXCLUS"] %}<option value="{{ item }}" {% if candidate.status == item %}selected{% endif %}>{{ status_display(item) }}</option>{% endfor %}</select></div>
-                        <div class="field"><label>Pozitie detectata</label><input type="text" name="position" value="{{ candidate.position or '' }}"></div>
-                        <div class="field"><label>Experienta</label><input type="text" name="experience" value="{{ candidate.experience or '' }}"></div>
-                        <div class="field full"><label>Skill-uri</label><textarea name="skills">{{ candidate.skills or '' }}</textarea></div>
-                        <div class="field full"><label>Rezumat / observatii HR</label><textarea name="summary">{{ candidate.summary or '' }}</textarea></div>
-                        <div class="field full"><button class="btn btn-green" type="submit">Salveaza modificarile</button></div>
+                <div class="hero-actions">
+                    <a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Vezi CV
+                    </a>
+                    <form method="post" action="/candidat/{{ candidate.id }}/selecteaza" style="display:inline">
+                        <button class="btn btn-potential" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Marcheaza potential
+                        </button>
                     </form>
-                </section>
+                    <form method="post" action="/candidat/{{ candidate.id }}/trimite-interviu" style="display:inline">
+                        <button class="btn btn-email" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            Trimite mail interviu
+                        </button>
+                    </form>
+                    <button class="btn btn-edit-sm" type="button" onclick="toggleEdit()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Editare
+                    </button>
+                    <form method="post" action="/candidat/{{ candidate.id }}/angajeaza" style="display:inline">
+                        <button class="btn btn-hire" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+                            Marcheaza angajat
+                        </button>
+                    </form>
+                    <form method="post" action="/candidat/{{ candidate.id }}/refuza" style="display:inline">
+                        <button class="btn btn-exclude" type="submit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                            Potrivit altor roluri
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-                <section class="panel">
-                    <h2>Adauga nota HR</h2>
+            <!-- ─── CV VIEWER ─────────────────── -->
+            <div class="cv-section">
+                <div class="cv-header">
+                    <span class="cv-header-title">
+                        <svg style="width:15px;height:15px;display:inline;vertical-align:middle;margin-right:7px;color:var(--purple-2)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        CV Original
+                    </span>
+                    <button class="cv-toggle" id="cvToggle" onclick="toggleCV()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        Deschide CV
+                    </button>
+                </div>
+                <div class="cv-body" id="cvBody">
+                    <iframe src="/cv/{{ candidate.id }}" title="CV Candidat" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- ─── PROFIL + SKILLS ────────────── -->
+            <div class="two-col">
+                <div class="panel">
+                    <div class="panel-title">Profil candidat</div>
+                    <div class="info-table">
+                        <div class="info-row">
+                            <span class="info-key">Telefon</span>
+                            <span class="info-val">{{ candidate.phone or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">Email</span>
+                            <span class="info-val">{{ candidate.email or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">Post potrivit</span>
+                            <span class="info-val">{{ candidate.position or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">Experienta</span>
+                            <span class="info-val">{{ candidate.experience or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">Companii</span>
+                            <span class="info-val">{{ candidate.companies or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">CV fisier</span>
+                            <span class="info-val">{{ candidate.cv_file or "Nespecificat" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">Skill-uri si observatii</div>
+                    <div class="info-table">
+                        <div class="info-row">
+                            <span class="info-key">Skill-uri</span>
+                            <span class="info-val">{{ candidate.skills or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">Puncte forte</span>
+                            <span class="info-val">{{ candidate.strengths or "Nespecificat" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">Gap-uri</span>
+                            <span class="info-val">{{ candidate.weaknesses or "Nespecificat" }}</span>
+                        </div>
+                    </div>
+                    {% if candidate.skills %}
+                    <div style="margin-top:14px">
+                        <div class="tag-list">
+                            {% for skill in candidate.skills.split(',') %}
+                            <span class="tag-chip">{{ skill.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ─── REZUMAT AI ─────────────────── -->
+            <div class="panel full">
+                <div class="panel-title">Rezumat AI / Observatii</div>
+                <div class="summary-box">{{ clean_summary(candidate.summary) }}</div>
+            </div>
+
+            <!-- ─── EDIT + NOTA ───────────────── -->
+            <div class="panel full hidden" id="editPanel">
+                <div class="panel-title">Editare manuala candidat</div>
+                <div class="edit-note">Corecteaza emailul, telefonul, numele, statusul si observatiile.</div>
+                <form method="post" action="/candidat/{{ candidate.id }}/salveaza" class="form-grid">
+                    <div class="field"><label>Nume</label><input type="text" name="name" value="{{ candidate.name or '' }}"></div>
+                    <div class="field"><label>Email</label><input type="email" name="email" value="{{ candidate.email or '' }}"></div>
+                    <div class="field"><label>Telefon</label><input type="text" name="phone" value="{{ candidate.phone or '' }}"></div>
+                    <div class="field"><label>Status</label><select name="status">{% for item in ["NOU","ADMIS","DE ANALIZAT","RESPINS","SELECTAT","INTERVIU","REFUZAT","ANGAJAT","EXCLUS"] %}<option value="{{ item }}" {% if candidate.status == item %}selected{% endif %}>{{ status_display(item) }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>Pozitie detectata</label><input type="text" name="position" value="{{ candidate.position or '' }}"></div>
+                    <div class="field"><label>Experienta</label><input type="text" name="experience" value="{{ candidate.experience or '' }}"></div>
+                    <div class="field full"><label>Skill-uri</label><textarea name="skills">{{ candidate.skills or '' }}</textarea></div>
+                    <div class="field full"><label>Rezumat / observatii HR</label><textarea name="summary">{{ candidate.summary or '' }}</textarea></div>
+                    <div class="field full"><button class="btn btn-save-green" type="submit">Salveaza modificarile</button></div>
+                </form>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <div class="panel-title">Adauga nota HR</div>
                     <div class="edit-note">Notele se salveaza in istoricul candidatului.</div>
                     <form method="post" action="/candidat/{{ candidate.id }}/nota" class="form-grid">
                         <div class="field full"><label>Nota HR</label><textarea name="note" placeholder="Ex: L-am sunat. A avut atitudine nepotrivita. Nu recomandam contactari viitoare."></textarea></div>
-                        <div class="field full"><button class="btn btn-blue" type="submit">Salveaza nota HR</button></div>
+                        <div class="field full"><button class="btn btn-save-blue" type="submit">Salveaza nota HR</button></div>
                     </form>
-                </section>
+                </div>
 
-                <section class="panel danger-box">
-                    <h2>Candidat exclus</h2>
+                <div class="panel danger-box">
+                    <div class="panel-title">Candidat exclus</div>
                     <div class="edit-note">Foloseste acest buton pentru candidati cu atitudine nepotrivita. Nu se trimite email.</div>
                     <form method="post" action="/candidat/{{ candidate.id }}/exclude" class="form-grid" onsubmit="return confirm('Sigur vrei sa marchezi acest candidat ca EXCLUS? Nu se trimite email.')">
                         <div class="field full"><label>Motiv excludere</label><textarea name="reason" placeholder="Ex: Atitudine agresiva la telefon, limbaj nepotrivit."></textarea></div>
-                        <div class="field full"><button class="btn btn-red" type="submit">Candidat Exclus</button></div>
+                        <div class="field full"><button class="btn btn-exclude" type="submit">Candidat Exclus</button></div>
                     </form>
-                </section>
-
-                <section class="panel">
-                    <h2>Istoric actiuni</h2>
-                    {% if events|length == 0 %}<div class="summary">Nu exista actiuni inregistrate.</div>{% else %}<div class="timeline">{% for event in events %}<div class="event"><div class="dot dot-{{ event_class(event.event_type) }}"></div><div><div class="date">{{ format_event_date(event.created_at) }}</div><h3>{{ event.title }}</h3><p>{{ event.description or "" }}</p></div></div>{% endfor %}</div>{% endif %}
-                </section>
-
-                <section class="panel">
-                    <h2>Skill-uri si observatii</h2>
-                    <div class="info">
-                        <div class="row"><div class="key">Skill-uri</div><div class="val">{{ candidate.skills or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Puncte forte</div><div class="val">{{ candidate.strengths or "Nespecificat" }}</div></div>
-                        <div class="row"><div class="key">Gap-uri</div><div class="val">{{ candidate.weaknesses or "Nespecificat" }}</div></div>
-                    </div>
-                </section>
-
-                <section class="panel" style="grid-column:1/-1"><h2>Rezumat AI / Observatii</h2><div class="summary">{{ clean_summary(candidate.summary) }}</div></section>
+                </div>
             </div>
-        {% endif %}
-    </main>
+
+            <!-- ─── ISTORIC ────────────────────── -->
+            <div class="panel full">
+                <div class="panel-title">Istoric actiuni</div>
+                {% if events|length == 0 %}
+                    <div style="color:var(--muted);font-size:13px;padding:8px 0">Nu exista actiuni inregistrate.</div>
+                {% else %}
+                    <div class="timeline">
+                        {% for event in events %}
+                        <div class="event">
+                            <div class="dot-wrap">
+                                <div class="dot dot-{{ event_class(event.event_type) }}"></div>
+                            </div>
+                            <div>
+                                <div class="event-date">{{ format_event_date(event.created_at) }}</div>
+                                <div class="event-title">{{ event.title }}</div>
+                                {% if event.description %}<div class="event-desc">{{ event.description }}</div>{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            {% endif %}
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /layout -->
+
 <script>
 function toggleEdit(){
     const panel = document.getElementById("editPanel");
     panel.classList.toggle("hidden");
-    if(!panel.classList.contains("hidden")){ panel.scrollIntoView({behavior:"smooth", block:"start"}); }
+    if(!panel.classList.contains("hidden")){
+        panel.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+}
+
+function toggleCV(){
+    const body = document.getElementById("cvBody");
+    const toggle = document.getElementById("cvToggle");
+    const isOpen = body.classList.contains("open");
+    if(isOpen){
+        body.classList.remove("open");
+        toggle.classList.remove("open");
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Deschide CV';
+    } else {
+        body.classList.add("open");
+        toggle.classList.add("open");
+        toggle.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Inchide CV';
+    }
 }
 </script>
-
-</div>
 </body>
 </html>

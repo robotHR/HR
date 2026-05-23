@@ -205,6 +205,8 @@ def _download_attachments_from_message(mail, message_id, downloaded, skipped):
         with open(filepath, "wb") as file:
             file.write(payload)
 
+        upload_cv_to_drive(filepath, final_filename)
+
         downloaded.append(final_filename)
 
 

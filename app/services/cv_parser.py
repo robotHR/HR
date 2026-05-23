@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from app.core.database import SessionLocal
 from app.models.candidate_model import Candidate
-from app.services.google_drive_service import list_cv_files, download_cv_file
+# Cloudinary este folosit pentru persistenta CV-urilor (vezi cloudinary_service.py)
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

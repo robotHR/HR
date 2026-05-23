@@ -11,8 +11,7 @@ try:
 except ImportError:
     resend = None
 
-
-from app.services.google_drive_service import upload_cv_to_drive
+from app.services.cloudinary_service import upload_cv_to_cloudinary, check_cv_exists_on_cloudinary
 
 UPLOAD_FOLDER = "app/uploads"
 
@@ -78,26 +77,12 @@ def _unique_path(folder, filename):
     return os.path.join(folder, candidate), candidate
 
 
-def _attachment_already_exists(folder, filename):
+def _attachment_already_exists(filename):
     """
-    Verifica daca atasamentul exista deja in uploads.
-    Evita descarcarea aceluiasi CV la fiecare rulare Gmail.
+    Verifica daca atasamentul exista deja pe Cloudinary.
+    Persistent — nu depinde de disk-ul Render care se reseteaza.
     """
-    base, ext = os.path.splitext(filename)
-
-    if os.path.exists(os.path.join(folder, filename)):
-        return True
-
-    pattern = re.compile(rf"^{re.escape(base)}(_\d+)?{re.escape(ext)}$", re.IGNORECASE)
-
-    try:
-        for existing_file in os.listdir(folder):
-            if pattern.match(existing_file):
-                return True
-    except FileNotFoundError:
-        return False
-
-    return False
+    return check_cv_exists_on_cloudinary(filename)
 
 
 def filename_is_cv(filename):
@@ -107,42 +92,16 @@ def filename_is_cv(filename):
         return False
 
     blocked_keywords = [
-        "factura",
-        "invoice",
-        "bon",
-        "chitanta",
-        "chitanță",
-        "proforma",
-        "contract",
-        "extras",
-        "plata",
-        "receipt",
-        "ordin",
-        "oferta"
+        "factura", "invoice", "bon", "chitanta", "chitanță",
+        "proforma", "contract", "extras", "plata", "receipt",
+        "ordin", "oferta"
     ]
 
     for blocked in blocked_keywords:
         if blocked in lower_name:
             return False
 
-    cv_keywords = [
-        "cv",
-        "c.v",
-        "curriculum",
-        "vitae",
-        "resume",
-        "candidat",
-        "candidatura",
-        "angajare",
-        "aplicare"
-    ]
-
-    for keyword in cv_keywords:
-        if keyword in lower_name:
-            return True
-
-    # Acceptam si fisiere PDF/DOC/DOCX fara cuvantul "CV".
-    # Multi candidati trimit fisierul doar cu numele lor.
+    # Acceptam toate PDF/DOC/DOCX care nu sunt documente financiare
     return True
 
 
@@ -196,30 +155,37 @@ def _download_attachments_from_message(mail, message_id, downloaded, skipped):
             skipped.append(filename)
             continue
 
-        if _attachment_already_exists(UPLOAD_FOLDER, filename):
+        # Verifica pe Cloudinary — persistent, nu pe disk local
+        if _attachment_already_exists(filename):
             skipped.append(filename)
             continue
 
+        # Salveaza temporar pe disk pentru cv_parser (citire text)
         filepath, final_filename = _unique_path(UPLOAD_FOLDER, filename)
 
         with open(filepath, "wb") as file:
             file.write(payload)
 
-        upload_cv_to_drive(filepath, final_filename)
+        # Uploadeaza pe Cloudinary pentru persistenta
+        try:
+            upload_cv_to_cloudinary(filepath, final_filename)
+        except Exception:
+            pass
 
         downloaded.append(final_filename)
 
 
 def download_cv_attachments(max_results=20):
     """
-    Citeste ultimele emailuri din Gmail prin IMAP si descarca atasamentele CV in app/uploads.
+    Citeste ultimele emailuri din Gmail prin IMAP si descarca
+    atasamentele CV in app/uploads + Cloudinary.
+
+    Verifica duplicatele pe Cloudinary — nu re-descarca CV-uri existente
+    chiar daca Render a restartat si disk-ul e gol.
 
     Necesita in Render:
     GMAIL_EMAIL
     GMAIL_APP_PASSWORD
-
-    Optional:
-    GMAIL_IMAP_FOLDER=INBOX
     """
     mail = None
     downloaded = []
@@ -228,9 +194,6 @@ def download_cv_attachments(max_results=20):
     try:
         mail = _connect_imap()
 
-        # Gmail IMAP nu accepta stabil comanda: HAS ATTACHMENT.
-        # Folosim X-GM-RAW, adica sintaxa Gmail reala.
-        # Cauta doar emailuri recente cu atasamente, ca sa reducem timpul de procesare.
         try:
             status, data = mail.search(
                 None,
@@ -270,19 +233,6 @@ def download_cv_attachments(max_results=20):
 
 
 def send_email_api(to_email: str, subject: str, body: str):
-    """
-    Trimite email prin Resend API, nu SMTP.
-
-    Necesita in Render:
-    RESEND_API_KEY
-    FROM_EMAIL
-
-    Pentru test:
-    FROM_EMAIL=onboarding@resend.dev
-
-    Pentru productie:
-    FROM_EMAIL=NEXAS HR <hr@domeniul-clientului.ro>
-    """
     if resend is None:
         raise RuntimeError("Lipseste pachetul resend. Adauga 'resend' in requirements.txt.")
 
@@ -326,11 +276,7 @@ Cu respect,
 Echipa HR
 """
 
-    result = send_email_api(
-        to_email=to_email,
-        subject=subject,
-        body=body
-    )
+    result = send_email_api(to_email=to_email, subject=subject, body=body)
 
     return {
         "sent": True,
@@ -364,11 +310,7 @@ Cu respect,
 Echipa HR
 """
 
-    result = send_email_api(
-        to_email=to_email,
-        subject=subject,
-        body=body
-    )
+    result = send_email_api(to_email=to_email, subject=subject, body=body)
 
     return {
         "sent": True,

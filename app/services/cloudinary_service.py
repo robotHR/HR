@@ -14,39 +14,49 @@ cloudinary.config(
 )
 
 
+def check_cv_exists_on_cloudinary(filename):
+    """
+    Verifica daca un fisier exista deja pe Cloudinary.
+    Folosit pentru a evita re-descarcarea CV-urilor din Gmail.
+    """
+    try:
+        cloudinary.api.resource(filename, resource_type="raw")
+        return True
+    except Exception:
+        return False
+
+
 def upload_cv_to_cloudinary(local_file_path, filename):
     """
     Uploadeaza CV pe Cloudinary ca fisier raw (PDF/DOCX).
     Daca exista deja, returneaza direct fara re-upload.
     """
-    public_id = filename
-
     try:
-        existing = cloudinary.api.resource(public_id, resource_type="raw")
+        existing = cloudinary.api.resource(filename, resource_type="raw")
         if existing:
             return existing
     except Exception:
         pass
 
-    result = cloudinary.uploader.upload(
-        local_file_path,
-        public_id=public_id,
-        resource_type="raw",
-        overwrite=False,
-        use_filename=True,
-        unique_filename=False
-    )
+    with open(local_file_path, "rb") as f:
+        result = cloudinary.uploader.upload(
+            f,
+            public_id=filename,
+            resource_type="raw",
+            overwrite=False,
+            use_filename=True,
+            unique_filename=False
+        )
     return result
 
 
 def upload_cv_bytes_to_cloudinary(file_bytes, filename):
     """
     Uploadeaza CV din bytes (ex: din Gmail) pe Cloudinary.
+    Daca exista deja, returneaza direct fara re-upload.
     """
-    public_id = filename
-
     try:
-        existing = cloudinary.api.resource(public_id, resource_type="raw")
+        existing = cloudinary.api.resource(filename, resource_type="raw")
         if existing:
             return existing
     except Exception:
@@ -54,7 +64,7 @@ def upload_cv_bytes_to_cloudinary(file_bytes, filename):
 
     result = cloudinary.uploader.upload(
         file_bytes,
-        public_id=public_id,
+        public_id=filename,
         resource_type="raw",
         overwrite=False,
         use_filename=True,

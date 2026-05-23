@@ -219,7 +219,7 @@
         .hero-grid{
             position:relative;
             display:grid;
-            grid-template-columns:1.12fr .88fr;
+            grid-template-columns:1fr 1fr;
             gap:24px;
             align-items:stretch;
         }
@@ -316,6 +316,9 @@
         .mini-list{
             display:grid;
             gap:10px;
+            max-height:340px;
+            overflow:auto;
+            padding-right:4px;
         }
 
         .mini-row{
@@ -342,7 +345,7 @@
 
         .mini-row strong{
             display:block;
-            font-size:13px;
+            font-size:12px;
         }
 
         .mini-row small{
@@ -961,9 +964,39 @@
         </nav>
 
         <div class="sidebar-card">
-            <div class="sidebar-card-icon">⇪</div>
-            <strong>Import CV-uri</strong>
-            <p>Din Gmail sau incarcare manuala. Totul ramane intr-un singur loc.</p>
+            <div style="display:grid;gap:10px">
+
+                <form action="/gmail-si-analiza"
+                      method="post"
+                      class="loading-form"
+                      data-title="Se verifica Gmail"
+                      data-text="Agentul cauta CV-uri in Gmail si le salveaza in platforma.">
+
+                    <button type="submit" class="btn-gmail" style="width:100%">
+                        Gmail CV
+                    </button>
+                </form>
+
+                <form action="/upload-cv-uri"
+                      method="post"
+                      enctype="multipart/form-data"
+                      class="loading-form"
+                      data-title="Se incarca CV-urile"
+                      data-text="Agentul salveaza CV-urile incarcate manual.">
+
+                    <input type="file"
+                           name="cv_files"
+                           accept=".pdf,.doc,.docx"
+                           multiple
+                           required
+                           style="margin-bottom:10px">
+
+                    <button type="submit" class="btn-main" style="width:100%">
+                        Upload CV
+                    </button>
+                </form>
+
+            </div>
         </div>
     </aside>
 
@@ -998,7 +1031,7 @@
                     <div class="mini-list">
                         {% set shown = namespace(count=0) %}
                         {% for job_title, job_candidates in jobs.items() %}
-                            {% for candidate in job_candidates[:1] %}
+                            {% for candidate in job_candidates[:4] %}
                                 {% if shown.count < 3 %}
                                     <div class="mini-row">
                                         <div class="mini-avatar">{{ (candidate.name or "C")[0:1] }}</div>
@@ -1063,18 +1096,7 @@
                 </div>
             </div>
 
-            <div class="source-grid">
-                <div class="source-card">
-                    <div class="source-icon">M</div>
-                    <div>
-                        <h3>CV-uri din Gmail</h3>
-                        <p>Agentul cauta CV-uri noi in Gmail, le descarca si le analizeaza pentru posturile introduse.</p>
-                        <form action="/gmail-si-analiza" method="post" class="loading-form" data-title="Se verifica Gmail" data-text="Agentul cauta CV-uri in Gmail si le salveaza in platforma. Analiza se face separat din Potrivire pe job.">
-                            <div class="form-line">
-                                <button type="submit" class="btn-gmail">Importa CV-uri din Gmail</button>
-                            </div>
-                        </form>
-                    </div>
+            
                 </div>
 
                 <div class="source-card">

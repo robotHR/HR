@@ -5,11 +5,17 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     autoDeploy: false
+    disk:
+      name: nexas-hr-uploads
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: APP_ENV
         value: production
+      - key: UPLOAD_FOLDER
+        value: /var/data/uploads
       - key: SECRET_KEY
         sync: false
       - key: HR_USERNAME

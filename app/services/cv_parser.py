@@ -15,12 +15,14 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from app.core.database import SessionLocal
 from app.models.candidate_model import Candidate
+from app.services.google_drive_service import list_cv_files, download_cv_file
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/var/data/uploads")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+UPLOAD_FOLDER = "app/uploads"
+TEMP_FOLDER = "/tmp/nexas_hr"
+os.makedirs(TEMP_FOLDER, exist_ok=True)
 JOB_PROFILES_PATH = "config/job_profiles.json"
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPENROUTER_API_KEY"))
 

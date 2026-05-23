@@ -12,8 +12,9 @@ except ImportError:
     resend = None
 
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", "/var/data/uploads")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+from app.services.google_drive_service import upload_cv_to_drive
+
+UPLOAD_FOLDER = "app/uploads"
 
 GMAIL_EMAIL = os.getenv("GMAIL_EMAIL")
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")

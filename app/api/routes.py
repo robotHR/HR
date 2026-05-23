@@ -1002,21 +1002,31 @@ async def upload_cv_files(cv_files: list[UploadFile] = File(...)):
     return RedirectResponse(url=f"/?message={message}", status_code=303)
 
 
-@router.post("/gmail-si-analiza")
-async def gmail_and_analyze():
-
+@router.post("/descarca-gmail")
+async def descarca_gmail():
+    """
+    Descarca CV-uri noi din Gmail fara a face analiza.
+    Duplicatele sunt verificate pe Cloudinary - nu re-descarca CV-uri existente.
+    """
     gmail_result = download_cv_attachments(max_results=30)
 
     message = (
         f"Gmail verificat. "
         f"CV-uri noi descarcate: {gmail_result['downloaded_count']}. "
-        f"CV-uri deja existente: {gmail_result['skipped_count']}."
+        f"CV-uri deja existente (sarite): {gmail_result['skipped_count']}. "
+        f"Acum poti rula analiza pentru jobul dorit."
     )
 
     return RedirectResponse(
         url=f"/?message={message}",
         status_code=303
     )
+
+
+@router.post("/gmail-si-analiza")
+async def gmail_and_analyze():
+    """Pastrat pentru compatibilitate - redirecteaza la /descarca-gmail."""
+    return RedirectResponse(url="/descarca-gmail", status_code=303)
 
 
 @router.post("/sterge-baza")

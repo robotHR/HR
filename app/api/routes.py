@@ -16,7 +16,7 @@ from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.services.cv_parser import process_cvs_for_job
-from app.services.google_drive_service import upload_cv_to_drive
+from app.services.google_drive_service import upload_cv_to_drive, stream_cv_from_drive
 
 from app.services.gmail_service import (
     download_cv_attachments,
@@ -790,12 +790,23 @@ async def open_candidate_cv(candidate_id: int):
     if not candidate or not candidate.cv_file:
         return JSONResponse({"error": "CV-ul nu a fost gasit pentru acest candidat."}, status_code=404)
 
+    # Incearca mai intai din Google Drive (persistent pe Render free tier)
+    buffer, mime = stream_cv_from_drive(candidate.cv_file)
+    if buffer:
+        return StreamingResponse(
+            buffer,
+            media_type=mime,
+            headers={
+                "Content-Disposition": f'inline; filename="{candidate.cv_file}"'
+            }
+        )
+
+    # Fallback: disk local (doar daca exista, ex. in dev)
     file_path = os.path.join("app", "uploads", candidate.cv_file)
+    if os.path.exists(file_path):
+        return FileResponse(path=file_path, filename=candidate.cv_file, media_type="application/pdf")
 
-    if not os.path.exists(file_path):
-        return JSONResponse({"error": "Fisierul CV nu exista in app/uploads."}, status_code=404)
-
-    return FileResponse(path=file_path, filename=candidate.cv_file, media_type="application/pdf")
+    return JSONResponse({"error": "CV-ul nu a fost gasit nici pe Drive, nici local."}, status_code=404)
 
 
 @router.post("/candidat/{candidate_id}/trimite-interviu")

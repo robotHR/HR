@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posturi Vacante | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#07091a;--surface:#0e1228;--surface-2:#111530;--line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.11);
+            --text:#f1f5ff;--muted:rgba(200,210,255,.45);--soft:rgba(200,210,255,.65);
+            --purple:#7c6ef7;--purple-2:#a78bfa;--green:#2dd4bf;--yellow:#f59e0b;--red:#f87171;
+            --radius-xl:20px;--radius-lg:14px;--radius-md:10px;
+        }
+        body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
+        .sidebar{width:220px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--line);position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:20}
+        .sidebar-logo{padding:26px 22px 22px;border-bottom:1px solid var(--line)}
+        .logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff}
+        .logo-text .accent{color:var(--purple-2)}
+        .logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+        .nav{display:flex;flex-direction:column;gap:2px;padding:14px 12px;flex:1}
+        .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;border-radius:var(--radius-md);transition:.15s}
+        .nav a:hover{color:#fff;background:rgba(255,255,255,.05)}
+        .nav a.active{color:#fff;background:rgba(124,110,247,.15)}
+        .nav a.logout-link{color:#fca5a5}
+        .main{margin-left:220px;width:calc(100% - 220px);padding:32px}
+        .page-header{margin-bottom:28px}
+        .page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;margin-bottom:4px}
+        .page-sub{font-size:13px;color:var(--muted)}
+        .notice{padding:12px 16px;border-radius:var(--radius-lg);font-size:13px;font-weight:500;margin-bottom:20px;background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.2);color:#99f6e4}
+        .public-link-bar{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(124,110,247,.08);border:1px solid rgba(124,110,247,.2);border-radius:var(--radius-lg);margin-bottom:24px}
+        .public-link-bar span{font-size:13px;color:var(--muted)}
+        .public-link-bar a{font-size:13px;font-weight:700;color:var(--purple-2);text-decoration:none}
+        .public-link-bar a:hover{text-decoration:underline}
+        .two-col{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;align-items:start}
+        .panel{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--radius-xl);padding:24px}
+        .panel-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:18px}
+        .field{display:grid;gap:6px;margin-bottom:14px}
+        .field.full{grid-column:1/-1}
+        label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+        input,select,textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line-2);border-radius:var(--radius-md);padding:10px 12px;font-size:13px;font-weight:500;color:var(--text);outline:none;font-family:'DM Sans',sans-serif;transition:.15s}
+        input:focus,select:focus,textarea:focus{border-color:rgba(124,110,247,.5);background:rgba(124,110,247,.06)}
+        input::placeholder,textarea::placeholder{color:rgba(255,255,255,.22)}
+        select option{background:#0e1228}
+        textarea{min-height:100px;resize:vertical;line-height:1.6}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:var(--radius-md);font-size:13px;font-weight:600;cursor:pointer;border:0;font-family:'DM Sans',sans-serif;transition:.15s;text-decoration:none}
+        .btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-2));color:#fff}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,110,247,.3)}
+        .btn-danger{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.18)}
+        .btn-danger:hover{background:rgba(248,113,113,.15)}
+        .btn-edit{background:rgba(245,158,11,.08);color:var(--yellow);border:1px solid rgba(245,158,11,.2)}
+        .btn-edit:hover{background:rgba(245,158,11,.14)}
+        .btn-toggle-on{background:rgba(45,212,191,.08);color:var(--green);border:1px solid rgba(45,212,191,.2)}
+        .btn-toggle-off{background:rgba(245,158,11,.08);color:var(--yellow);border:1px solid rgba(245,158,11,.2)}
+        .jobs-list{display:grid;gap:14px}
+        .job-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--radius-xl);padding:20px 24px}
+        .job-card.inactive{opacity:.55;border-color:var(--line)}
+        .job-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+        .job-card-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff}
+        .job-card-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+        .meta-chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:rgba(124,110,247,.1);color:var(--purple-2);border:1px solid rgba(124,110,247,.2)}
+        .meta-chip.green{background:rgba(45,212,191,.1);color:var(--green);border-color:rgba(45,212,191,.2)}
+        .meta-chip.yellow{background:rgba(245,158,11,.1);color:var(--yellow);border-color:rgba(245,158,11,.2)}
+        .job-card-desc{font-size:13px;color:var(--soft);line-height:1.6;margin-bottom:14px;max-height:60px;overflow:hidden}
+        .job-card-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .empty-state{padding:48px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-xl);color:var(--muted);font-size:14px}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
+        .modal-overlay.open{display:flex}
+        .modal{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--radius-xl);padding:28px;width:min(680px,100%);max-height:90vh;overflow-y:auto}
+        .modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:20px}
+        .modal-close{float:right;background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;margin-top:-4px}
+        .modal-close:hover{color:#fff}
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-text">N<span class="accent">E</span>XAS</div>
+        <div class="logo-sub">HR Platform</div>
+    </div>
+    <nav class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/candidati">Candidati</a>
+        <a href="/analytics">Analytics</a>
+        <a class="active" href="/posturi">Posturi Vacante</a>
+        <a class="logout-link" href="/logout">Logout</a>
+    </nav>
+</aside>
+
+<div class="main">
+    <div class="page-header">
+        <div class="page-title">Posturi Vacante</div>
+        <div class="page-sub">Administreaza posturile active. Pagina publica este vizibila la /cariere.</div>
+    </div>
+
+    {% if message %}
+    <div class="notice">{{ message }}</div>
+    {% endif %}
+
+    <div class="public-link-bar">
+        <span>Pagina publica candidati:</span>
+        <a href="/cariere" target="_blank">nexas.ro/cariere →</a>
+    </div>
+
+    <div class="two-col">
+        <!-- FORM ADAUGA POST -->
+        <div class="panel">
+            <div class="panel-title">Adauga post nou</div>
+            <form method="post" action="/posturi/adauga">
+                <div class="form-grid">
+                    <div class="field full"><label>Titlu post *</label><input type="text" name="titlu" placeholder="Ex: Sofer TIR, Sudor, Contabil" required></div>
+                    <div class="field"><label>Departament</label><input type="text" name="departament" placeholder="Ex: Logistica, Productie"></div>
+                    <div class="field"><label>Locatie</label><input type="text" name="locatie" placeholder="Ex: Cluj-Napoca"></div>
+                    <div class="field"><label>Tip contract</label>
+                        <select name="tip_contract">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Sezonier">Sezonier</option>
+                        </select>
+                    </div>
+                    <div class="field full"><label>Descriere scurta</label><textarea name="descriere" placeholder="Scurta descriere a postului..."></textarea></div>
+                    <div class="field full"><label>Responsabilitati</label><textarea name="responsabilitati" placeholder="- Responsabilitate 1&#10;- Responsabilitate 2"></textarea></div>
+                    <div class="field full"><label>Cerinte minime</label><textarea name="cerinte" placeholder="- Cerinta 1&#10;- Cerinta 2"></textarea></div>
+                    <div class="field full"><label>Ce oferim</label><textarea name="ce_oferim" placeholder="- Beneficiu 1&#10;- Beneficiu 2"></textarea></div>
+                </div>
+                <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;margin-top:6px">Adauga post</button>
+            </form>
+        </div>
+
+        <!-- LISTA POSTURI -->
+        <div>
+            {% if not jobs %}
+            <div class="empty-state">Nu ai posturi create inca. Adauga primul post din formularul din stanga.</div>
+            {% else %}
+            <div class="jobs-list">
+                {% for job in jobs %}
+                <div class="job-card {% if not job.activ %}inactive{% endif %}">
+                    <div class="job-card-header">
+                        <div class="job-card-title">{{ job.titlu }}</div>
+                        <div class="meta-chip {% if job.activ %}green{% else %}yellow{% endif %}">
+                            {% if job.activ %}Activ{% else %}Inactiv{% endif %}
+                        </div>
+                    </div>
+                    <div class="job-card-meta">
+                        {% if job.departament %}<span class="meta-chip">{{ job.departament }}</span>{% endif %}
+                        {% if job.locatie %}<span class="meta-chip">{{ job.locatie }}</span>{% endif %}
+                        {% if job.tip_contract %}<span class="meta-chip">{{ job.tip_contract }}</span>{% endif %}
+                    </div>
+                    {% if job.descriere %}
+                    <div class="job-card-desc">{{ job.descriere }}</div>
+                    {% endif %}
+                    <div class="job-card-actions">
+                        <button class="btn btn-edit" onclick="openEdit({{ job.id }}, {{ job|tojson }})">Editeaza</button>
+                        <form method="post" action="/posturi/{{ job.id }}/toggle" style="display:inline">
+                            <button class="btn {% if job.activ %}btn-toggle-off{% else %}btn-toggle-on{% endif %}" type="submit">
+                                {% if job.activ %}Dezactiveaza{% else %}Activeaza{% endif %}
+                            </button>
+                        </form>
+                        <a class="btn" style="background:rgba(255,255,255,.04);color:var(--soft);border:1px solid var(--line-2)" href="/cariere/{{ job.id }}" target="_blank">Previzualizeaza</a>
+                        <form method="post" action="/posturi/{{ job.id }}/sterge" style="display:inline" onsubmit="return confirm('Stergi postul {{ job.titlu }}?')">
+                            <button class="btn btn-danger" type="submit">Sterge</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITARE -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeEdit()">×</button>
+        <div class="modal-title">Editeaza post</div>
+        <form method="post" id="editForm">
+            <div class="form-grid">
+                <div class="field full"><label>Titlu post *</label><input type="text" name="titlu" id="edit_titlu" required></div>
+                <div class="field"><label>Departament</label><input type="text" name="departament" id="edit_departament"></div>
+                <div class="field"><label>Locatie</label><input type="text" name="locatie" id="edit_locatie"></div>
+                <div class="field"><label>Tip contract</label>
+                    <select name="tip_contract" id="edit_tip_contract">
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Sezonier">Sezonier</option>
+                    </select>
+                </div>
+                <div class="field full"><label>Descriere</label><textarea name="descriere" id="edit_descriere"></textarea></div>
+                <div class="field full"><label>Responsabilitati</label><textarea name="responsabilitati" id="edit_responsabilitati"></textarea></div>
+                <div class="field full"><label>Cerinte</label><textarea name="cerinte" id="edit_cerinte"></textarea></div>
+                <div class="field full"><label>Ce oferim</label><textarea name="ce_oferim" id="edit_ce_oferim"></textarea></div>
+            </div>
+            <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;margin-top:6px">Salveaza modificarile</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEdit(id, job) {
+    document.getElementById('editForm').action = '/posturi/' + id + '/editeaza';
+    document.getElementById('edit_titlu').value = job.titlu || '';
+    document.getElementById('edit_departament').value = job.departament || '';
+    document.getElementById('edit_locatie').value = job.locatie || '';
+    document.getElementById('edit_tip_contract').value = job.tip_contract || 'Full-time';
+    document.getElementById('edit_descriere').value = job.descriere || '';
+    document.getElementById('edit_responsabilitati').value = job.responsabilitati || '';
+    document.getElementById('edit_cerinte').value = job.cerinte || '';
+    document.getElementById('edit_ce_oferim').value = job.ce_oferim || '';
+    document.getElementById('editModal').classList.add('open');
+}
+function closeEdit() {
+    document.getElementById('editModal').classList.remove('open');
+}
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEdit();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cariere | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --blue:#1a4fd6;--blue-2:#2563eb;--blue-light:#dbeafe;--blue-mid:#93c5fd;
+            --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-400:#94a3b8;
+            --gray-600:#475569;--gray-800:#1e293b;--gray-900:#0f172a;
+            --white:#ffffff;--radius-xl:20px;--radius-lg:14px;--radius-md:10px;
+        }
+        body{background:var(--gray-50);color:var(--gray-800);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+        /* HEADER */
+        .header{background:var(--white);border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:10;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+        .header-inner{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+        .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .brand-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--gray-900)}
+        .brand-logo span{color:var(--blue-2)}
+        .brand-sub{font-size:11px;color:var(--gray-400);letter-spacing:2px;text-transform:uppercase}
+        .header-tag{font-size:12px;font-weight:600;color:var(--blue-2);background:var(--blue-light);padding:5px 12px;border-radius:999px}
+
+        /* HERO */
+        .hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a6e 50%,#1a4fd6 100%);color:var(--white);padding:72px 24px 64px;text-align:center}
+        .hero-inner{max-width:700px;margin:0 auto}
+        .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:20px}
+        .hero-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.1;margin-bottom:16px}
+        .hero-title span{color:#93c5fd}
+        .hero-sub{font-size:16px;color:rgba(255,255,255,.7);line-height:1.6;max-width:500px;margin:0 auto}
+        .hero-stats{display:flex;gap:32px;justify-content:center;margin-top:36px;flex-wrap:wrap}
+        .hero-stat{text-align:center}
+        .hero-stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--white)}
+        .hero-stat-label{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+
+        /* CONTENT */
+        .content{max-width:1100px;margin:0 auto;padding:48px 24px}
+        .section-header{margin-bottom:28px}
+        .section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+        .section-sub{font-size:14px;color:var(--gray-400)}
+
+        /* JOB CARDS */
+        .jobs-grid{display:grid;gap:16px}
+        .job-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-xl);padding:28px;transition:.2s ease;cursor:pointer}
+        .job-card:hover{border-color:var(--blue-2);box-shadow:0 8px 32px rgba(26,79,214,.1);transform:translateY(-2px)}
+        .job-card-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--gray-900);margin-bottom:10px}
+        .job-card-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+        .chip{font-size:12px;font-weight:600;padding:4px 12px;border-radius:999px}
+        .chip-blue{background:var(--blue-light);color:var(--blue-2)}
+        .chip-gray{background:var(--gray-100);color:var(--gray-600)}
+        .chip-green{background:#dcfce7;color:#16a34a}
+        .job-card-desc{font-size:14px;color:var(--gray-600);line-height:1.65;margin-bottom:20px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+        .job-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid var(--gray-100)}
+        .job-meta{display:flex;gap:20px}
+        .job-meta-item{font-size:12px;color:var(--gray-400)}
+        .job-meta-item strong{color:var(--gray-600);font-weight:600}
+        .job-card-btns{display:flex;gap:10px}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--radius-md);font-size:13px;font-weight:700;cursor:pointer;border:0;font-family:'DM Sans',sans-serif;transition:.15s;text-decoration:none;white-space:nowrap}
+        .btn-primary{background:var(--blue-2);color:#fff}
+        .btn-primary:hover{background:var(--blue);transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.3)}
+        .btn-outline{background:transparent;color:var(--blue-2);border:1.5px solid var(--blue-2)}
+        .btn-outline:hover{background:var(--blue-light)}
+
+        /* EMPTY */
+        .empty{text-align:center;padding:64px 24px;color:var(--gray-400)}
+        .empty-icon{font-size:48px;margin-bottom:16px}
+        .empty-title{font-size:18px;font-weight:700;color:var(--gray-600);margin-bottom:8px}
+
+        /* FOOTER */
+        .footer{background:var(--gray-900);color:rgba(255,255,255,.4);text-align:center;padding:28px;font-size:13px;margin-top:64px}
+        .footer strong{color:rgba(255,255,255,.7)}
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <a class="brand" href="/cariere">
+            <div>
+                <div class="brand-logo">N<span>E</span>XAS</div>
+                <div class="brand-sub">HR Platform</div>
+            </div>
+        </a>
+        <div class="header-tag">{{ jobs|length }} posturi disponibile</div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-badge">✦ Oportunitati de cariera</div>
+        <h1 class="hero-title">Alatura-te echipei<br><span>NEXAS</span></h1>
+        <p class="hero-sub">Cautam oameni talentati si motivati. Gaseste jobul potrivit si aplica direct — simplu si rapid.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-num">{{ jobs|length }}</div>
+                <div class="hero-stat-label">Posturi active</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">24h</div>
+                <div class="hero-stat-label">Timp raspuns</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">100%</div>
+                <div class="hero-stat-label">Sanse egale</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="content">
+    <div class="section-header">
+        <div class="section-title">Posturi disponibile</div>
+        <div class="section-sub">Click pe orice post pentru a vedea detaliile complete si a aplica.</div>
+    </div>
+
+    {% if not jobs %}
+    <div class="empty">
+        <div class="empty-icon">📋</div>
+        <div class="empty-title">Nu exista posturi active momentan</div>
+        <div>Revino curand pentru noi oportunitati.</div>
+    </div>
+    {% else %}
+    <div class="jobs-grid">
+        {% for job in jobs %}
+        <div class="job-card" onclick="window.location='/cariere/{{ job.id }}'">
+            <div class="job-card-title">{{ job.titlu }}</div>
+            <div class="job-card-chips">
+                {% if job.departament %}<span class="chip chip-blue">{{ job.departament }}</span>{% endif %}
+                {% if job.locatie %}<span class="chip chip-gray">📍 {{ job.locatie }}</span>{% endif %}
+                {% if job.tip_contract %}<span class="chip chip-green">{{ job.tip_contract }}</span>{% endif %}
+            </div>
+            {% if job.descriere %}
+            <div class="job-card-desc">{{ job.descriere }}</div>
+            {% endif %}
+            <div class="job-card-footer">
+                <div class="job-meta">
+                    {% if job.departament %}<div class="job-meta-item"><strong>Departament</strong> {{ job.departament }}</div>{% endif %}
+                    {% if job.locatie %}<div class="job-meta-item"><strong>Locatie</strong> {{ job.locatie }}</div>{% endif %}
+                    <div class="job-meta-item"><strong>Data</strong> {{ job.created_at.strftime('%d/%m/%Y') }}</div>
+                </div>
+                <div class="job-card-btns">
+                    <a class="btn btn-outline" href="/cariere/{{ job.id }}">Vezi detalii</a>
+                    <a class="btn btn-primary" href="/cariere/{{ job.id }}#aplica">Aplica acum</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<footer class="footer">
+    <strong>NEXAS HR Platform</strong> · Toate drepturile rezervate · www.nexas.ro
+</footer>
+
+</body>
+</html>

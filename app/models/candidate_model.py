@@ -25,6 +25,7 @@ class Candidate(Base):
     summary = Column(Text, nullable=True)
 
     job_title = Column(String, nullable=True)
+    job_id = Column(Integer, nullable=True)
     status = Column(String, nullable=True)
     cv_file = Column(String, nullable=True)
 

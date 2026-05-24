@@ -23,7 +23,7 @@ from app.core.database import SessionLocal
 from app.models.candidate_model import Candidate
 from app.models.cv_analysis_model import CvAnalysis
 
-# Cloudinary este folosit pentru persistenta CV-urilor (vezi cloudinary_service.py)
+from app.services.cloudinary_service import upload_cv_to_cloudinary, check_cv_exists_on_cloudinary, stream_cv_from_cloudinary
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

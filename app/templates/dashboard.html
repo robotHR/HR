@@ -157,27 +157,59 @@
         }
 
         .hero{
+            display:block;
+        }
+        .hero-grid{
             display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:24px;align-items:stretch;
+            grid-template-columns:minmax(360px,540px) 1fr;
+            gap:24px;
+            align-items:stretch;
+        }
+        .hero-left{
+            display:flex;
+            flex-direction:column;
+            gap:0;
         }
         .hero-right{
-            display:grid;
-            grid-template-columns:1fr 180px;
-            gap:12px;align-items:stretch;
+            margin-top:0;
         }
-        .hero-logo-wrap{
-            display:flex;align-items:center;justify-content:center;
+        .dashboard-image-card{
+            min-height:292px;
             border-radius:var(--radius-lg);
             overflow:hidden;
-            background:rgba(255,255,255,.03);
+            background:linear-gradient(135deg,rgba(124,110,247,.08),rgba(45,212,191,.035));
             border:1px solid var(--line);
-            height:100%;
+            position:relative;
+            box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
         }
-        .hero-logo-wrap img{
-            width:100%;height:100%;
+        .dashboard-image-card::before{
+            content:'';
+            position:absolute;
+            inset:0;
+            background:radial-gradient(circle at 35% 20%,rgba(167,139,250,.18),transparent 34%),radial-gradient(circle at 80% 80%,rgba(45,212,191,.1),transparent 30%);
+            pointer-events:none;
+            z-index:1;
+        }
+        .dashboard-image-card img{
+            width:100%;
+            height:100%;
+            display:block;
             object-fit:cover;
-            opacity:.92;
+            opacity:.94;
+            position:absolute;
+            inset:0;
+        }
+        .dashboard-image-card .image-fallback{
+            position:absolute;
+            inset:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:24px;
+            color:var(--muted);
+            font-size:13px;
+            z-index:0;
         }
 
         .eyebrow{
@@ -519,7 +551,8 @@
 
         /* ─── RESPONSIVE ──────────────────── */
         @media(max-width:1200px){
-            .hero{grid-template-columns:1fr}
+            .hero-grid{grid-template-columns:1fr}
+            .dashboard-image-card{min-height:260px}
             .stats-row{grid-template-columns:repeat(2,1fr)}
             .source-grid{grid-template-columns:1fr}
         }
@@ -534,8 +567,6 @@
         }
 
     </style>
-</head>
-
 </head>
 
 <body>
@@ -583,61 +614,63 @@
 
         <section class="hero">
             <div class="hero-grid">
-                <div>
+                <div class="hero-left">
                     <div class="eyebrow">Dashboard recrutare AI</div>
                     <h1 class="hero-title">NEXAS <span>HR</span></h1>
                     <div class="hero-sub">
                         CV-uri din Gmail sau incarcare manuala. Cauti jobul. Vezi candidatii potriviti.
                     </div>
 
+                    <div class="hero-right">
+                        <div class="hero-panel">
+                            <div class="mini-title">
+                                Potriviri recomandate
+                                <span>{{ total }} candidati</span>
+                            </div>
+                            <div class="mini-list">
+                                {% set shown = namespace(count=0) %}
+                                {% for job_title, job_candidates in jobs.items() %}
+                                    {% for candidate in job_candidates[:1] %}
+                                        {% if shown.count < 3 %}
+                                            <div class="mini-row">
+                                                <div class="mini-avatar">{{ (candidate.name or "C")[0:1] }}</div>
+                                                <div>
+                                                    <strong>{{ candidate.name or "Candidat necunoscut" }}</strong>
+                                                    <small>{{ candidate.position or job_title }}</small>
+                                                </div>
+                                                <div class="mini-score">{{ candidate.score or 0 }}</div>
+                                            </div>
+                                            {% set shown.count = shown.count + 1 %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
 
+                                {% if total == 0 %}
+                                    <div class="mini-row">
+                                        <div class="mini-avatar">+</div>
+                                        <div>
+                                            <strong>Incarca CV-uri</strong>
+                                            <small>Gmail sau upload manual</small>
+                                        </div>
+                                        <div class="mini-score">AI</div>
+                                    </div>
+                                    <div class="mini-row">
+                                        <div class="mini-avatar">?</div>
+                                        <div>
+                                            <strong>Cauta un job</strong>
+                                            <small>Ex: Sofer TIR, Consier, Contabil</small>
+                                        </div>
+                                        <div class="mini-score">0</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-              
-
-                <div class="hero-right">
-                <div class="hero-panel">
-                    <div class="mini-title">
-                        Potriviri recomandate
-                        <span>{{ total }} candidati</span>
-                    </div>
-                    <div class="mini-list">
-                        {% set shown = namespace(count=0) %}
-                        {% for job_title, job_candidates in jobs.items() %}
-                            {% for candidate in job_candidates[:1] %}
-                                {% if shown.count < 3 %}
-                                    <div class="mini-row">
-                                        <div class="mini-avatar">{{ (candidate.name or "C")[0:1] }}</div>
-                                        <div>
-                                            <strong>{{ candidate.name or "Candidat necunoscut" }}</strong>
-                                            <small>{{ candidate.position or job_title }}</small>
-                                        </div>
-                                        <div class="mini-score">{{ candidate.score or 0 }}</div>
-                                    </div>
-                                    {% set shown.count = shown.count + 1 %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-
-                        {% if total == 0 %}
-                            <div class="mini-row">
-                                <div class="mini-avatar">+</div>
-                                <div>
-                                    <strong>Incarca CV-uri</strong>
-                                    <small>Gmail sau upload manual</small>
-                                </div>
-                                <div class="mini-score">AI</div>
-                            </div>
-                            <div class="mini-row">
-                                <div class="mini-avatar">?</div>
-                                <div>
-                                    <strong>Cauta un job</strong>
-                                    <small>Ex: Sofer TIR, Consier, Contabil</small>
-                                </div>
-                                <div class="mini-score">0</div>
-                            </div>
-                        {% endif %}
-                    </div>
+                <div class="dashboard-image-card">
+                    <div class="image-fallback">Imagine NEXAS HR</div>
+                    <img src="/static/images/LOGO%20NEXAS.jpg" alt="NEXAS HR Platform">
                 </div>
             </div>
         </section>

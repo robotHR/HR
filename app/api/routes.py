@@ -63,23 +63,16 @@ def is_allowed_cv_file(filename):
 
 
 def ensure_candidate_extra_columns():
-    inspector = inspect(engine)
-
-    if not inspector.has_table("candidates"):
+    if not inspect(engine).has_table("candidates"):
         return
 
-    existing = [column["name"] for column in inspector.get_columns("candidates")]
-
     with engine.begin() as conn:
-        if "batch_id" not in existing:
-            conn.execute(text("ALTER TABLE candidates ADD COLUMN batch_id VARCHAR"))
-
-        if "visible_in_dashboard" not in existing:
-            conn.execute(text("ALTER TABLE candidates ADD COLUMN visible_in_dashboard INTEGER DEFAULT 1"))
-            conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
-
-        if "companies" not in existing:
-            conn.execute(text("ALTER TABLE candidates ADD COLUMN companies TEXT"))
+        # Folosim IF NOT EXISTS — sigur pe PostgreSQL, nu crapa daca exista deja
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS batch_id VARCHAR"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS visible_in_dashboard INTEGER DEFAULT 1"))
+        conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS companies TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_id INTEGER"))
 
 
 ensure_candidate_extra_columns()
@@ -1115,11 +1108,16 @@ async def debug_db():
 async def jobs_page(request: Request, message: str = ""):
     db = SessionLocal()
     jobs = db.query(JobPost).order_by(JobPost.created_at.desc()).all()
+    # Numar aplicatii per post
+    applicant_counts = {}
+    for job in jobs:
+        count = db.query(Candidate).filter(Candidate.job_id == job.id).count()
+        applicant_counts[job.id] = count
     db.close()
     return templates.TemplateResponse(
         request=request,
         name="jobs.html",
-        context={"request": request, "jobs": jobs, "message": message}
+        context={"request": request, "jobs": jobs, "message": message, "applicant_counts": applicant_counts}
     )
 
 
@@ -1239,6 +1237,7 @@ async def apply_to_job(
     telefon: str = Form(""),
     cv_file: UploadFile = File(...)
 ):
+    import os as _os
     db = SessionLocal()
     job = db.query(JobPost).filter(JobPost.id == job_id, JobPost.activ == True).first()
     db.close()
@@ -1246,24 +1245,14 @@ async def apply_to_job(
     if not job:
         return HTMLResponse("<h2>Post indisponibil.</h2>", status_code=404)
 
-    # Valideaza extensia CV
-    ext = os.path.splitext(cv_file.filename or "")[1].lower()
+    ext = _os.path.splitext(cv_file.filename or "")[1].lower()
     if ext not in {".pdf", ".docx", ".doc"}:
-        return RedirectResponse(
-            url=f"/cariere/{job_id}?error=Doar fisiere PDF, DOC, DOCX sunt acceptate.",
-            status_code=303
-        )
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Doar PDF, DOC, DOCX.", status_code=303)
 
-    # Citeste bytes CV
     cv_bytes = await cv_file.read()
     if not cv_bytes:
-        return RedirectResponse(
-            url=f"/cariere/{job_id}?error=Fisierul CV este gol.",
-            status_code=303
-        )
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Fisierul CV este gol.", status_code=303)
 
-    # Genereaza nume unic pentru fisier
-    import unicodedata
     safe_name = re.sub(r"[^A-Za-z0-9._() -]+", "_", cv_file.filename or "cv")
     final_filename = f"aplicatie_{job_id}_{int(time.time())}_{safe_name}"
 
@@ -1274,6 +1263,12 @@ async def apply_to_job(
     except Exception:
         pass
 
+    # Salveaza fisier local temporar pentru analiza
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    local_path = os.path.join(UPLOAD_FOLDER, final_filename)
+    with open(local_path, "wb") as f:
+        f.write(cv_bytes)
+
     # Salveaza candidat in DB
     db = SessionLocal()
     candidate = Candidate(
@@ -1281,11 +1276,12 @@ async def apply_to_job(
         email=email,
         phone=telefon,
         job_title=job.titlu,
+        job_id=job_id,
         position=job.titlu,
         status="NOU",
         score=0,
         cv_file=final_filename,
-        summary=f"Aplicatie directa pentru postul: {job.titlu}. Locatie: {job.locatie}."
+        summary=f"Aplicatie directa pentru postul: {job.titlu}. Locatie: {job.locatie or ''}."
     )
     db.add(candidate)
     db.commit()
@@ -1296,10 +1292,23 @@ async def apply_to_job(
         candidate_id=candidate_id,
         event_type="aplicatie",
         title=f"Aplicatie directa — {job.titlu}",
-        description=f"Candidatul a aplicat prin pagina publica /cariere pentru postul {job.titlu}."
+        description=f"Candidatul a aplicat prin /cariere pentru postul {job.titlu}."
     )
 
-    # Trimite email de confirmare candidatului
+    # Analiza AI automata pentru postul aplicat
+    ai_score = 0
+    try:
+        result = process_cvs_for_job(job.titlu)
+        # Extrage scorul candidatului proaspat salvat
+        db2 = SessionLocal()
+        updated = db2.query(Candidate).filter(Candidate.id == candidate_id).first()
+        if updated:
+            ai_score = updated.score or 0
+        db2.close()
+    except Exception:
+        pass
+
+    # Email confirmare catre candidat
     try:
         send_email_api(
             to_email=email,
@@ -1319,7 +1328,28 @@ Echipa HR NEXAS
     except Exception:
         pass
 
-    return RedirectResponse(
-        url=f"/cariere/{job_id}?success=1",
-        status_code=303
-    )
+    # Notificare catre HR
+    hr_email = os.getenv("GMAIL_EMAIL", "")
+    if hr_email:
+        try:
+            send_email_api(
+                to_email=hr_email,
+                subject=f"Aplicatie noua: {nume} — {job.titlu}",
+                body=f"""Aplicatie noua primita pe NEXAS HR.
+
+Candidat: {nume}
+Email: {email}
+Telefon: {telefon or 'necompletat'}
+Post: {job.titlu}
+Locatie: {job.locatie or 'nespecificata'}
+Scor AI: {ai_score}/100
+
+Vezi candidatul: https://hr-g66k.onrender.com/candidat/{candidate_id}
+"""
+            )
+        except Exception:
+            pass
+
+    return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
+
+

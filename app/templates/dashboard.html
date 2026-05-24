@@ -174,19 +174,21 @@
             margin-top:0;
         }
         .dashboard-image-card{
-            min-height:292px;
+            height:292px;
+            min-height:0;
             border-radius:var(--radius-lg);
             overflow:hidden;
             background:linear-gradient(135deg,rgba(124,110,247,.08),rgba(45,212,191,.035));
             border:1px solid var(--line);
             position:relative;
             box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+            transition:height .35s ease, transform .35s ease, opacity .35s ease;
         }
         .dashboard-image-card::before{
             content:'';
             position:absolute;
             inset:0;
-            background:radial-gradient(circle at 35% 20%,rgba(167,139,250,.18),transparent 34%),radial-gradient(circle at 80% 80%,rgba(45,212,191,.1),transparent 30%);
+            background:radial-gradient(circle at 35% 20%,rgba(167,139,250,.14),transparent 34%),radial-gradient(circle at 80% 80%,rgba(45,212,191,.08),transparent 30%);
             pointer-events:none;
             z-index:1;
         }
@@ -195,9 +197,19 @@
             height:100%;
             display:block;
             object-fit:cover;
+            object-position:center center;
             opacity:.94;
             position:absolute;
             inset:0;
+            transition:transform .35s ease, opacity .35s ease;
+        }
+        .dashboard-image-card.is-small{
+            height:220px;
+            transform:scale(.985);
+        }
+        .dashboard-image-card.is-small img{
+            transform:scale(.94);
+            opacity:.9;
         }
         .dashboard-image-card .image-fallback{
             position:absolute;
@@ -930,6 +942,24 @@ document.addEventListener('DOMContentLoaded', function() {
             bar.style.width = width;
         }, 300);
     });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const imageCard = document.querySelector(".dashboard-image-card");
+    if(!imageCard) return;
+
+    function resizeHeroImage(){
+        if(window.scrollY > 70){
+            imageCard.classList.add("is-small");
+        } else {
+            imageCard.classList.remove("is-small");
+        }
+    }
+
+    resizeHeroImage();
+    window.addEventListener("scroll", resizeHeroImage, { passive:true });
 });
 </script>
 

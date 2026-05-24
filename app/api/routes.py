@@ -1175,6 +1175,38 @@ async def toggle_job(job_id: int):
     return RedirectResponse(url=f"/posturi?message=Post marcat ca {status_msg}.", status_code=303)
 
 
+@router.get("/posturi/{job_id}/aplicatii", response_class=HTMLResponse)
+async def job_applicants(request: Request, job_id: int):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id).first()
+    if not job:
+        db.close()
+        return HTMLResponse("<h2>Post negasit.</h2>", status_code=404)
+
+    candidates = db.query(Candidate).filter(
+        Candidate.job_id == job_id
+    ).order_by(Candidate.score.desc()).all()
+    db.close()
+
+    top = [c for c in candidates if (c.score or 0) >= 75]
+    potential = [c for c in candidates if 50 <= (c.score or 0) < 75]
+    rest = [c for c in candidates if (c.score or 0) < 50]
+
+    return templates.TemplateResponse(
+        request=request,
+        name="job_applicants.html",
+        context={
+            "request": request,
+            "job": job,
+            "top": top,
+            "potential": potential,
+            "rest": rest,
+            "total": len(candidates),
+            "status_display": status_display
+        }
+    )
+
+
 @router.post("/posturi/{job_id}/editeaza")
 async def edit_job(
     job_id: int,

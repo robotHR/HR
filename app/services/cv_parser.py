@@ -30,6 +30,55 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDER = "app/uploads"
+
+
+def sync_from_cloudinary():
+    """
+    Descarca din Cloudinary toate fisierele care nu exista local in app/uploads/.
+    Apelat automat inainte de analiza pentru a asigura ca fisierele sunt disponibile.
+    Returneaza numarul de fisiere sincronizate.
+    """
+    import cloudinary.api
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    try:
+        results = cloudinary.api.resources(
+            resource_type="raw",
+            max_results=500
+        )
+        remote_files = results.get("resources", [])
+    except Exception as e:
+        logger.warning(f"Nu s-au putut lista fisierele din Cloudinary: {e}")
+        return 0
+
+    synced = 0
+    for resource in remote_files:
+        filename = resource.get("public_id", "")
+        if not filename:
+            continue
+
+        # Pastreaza doar CV-uri
+        ext = os.path.splitext(filename)[1].lower()
+        if ext not in (".pdf", ".docx", ".doc"):
+            continue
+
+        local_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        # Daca exista deja local, skip
+        if os.path.exists(local_path):
+            continue
+
+        # Descarca din Cloudinary
+        buffer, mime = stream_cv_from_cloudinary(filename)
+        if buffer:
+            with open(local_path, "wb") as f:
+                f.write(buffer.read())
+            synced += 1
+            logger.info(f"Sincronizat din Cloudinary: {filename}")
+
+    if synced > 0:
+        logger.info(f"Sincronizare Cloudinary completa: {synced} fisiere descarcate local")
+    return synced
 TEMP_FOLDER = "/tmp/nexas_hr"
 os.makedirs(TEMP_FOLDER, exist_ok=True)
 
@@ -564,6 +613,12 @@ def process_cvs_for_job(target_job):
     profile = match_job_profile(target_job) or build_fallback_profile(target_job)
     print("Profil job folosit:", profile.get("job_title"), "-", profile.get("domain"))
 
+    # Sincronizeaza fisierele din Cloudinary inainte de analiza
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    synced = sync_from_cloudinary()
+    if synced > 0:
+        print(f"Sincronizare Cloudinary: {synced} fisiere descarcate local")
+
     # Colecteaza fisierele CV disponibile
     try:
         all_files = [
@@ -574,7 +629,7 @@ def process_cvs_for_job(target_job):
         all_files = []
 
     if not all_files:
-        return {"ok": False, "message": "Nu exista CV-uri in uploads. Incarca CV-uri mai intai.", "saved": 0}
+        return {"ok": False, "message": "Nu exista CV-uri. Verifica Cloudinary sau incarca CV-uri.", "saved": 0}
 
     # Numara cate sunt din cache vs. noi
     cache_hits = 0

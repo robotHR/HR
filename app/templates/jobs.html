@@ -159,17 +159,18 @@
                     <div class="job-card-desc">{{ job.descriere }}</div>
                     {% endif %}
                     <div class="job-card-actions">
-                        <button class="btn btn-edit" onclick="openEdit(
-                            {{ job.id }},
-                            {{ job.titlu|tojson }},
-                            {{ (job.departament or '')|tojson }},
-                            {{ (job.locatie or '')|tojson }},
-                            {{ (job.tip_contract or 'Full-time')|tojson }},
-                            {{ (job.descriere or '')|tojson }},
-                            {{ (job.responsabilitati or '')|tojson }},
-                            {{ (job.cerinte or '')|tojson }},
-                            {{ (job.ce_oferim or '')|tojson }}
-                        )">Editeaza</button>
+                        <button class="btn btn-edit"
+                            onclick="openEdit(this)"
+                            data-id="{{ job.id }}"
+                            data-titlu="{{ job.titlu|e }}"
+                            data-departament="{{ (job.departament or '')|e }}"
+                            data-locatie="{{ (job.locatie or '')|e }}"
+                            data-tip="{{ (job.tip_contract or 'Full-time')|e }}"
+                            data-descriere="{{ (job.descriere or '')|e }}"
+                            data-responsabilitati="{{ (job.responsabilitati or '')|e }}"
+                            data-cerinte="{{ (job.cerinte or '')|e }}"
+                            data-ce-oferim="{{ (job.ce_oferim or '')|e }}"
+                        >Editeaza</button>
                         <form method="post" action="/posturi/{{ job.id }}/toggle" style="display:inline">
                             <button class="btn {% if job.activ %}btn-toggle-off{% else %}btn-toggle-on{% endif %}" type="submit">
                                 {% if job.activ %}Dezactiveaza{% else %}Activeaza{% endif %}
@@ -217,16 +218,17 @@
 </div>
 
 <script>
-function openEdit(id, titlu, departament, locatie, tip_contract, descriere, responsabilitati, cerinte, ce_oferim) {
-    document.getElementById('editForm').action = '/posturi/' + id + '/editeaza';
-    document.getElementById('edit_titlu').value = titlu || '';
-    document.getElementById('edit_departament').value = departament || '';
-    document.getElementById('edit_locatie').value = locatie || '';
-    document.getElementById('edit_tip_contract').value = tip_contract || 'Full-time';
-    document.getElementById('edit_descriere').value = descriere || '';
-    document.getElementById('edit_responsabilitati').value = responsabilitati || '';
-    document.getElementById('edit_cerinte').value = cerinte || '';
-    document.getElementById('edit_ce_oferim').value = ce_oferim || '';
+function openEdit(btn) {
+    const d = btn.dataset;
+    document.getElementById('editForm').action = '/posturi/' + d.id + '/editeaza';
+    document.getElementById('edit_titlu').value = d.titlu || '';
+    document.getElementById('edit_departament').value = d.departament || '';
+    document.getElementById('edit_locatie').value = d.locatie || '';
+    document.getElementById('edit_tip_contract').value = d.tip || 'Full-time';
+    document.getElementById('edit_descriere').value = d.descriere || '';
+    document.getElementById('edit_responsabilitati').value = d.responsabilitati || '';
+    document.getElementById('edit_cerinte').value = d.cerinte || '';
+    document.getElementById('edit_ce_oferim').value = d.ceOferim || '';
     document.getElementById('editModal').classList.add('open');
 }
 function closeEdit() {

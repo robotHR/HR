@@ -159,12 +159,20 @@
                     <label>CV (PDF, DOC, DOCX) *</label>
                     <input type="file" name="cv_file" accept=".pdf,.doc,.docx" required>
                 </div>
-                <button class="btn-apply" type="submit">Trimite aplicatia →</button>
+                <button class="btn-apply" type="submit" id="submitBtn">Trimite aplicatia →</button>
                 <div class="form-note">
                     Prin trimiterea acestui formular esti de acord cu procesarea datelor tale in scopul recrutarii.
                     Vei primi o confirmare pe email.
                 </div>
             </form>
+            <script>
+            document.querySelector('form[action*="/aplica"]').addEventListener('submit', function() {
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                btn.textContent = 'Se trimite... ⏳';
+                btn.style.opacity = '0.75';
+            });
+            </script>
         </div>
     </div>
 </div>

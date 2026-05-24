@@ -11,6 +11,7 @@ from app.core.database import Base, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.models.cv_analysis_model import CvAnalysis
+from app.models.job_post_model import JobPost
 
 Base.metadata.create_all(bind=engine)
 
@@ -31,7 +32,8 @@ async def protect_private_pages(request: Request, call_next):
     public_paths = [
         "/login",
         "/static",
-        "/favicon.ico"
+        "/favicon.ico",
+        "/cariere"
     ]
 
     is_public = any(

@@ -5,7 +5,7 @@ import time
 from collections import Counter, defaultdict
 from io import BytesIO
 
-from fastapi import APIRouter, Request, Form, UploadFile, File
+from fastapi import APIRouter, Request, Form, UploadFile, File, BackgroundTasks
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import inspect, text
@@ -16,7 +16,19 @@ from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.models.job_post_model import JobPost
-from app.services.cv_parser import process_cvs_for_job
+from app.services.cv_parser import (
+    process_cvs_for_job,
+    extract_text_from_file,
+    analyze_cv_with_ai,
+    parse_ai_response,
+    normalize_data,
+    save_candidate_to_db,
+    match_job_profile,
+    build_fallback_profile,
+    clean_score,
+    recommendation_to_status,
+    as_text
+)
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
 from app.services.gmail_service import (
@@ -1183,8 +1195,10 @@ async def job_applicants(request: Request, job_id: int):
         db.close()
         return HTMLResponse("<h2>Post negasit.</h2>", status_code=404)
 
+    # Exclude candidatii fara analiza AI (scor 0 si summary default)
     candidates = db.query(Candidate).filter(
-        Candidate.job_id == job_id
+        Candidate.job_id == job_id,
+        Candidate.score > 0
     ).order_by(Candidate.score.desc()).all()
     db.close()
 
@@ -1263,95 +1277,132 @@ async def career_detail_page(request: Request, job_id: int):
     )
 
 
-@router.post("/cariere/{job_id}/aplica")
-async def apply_to_job(
+def _background_analyze_and_save(
+    cv_bytes: bytes,
+    final_filename: str,
+    local_path: str,
+    job_title: str,
     job_id: int,
-    nume: str = Form(...),
-    email: str = Form(...),
-    telefon: str = Form(""),
-    cv_file: UploadFile = File(...)
+    job_locatie: str,
+    nume: str,
+    email: str,
+    telefon: str
 ):
-    import os as _os
-    db = SessionLocal()
-    job = db.query(JobPost).filter(JobPost.id == job_id, JobPost.activ == True).first()
-    db.close()
-
-    if not job:
-        return HTMLResponse("<h2>Post indisponibil.</h2>", status_code=404)
-
-    ext = _os.path.splitext(cv_file.filename or "")[1].lower()
-    if ext not in {".pdf", ".docx", ".doc"}:
-        return RedirectResponse(url=f"/cariere/{job_id}?error=Doar PDF, DOC, DOCX.", status_code=303)
-
-    cv_bytes = await cv_file.read()
-    if not cv_bytes:
-        return RedirectResponse(url=f"/cariere/{job_id}?error=Fisierul CV este gol.", status_code=303)
-
-    safe_name = re.sub(r"[^A-Za-z0-9._() -]+", "_", cv_file.filename or "cv")
-    final_filename = f"aplicatie_{job_id}_{int(time.time())}_{safe_name}"
-
-    # Upload pe Cloudinary
-    from app.services.cloudinary_service import upload_cv_bytes_to_cloudinary
+    """
+    Ruleaza in background dupa ce Ion a primit confirmarea.
+    1. Analizeaza CV-ul cu AI
+    2. Salveaza candidatul in DB cu scor real
+    3. Trimite emailuri
+    Zero blocare pe server.
+    """
     try:
-        upload_cv_bytes_to_cloudinary(cv_bytes, final_filename)
-    except Exception:
-        pass
+        # Scrie fisierul local temporar
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        with open(local_path, "wb") as f:
+            f.write(cv_bytes)
 
-    # Salveaza fisier local temporar pentru analiza
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    local_path = os.path.join(UPLOAD_FOLDER, final_filename)
-    with open(local_path, "wb") as f:
-        f.write(cv_bytes)
+        # Extrage text din CV
+        cv_text = extract_text_from_file(local_path)
 
-    # Salveaza candidat in DB
-    db = SessionLocal()
-    candidate = Candidate(
-        name=nume,
-        email=email,
-        phone=telefon,
-        job_title=job.titlu,
-        job_id=job_id,
-        position=job.titlu,
-        status="NOU",
-        score=0,
-        cv_file=final_filename,
-        summary=f"Aplicatie directa pentru postul: {job.titlu}. Locatie: {job.locatie or ''}."
-    )
-    db.add(candidate)
-    db.commit()
-    candidate_id = candidate.id
-    db.close()
+        if cv_text:
+            # Analiza AI
+            profile = match_job_profile(job_title) or build_fallback_profile(job_title)
+            ai_response = analyze_cv_with_ai(cv_text, job_title)
+            data = parse_ai_response(ai_response)
 
-    log_candidate_event(
-        candidate_id=candidate_id,
-        event_type="aplicatie",
-        title=f"Aplicatie directa — {job.titlu}",
-        description=f"Candidatul a aplicat prin /cariere pentru postul {job.titlu}."
-    )
+            if data:
+                normalized = normalize_data(data, final_filename, job_title, cv_text, profile)
+                score = clean_score(normalized.get("score", 0))
+                status = recommendation_to_status(normalized.get("recommendation", "CONSIDER"))
 
-    # Analiza AI automata pentru postul aplicat
-    ai_score = 0
-    try:
-        result = process_cvs_for_job(job.titlu)
-        # Extrage scorul candidatului proaspat salvat
-        db2 = SessionLocal()
-        updated = db2.query(Candidate).filter(Candidate.id == candidate_id).first()
-        if updated:
-            ai_score = updated.score or 0
-        db2.close()
-    except Exception:
-        pass
+                # Salveaza candidat cu scor real in DB
+                db = SessionLocal()
+                candidate = Candidate(
+                    name=as_text(normalized.get("name", nume)),
+                    email=as_text(normalized.get("email", email)) or email,
+                    phone=as_text(normalized.get("phone", telefon)) or telefon,
+                    position=as_text(normalized.get("position", job_title)),
+                    experience=as_text(normalized.get("years_experience", "")),
+                    skills=as_text(normalized.get("skills", "")),
+                    companies=as_text(normalized.get("companies", "")),
+                    score=score,
+                    level=as_text(normalized.get("level", "")),
+                    strengths=as_text(normalized.get("strengths", "")),
+                    weaknesses=as_text(normalized.get("weaknesses", "")),
+                    summary=as_text(normalized.get("summary", "")),
+                    job_title=job_title,
+                    job_id=job_id,
+                    status=status,
+                    cv_file=final_filename
+                )
+                db.add(candidate)
+                db.commit()
+                candidate_id = candidate.id
+                db.close()
 
-    # Email confirmare catre candidat
+                log_candidate_event(
+                    candidate_id=candidate_id,
+                    event_type="aplicatie",
+                    title=f"Aplicatie directa — {job_title}",
+                    description=f"CV analizat AI. Scor: {score}. Status: {status}."
+                )
+
+                # Notificare HR cu scor real
+                hr_email = os.getenv("GMAIL_EMAIL", "")
+                if hr_email:
+                    try:
+                        send_email_api(
+                            to_email=hr_email,
+                            subject=f"Aplicatie noua: {normalized.get('name', nume)} — {job_title} (scor: {score})",
+                            body=f"""Aplicatie noua primita pe NEXAS HR.
+
+Candidat: {normalized.get('name', nume)}
+Email: {email}
+Telefon: {telefon or 'necompletat'}
+Post: {job_title}
+Locatie: {job_locatie or 'nespecificata'}
+Scor AI: {score}/100
+Status: {status}
+
+Vezi candidatul: https://hr-g66k.onrender.com/candidat/{candidate_id}
+"""
+                        )
+                    except Exception:
+                        pass
+        else:
+            # CV fara text (imagine scanned) — salvam fara scor AI
+            db = SessionLocal()
+            candidate = Candidate(
+                name=nume, email=email, phone=telefon,
+                job_title=job_title, job_id=job_id,
+                position=job_title, status="NOU", score=0,
+                cv_file=final_filename,
+                summary=f"CV primit. Nu s-a putut extrage text (posibil scanat)."
+            )
+            db.add(candidate)
+            db.commit()
+            db.close()
+
+    except Exception as e:
+        print(f"EROARE background analiza {final_filename}: {e}")
+    finally:
+        # Sterge fisierul local dupa analiza
+        try:
+            if os.path.exists(local_path):
+                os.remove(local_path)
+        except Exception:
+            pass
+
+    # Email confirmare catre candidat (se trimite dupa analiza)
     try:
         send_email_api(
             to_email=email,
-            subject=f"CV-ul tau pentru postul {job.titlu} a fost primit",
+            subject=f"CV-ul tau pentru postul {job_title} a fost primit",
             body=f"""Buna ziua, {nume},
 
-Va multumim pentru interesul acordat postului de {job.titlu}{' in ' + job.locatie if job.locatie else ''}.
+Va multumim pentru interesul acordat postului de {job_title}{' in ' + job_locatie if job_locatie else ''}.
 
-CV-ul dumneavoastra a fost primit si se afla in curs de analiza.
+CV-ul dumneavoastra a fost primit si analizat.
 
 Vom reveni cu un raspuns in cel mai scurt timp posibil daca profilul dumneavoastra corespunde cerintelor postului.
 
@@ -1362,27 +1413,60 @@ Echipa HR NEXAS
     except Exception:
         pass
 
-    # Notificare catre HR
-    hr_email = os.getenv("GMAIL_EMAIL", "")
-    if hr_email:
-        try:
-            send_email_api(
-                to_email=hr_email,
-                subject=f"Aplicatie noua: {nume} — {job.titlu}",
-                body=f"""Aplicatie noua primita pe NEXAS HR.
 
-Candidat: {nume}
-Email: {email}
-Telefon: {telefon or 'necompletat'}
-Post: {job.titlu}
-Locatie: {job.locatie or 'nespecificata'}
-Scor AI: {ai_score}/100
+@router.post("/cariere/{job_id}/aplica")
+async def apply_to_job(
+    background_tasks: BackgroundTasks,
+    job_id: int,
+    nume: str = Form(...),
+    email: str = Form(...),
+    telefon: str = Form(""),
+    cv_file: UploadFile = File(...)
+):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id, JobPost.activ == True).first()
+    job_titlu = job.titlu if job else None
+    job_locatie = job.locatie if job else None
+    db.close()
 
-Vezi candidatul: https://hr-g66k.onrender.com/candidat/{candidate_id}
-"""
-            )
-        except Exception:
-            pass
+    if not job_titlu:
+        return HTMLResponse("<h2>Post indisponibil.</h2>", status_code=404)
+
+    ext = os.path.splitext(cv_file.filename or "")[1].lower()
+    if ext not in {".pdf", ".docx", ".doc"}:
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Doar PDF, DOC, DOCX.", status_code=303)
+
+    cv_bytes = await cv_file.read()
+    if not cv_bytes:
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Fisierul CV este gol.", status_code=303)
+
+    safe_name = re.sub(r"[^A-Za-z0-9._() -]+", "_", cv_file.filename or "cv")
+    final_filename = f"aplicatie_{job_id}_{int(time.time())}_{safe_name}"
+    local_path = os.path.join(UPLOAD_FOLDER, final_filename)
+
+    # Upload pe Cloudinary imediat
+    from app.services.cloudinary_service import upload_cv_bytes_to_cloudinary
+    try:
+        upload_cv_bytes_to_cloudinary(cv_bytes, final_filename)
+    except Exception:
+        pass
+
+    # Analiza + salvare + emailuri — IN BACKGROUND
+    background_tasks.add_task(
+        _background_analyze_and_save,
+        cv_bytes=cv_bytes,
+        final_filename=final_filename,
+        local_path=local_path,
+        job_title=job_titlu,
+        job_id=job_id,
+        job_locatie=job_locatie,
+        nume=nume,
+        email=email,
+        telefon=telefon
+    )
+
+    # Redirect INSTANT — Ion nu asteapta analiza
+    return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
 
     return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
 

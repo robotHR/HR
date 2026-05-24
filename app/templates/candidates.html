@@ -154,7 +154,7 @@
                                 <td><div class="name">{{ candidate.name or "Candidat necunoscut" }}</div><div class="small">{{ candidate.email or "Email lipsa" }}</div><div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
                                     <div class="small">Companii: {{ candidate.companies or "Nespecificat" }}</div></td>
                                 <td><div class="job">{{ candidate.job_title or "Nespecificat" }}</div><div class="small">Post potrivit: {{ candidate.position or "Nespecificat" }}</div></td>
-                                <td><div class="score-cell {% if candidate.score >= 70 %}score-green{% elif candidate.score >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ candidate.score or 0 }}</div></td>
+                                <td><div class="score-cell {% if candidate.score >= 75 %}score-green{% elif candidate.score >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ candidate.score or 0 }}</div></td>
                                 <td><span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span></td>
                                 <td><div class="summary">{{ clean_summary(candidate.summary) }}</div></td>
                                 <td><div class="actions-inline"><a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a><a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a></div></td>

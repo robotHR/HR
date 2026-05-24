@@ -141,8 +141,13 @@
                 <div class="job-card {% if not job.activ %}inactive{% endif %}">
                     <div class="job-card-header">
                         <div class="job-card-title">{{ job.titlu }}</div>
-                        <div class="meta-chip {% if job.activ %}green{% else %}yellow{% endif %}">
-                            {% if job.activ %}Activ{% else %}Inactiv{% endif %}
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <div class="meta-chip" style="background:rgba(124,110,247,.1);color:var(--purple-2);border-color:rgba(124,110,247,.2)">
+                                {{ applicant_counts.get(job.id, 0) }} aplicatii
+                            </div>
+                            <div class="meta-chip {% if job.activ %}green{% else %}yellow{% endif %}">
+                                {% if job.activ %}Activ{% else %}Inactiv{% endif %}
+                            </div>
                         </div>
                     </div>
                     <div class="job-card-meta">

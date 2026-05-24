@@ -964,6 +964,7 @@
             <a class="active" href="/">⌂ Dashboard</a>
             <a href="/candidati">◎ Candidati</a>
             <a href="/analytics">◴ Analytics</a>
+            <a href="/posturi">◈ Posturi Vacante</a>
             <a class="logout-link" href="/logout">↪ Logout</a>
         </nav>
 
@@ -1067,10 +1068,11 @@
                     <div class="source-icon">M</div>
                     <div>
                         <h3>CV-uri din Gmail</h3>
-                        <p>Agentul cauta mailuri noi cu CV-uri (dupa subiect), le descarca si le salveaza pe Cloudinary. CV-urile deja existente nu se re-descarca.</p>
-                        <form action="/descarca-gmail" method="post" class="loading-form" data-title="Se verifica Gmail" data-text="Agentul cauta CV-uri noi in Gmail si le salveaza pe Cloudinary. Mailurile fara subiect relevant sunt ignorate.">
+                        <p>Agentul cauta CV-uri noi in Gmail, le descarca si le analizeaza pentru posturile introduse.</p>
+                        <form action="/gmail-si-analiza" method="post" class="loading-form" data-title="Se verifica Gmail si se analizeaza CV-urile noi" data-text="Agentul cauta CV-uri noi in Gmail, le descarca si le potriveste cu posturile introduse.">
                             <div class="form-line">
-                                <button type="submit" class="btn-gmail">Descarca CV-uri din Gmail</button>
+                                <input type="text" name="target_job" placeholder="Ex: Casier, Sofer TIR, Contabil" required>
+                                <button type="submit" class="btn-gmail">Gmail + Analizeaza</button>
                             </div>
                         </form>
                     </div>

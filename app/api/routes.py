@@ -15,13 +15,15 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
+from app.models.job_post_model import JobPost
 from app.services.cv_parser import process_cvs_for_job
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
 from app.services.gmail_service import (
     download_cv_attachments,
     send_interview_email,
-    send_rejection_email
+    send_rejection_email,
+    send_email_api
 )
 
 router = APIRouter()
@@ -516,48 +518,18 @@ def build_analytics(candidates):
     }
 
 
-def _candidate_search_score(candidate, keywords):
-    """
-    Calculeaza un scor de relevanta pentru un candidat bazat pe keywords.
-    Cauta in toate campurile relevante (OR per keyword).
-    Returneaza numarul de keywords gasite — 0 inseamna nicio potrivire.
-    """
-    searchable = " ".join([
-        candidate.name or "",
-        candidate.email or "",
-        candidate.phone or "",
-        candidate.cv_file or "",
-        candidate.companies or "",
-        candidate.skills or "",
-        candidate.strengths or "",
-        candidate.weaknesses or "",
-        candidate.summary or "",
-        candidate.position or "",
-        candidate.experience or "",
-        candidate.job_title or "",
-    ]).lower()
-
-    score = sum(1 for kw in keywords if kw in searchable)
-    return score
-
-
 def apply_candidate_filters(candidates, q="", status="", job="", min_score=0):
     filtered = candidates
 
     if q:
-        # Imparte cautarea in cuvinte individuale (OR logic)
-        keywords = [kw.strip() for kw in q.lower().split() if kw.strip()]
-
-        # Pastreaza doar candidatii care au cel putin un keyword
-        scored = []
-        for candidate in filtered:
-            score = _candidate_search_score(candidate, keywords)
-            if score > 0:
-                scored.append((score, candidate))
-
-        # Sorteaza descrescator dupa relevanta (mai multe keywords gasite = primul)
-        scored.sort(key=lambda x: x[0], reverse=True)
-        filtered = [candidate for _, candidate in scored]
+        search = q.lower().strip()
+        filtered = [
+            candidate for candidate in filtered
+            if search in (candidate.name or "").lower()
+            or search in (candidate.email or "").lower()
+            or search in (candidate.phone or "").lower()
+            or search in (candidate.cv_file or "").lower()
+        ]
 
     if status:
         filtered = [candidate for candidate in filtered if (candidate.status or "") == status]
@@ -1135,3 +1107,219 @@ async def debug_db():
             for candidate in candidates
         ]
     })
+
+
+# ─── POSTURI VACANTE (INTERN) ────────────────────────────────────────────────
+
+@router.get("/posturi", response_class=HTMLResponse)
+async def jobs_page(request: Request, message: str = ""):
+    db = SessionLocal()
+    jobs = db.query(JobPost).order_by(JobPost.created_at.desc()).all()
+    db.close()
+    return templates.TemplateResponse(
+        request=request,
+        name="jobs.html",
+        context={"request": request, "jobs": jobs, "message": message}
+    )
+
+
+@router.post("/posturi/adauga")
+async def add_job(
+    titlu: str = Form(...),
+    departament: str = Form(""),
+    locatie: str = Form(""),
+    tip_contract: str = Form("Full-time"),
+    descriere: str = Form(""),
+    responsabilitati: str = Form(""),
+    cerinte: str = Form(""),
+    ce_oferim: str = Form("")
+):
+    db = SessionLocal()
+    job = JobPost(
+        titlu=titlu,
+        departament=departament,
+        locatie=locatie,
+        tip_contract=tip_contract,
+        descriere=descriere,
+        responsabilitati=responsabilitati,
+        cerinte=cerinte,
+        ce_oferim=ce_oferim,
+        activ=True
+    )
+    db.add(job)
+    db.commit()
+    db.close()
+    return RedirectResponse(url="/posturi?message=Post adaugat cu succes.", status_code=303)
+
+
+@router.post("/posturi/{job_id}/sterge")
+async def delete_job(job_id: int):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id).first()
+    if job:
+        db.delete(job)
+        db.commit()
+    db.close()
+    return RedirectResponse(url="/posturi?message=Post sters.", status_code=303)
+
+
+@router.post("/posturi/{job_id}/toggle")
+async def toggle_job(job_id: int):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id).first()
+    if job:
+        job.activ = not job.activ
+        db.commit()
+    db.close()
+    status_msg = "activ" if job and job.activ else "inactiv"
+    return RedirectResponse(url=f"/posturi?message=Post marcat ca {status_msg}.", status_code=303)
+
+
+@router.post("/posturi/{job_id}/editeaza")
+async def edit_job(
+    job_id: int,
+    titlu: str = Form(...),
+    departament: str = Form(""),
+    locatie: str = Form(""),
+    tip_contract: str = Form("Full-time"),
+    descriere: str = Form(""),
+    responsabilitati: str = Form(""),
+    cerinte: str = Form(""),
+    ce_oferim: str = Form("")
+):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id).first()
+    if job:
+        job.titlu = titlu
+        job.departament = departament
+        job.locatie = locatie
+        job.tip_contract = tip_contract
+        job.descriere = descriere
+        job.responsabilitati = responsabilitati
+        job.cerinte = cerinte
+        job.ce_oferim = ce_oferim
+        db.commit()
+    db.close()
+    return RedirectResponse(url="/posturi?message=Post actualizat.", status_code=303)
+
+
+# ─── PAGINA PUBLICA CARIERE ───────────────────────────────────────────────────
+
+@router.get("/cariere", response_class=HTMLResponse)
+async def careers_page(request: Request):
+    db = SessionLocal()
+    jobs = db.query(JobPost).filter(JobPost.activ == True).order_by(JobPost.created_at.desc()).all()
+    db.close()
+    return templates.TemplateResponse(
+        request=request,
+        name="careers.html",
+        context={"request": request, "jobs": jobs}
+    )
+
+
+@router.get("/cariere/{job_id}", response_class=HTMLResponse)
+async def career_detail_page(request: Request, job_id: int):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id, JobPost.activ == True).first()
+    db.close()
+    if not job:
+        return HTMLResponse("<h2>Post indisponibil.</h2>", status_code=404)
+    return templates.TemplateResponse(
+        request=request,
+        name="career_detail.html",
+        context={"request": request, "job": job}
+    )
+
+
+@router.post("/cariere/{job_id}/aplica")
+async def apply_to_job(
+    job_id: int,
+    nume: str = Form(...),
+    email: str = Form(...),
+    telefon: str = Form(""),
+    cv_file: UploadFile = File(...)
+):
+    db = SessionLocal()
+    job = db.query(JobPost).filter(JobPost.id == job_id, JobPost.activ == True).first()
+    db.close()
+
+    if not job:
+        return HTMLResponse("<h2>Post indisponibil.</h2>", status_code=404)
+
+    # Valideaza extensia CV
+    ext = os.path.splitext(cv_file.filename or "")[1].lower()
+    if ext not in {".pdf", ".docx", ".doc"}:
+        return RedirectResponse(
+            url=f"/cariere/{job_id}?error=Doar fisiere PDF, DOC, DOCX sunt acceptate.",
+            status_code=303
+        )
+
+    # Citeste bytes CV
+    cv_bytes = await cv_file.read()
+    if not cv_bytes:
+        return RedirectResponse(
+            url=f"/cariere/{job_id}?error=Fisierul CV este gol.",
+            status_code=303
+        )
+
+    # Genereaza nume unic pentru fisier
+    import unicodedata
+    safe_name = re.sub(r"[^A-Za-z0-9._() -]+", "_", cv_file.filename or "cv")
+    final_filename = f"aplicatie_{job_id}_{int(time.time())}_{safe_name}"
+
+    # Upload pe Cloudinary
+    from app.services.cloudinary_service import upload_cv_bytes_to_cloudinary
+    try:
+        upload_cv_bytes_to_cloudinary(cv_bytes, final_filename)
+    except Exception:
+        pass
+
+    # Salveaza candidat in DB
+    db = SessionLocal()
+    candidate = Candidate(
+        name=nume,
+        email=email,
+        phone=telefon,
+        job_title=job.titlu,
+        position=job.titlu,
+        status="NOU",
+        score=0,
+        cv_file=final_filename,
+        summary=f"Aplicatie directa pentru postul: {job.titlu}. Locatie: {job.locatie}."
+    )
+    db.add(candidate)
+    db.commit()
+    candidate_id = candidate.id
+    db.close()
+
+    log_candidate_event(
+        candidate_id=candidate_id,
+        event_type="aplicatie",
+        title=f"Aplicatie directa — {job.titlu}",
+        description=f"Candidatul a aplicat prin pagina publica /cariere pentru postul {job.titlu}."
+    )
+
+    # Trimite email de confirmare candidatului
+    try:
+        send_email_api(
+            to_email=email,
+            subject=f"CV-ul tau pentru postul {job.titlu} a fost primit",
+            body=f"""Buna ziua, {nume},
+
+Va multumim pentru interesul acordat postului de {job.titlu}{' in ' + job.locatie if job.locatie else ''}.
+
+CV-ul dumneavoastra a fost primit si se afla in curs de analiza.
+
+Vom reveni cu un raspuns in cel mai scurt timp posibil daca profilul dumneavoastra corespunde cerintelor postului.
+
+Cu respect,
+Echipa HR NEXAS
+"""
+        )
+    except Exception:
+        pass
+
+    return RedirectResponse(
+        url=f"/cariere/{job_id}?success=1",
+        status_code=303
+    )

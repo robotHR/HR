@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicatii — {{ job.titlu }} | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#07091a;--surface:#0e1228;--surface-2:#111530;
+            --line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.11);
+            --text:#f1f5ff;--muted:rgba(200,210,255,.45);--soft:rgba(200,210,255,.65);
+            --purple:#7c6ef7;--purple-2:#a78bfa;
+            --green:#2dd4bf;--yellow:#f59e0b;--red:#f87171;
+            --radius-xl:20px;--radius-lg:14px;--radius-md:10px;
+        }
+        body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
+
+        .sidebar{width:220px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--line);position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:20}
+        .sidebar-logo{padding:26px 22px 22px;border-bottom:1px solid var(--line)}
+        .logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff}
+        .logo-text .accent{color:var(--purple-2)}
+        .logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+        .nav{display:flex;flex-direction:column;gap:2px;padding:14px 12px;flex:1}
+        .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;border-radius:var(--radius-md);transition:.15s}
+        .nav a:hover{color:#fff;background:rgba(255,255,255,.05)}
+        .nav a.active{color:#fff;background:rgba(124,110,247,.15)}
+        .nav a.logout-link{color:#fca5a5}
+
+        .main{margin-left:220px;width:calc(100% - 220px);padding:32px}
+
+        .back-btn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 14px;border-radius:var(--radius-md);border:1px solid var(--line-2);background:rgba(255,255,255,.03);transition:.15s;margin-bottom:24px}
+        .back-btn:hover{color:#fff;border-color:rgba(255,255,255,.2)}
+
+        .page-header{margin-bottom:28px}
+        .page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:4px}
+        .page-sub{font-size:13px;color:var(--muted)}
+        .page-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+        .chip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:rgba(124,110,247,.1);color:var(--purple-2);border:1px solid rgba(124,110,247,.2)}
+
+        .section{margin-bottom:32px}
+        .section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+        .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+        .section-count{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px}
+        .title-top{color:var(--green)} .count-top{background:rgba(45,212,191,.12);color:var(--green)}
+        .title-potential{color:var(--yellow)} .count-potential{background:rgba(245,158,11,.12);color:var(--yellow)}
+        .title-rest{color:var(--muted)} .count-rest{background:rgba(255,255,255,.06);color:var(--muted)}
+
+        .candidates-list{display:grid;gap:10px}
+        .cand-card{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;padding:16px 20px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--radius-lg);transition:.15s}
+        .cand-card:hover{border-color:rgba(124,110,247,.3);background:rgba(124,110,247,.04)}
+        .cand-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;flex-shrink:0}
+        .avatar-top{background:linear-gradient(135deg,rgba(45,212,191,.2),rgba(45,212,191,.1));border:1.5px solid rgba(45,212,191,.3);color:var(--green)}
+        .avatar-potential{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(245,158,11,.1));border:1.5px solid rgba(245,158,11,.3);color:var(--yellow)}
+        .avatar-rest{background:rgba(255,255,255,.05);border:1.5px solid var(--line-2);color:var(--muted)}
+        .cand-info{min-width:0}
+        .cand-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:3px}
+        .cand-meta{display:flex;gap:10px;flex-wrap:wrap}
+        .cand-meta-item{font-size:12px;color:var(--muted)}
+        .cand-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+        .score-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#07091a;flex-shrink:0}
+        .score-green{background:linear-gradient(135deg,#2dd4bf,#0d9488)}
+        .score-yellow{background:linear-gradient(135deg,#f59e0b,#d97706)}
+        .score-red{background:linear-gradient(135deg,#f87171,#ef4444)}
+        .score-default{background:linear-gradient(135deg,#a78bfa,#7c6ef7);color:#fff}
+        .btn-detail{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--purple-2);text-decoration:none;padding:5px 10px;border-radius:var(--radius-md);background:rgba(124,110,247,.08);border:1px solid rgba(124,110,247,.2);transition:.15s;white-space:nowrap}
+        .btn-detail:hover{background:rgba(124,110,247,.16)}
+
+        .empty-section{padding:20px;text-align:center;color:var(--muted);font-size:13px;background:rgba(255,255,255,.02);border-radius:var(--radius-lg);border:1px dashed var(--line)}
+
+        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+        .stat-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--radius-lg);padding:16px 20px;text-align:center}
+        .stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
+        .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-text">N<span class="accent">E</span>XAS</div>
+        <div class="logo-sub">HR Platform</div>
+    </div>
+    <nav class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/candidati">Candidati</a>
+        <a href="/analytics">Analytics</a>
+        <a class="active" href="/posturi">Posturi Vacante</a>
+        <a class="logout-link" href="/logout">Logout</a>
+    </nav>
+</aside>
+
+<div class="main">
+    <a class="back-btn" href="/posturi">← Inapoi la posturi</a>
+
+    <div class="page-header">
+        <div class="page-title">{{ job.titlu }}</div>
+        <div class="page-sub">{{ total }} aplicatii primite pentru acest post</div>
+        <div class="page-chips">
+            {% if job.departament %}<span class="chip">{{ job.departament }}</span>{% endif %}
+            {% if job.locatie %}<span class="chip">{{ job.locatie }}</span>{% endif %}
+            {% if job.tip_contract %}<span class="chip">{{ job.tip_contract }}</span>{% endif %}
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--green)">{{ top|length }}</div>
+            <div class="stat-label">Top Candidati</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--yellow)">{{ potential|length }}</div>
+            <div class="stat-label">Potential</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num" style="color:var(--muted)">{{ rest|length }}</div>
+            <div class="stat-label">Nepotriviti</div>
+        </div>
+    </div>
+
+    <!-- TOP CANDIDATI -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title title-top">⭐ Top Candidati</span>
+            <span class="section-count count-top">{{ top|length }}</span>
+        </div>
+        {% if top %}
+        <div class="candidates-list">
+            {% for c in top %}
+            <div class="cand-card">
+                <div class="cand-avatar avatar-top">
+                    {{ (c.name or '?')[0]|upper }}{{ (c.name or ' ?').split(' ')[1][0]|upper if (c.name or ' ?').split(' ')|length > 1 else '' }}
+                </div>
+                <div class="cand-info">
+                    <div class="cand-name">{{ c.name or 'Necunoscut' }}</div>
+                    <div class="cand-meta">
+                        {% if c.email %}<span class="cand-meta-item">{{ c.email }}</span>{% endif %}
+                        {% if c.phone %}<span class="cand-meta-item">{{ c.phone }}</span>{% endif %}
+                        {% if c.position %}<span class="cand-meta-item">{{ c.position }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="cand-right">
+                    <div class="score-circle score-green">{{ c.score }}</div>
+                    <a class="btn-detail" href="/candidat/{{ c.id }}">Vezi profil →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-section">Nu exista candidati Top pentru acest post.</div>
+        {% endif %}
+    </div>
+
+    <!-- POTENTIAL -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title title-potential">★ Potential Candidat</span>
+            <span class="section-count count-potential">{{ potential|length }}</span>
+        </div>
+        {% if potential %}
+        <div class="candidates-list">
+            {% for c in potential %}
+            <div class="cand-card">
+                <div class="cand-avatar avatar-potential">
+                    {{ (c.name or '?')[0]|upper }}{{ (c.name or ' ?').split(' ')[1][0]|upper if (c.name or ' ?').split(' ')|length > 1 else '' }}
+                </div>
+                <div class="cand-info">
+                    <div class="cand-name">{{ c.name or 'Necunoscut' }}</div>
+                    <div class="cand-meta">
+                        {% if c.email %}<span class="cand-meta-item">{{ c.email }}</span>{% endif %}
+                        {% if c.phone %}<span class="cand-meta-item">{{ c.phone }}</span>{% endif %}
+                        {% if c.position %}<span class="cand-meta-item">{{ c.position }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="cand-right">
+                    <div class="score-circle score-yellow">{{ c.score }}</div>
+                    <a class="btn-detail" href="/candidat/{{ c.id }}">Vezi profil →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-section">Nu exista candidati Potential pentru acest post.</div>
+        {% endif %}
+    </div>
+
+    <!-- REST -->
+    <div class="section">
+        <div class="section-header">
+            <span class="section-title title-rest">Nepotriviti</span>
+            <span class="section-count count-rest">{{ rest|length }}</span>
+        </div>
+        {% if rest %}
+        <div class="candidates-list">
+            {% for c in rest %}
+            <div class="cand-card">
+                <div class="cand-avatar avatar-rest">
+                    {{ (c.name or '?')[0]|upper }}{{ (c.name or ' ?').split(' ')[1][0]|upper if (c.name or ' ?').split(' ')|length > 1 else '' }}
+                </div>
+                <div class="cand-info">
+                    <div class="cand-name">{{ c.name or 'Necunoscut' }}</div>
+                    <div class="cand-meta">
+                        {% if c.email %}<span class="cand-meta-item">{{ c.email }}</span>{% endif %}
+                        {% if c.phone %}<span class="cand-meta-item">{{ c.phone }}</span>{% endif %}
+                        {% if c.position %}<span class="cand-meta-item">{{ c.position }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="cand-right">
+                    <div class="score-circle score-red">{{ c.score }}</div>
+                    <a class="btn-detail" href="/candidat/{{ c.id }}">Vezi profil →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-section">Nu exista candidati nepotriviti.</div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

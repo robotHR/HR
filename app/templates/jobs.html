@@ -142,9 +142,9 @@
                     <div class="job-card-header">
                         <div class="job-card-title">{{ job.titlu }}</div>
                         <div style="display:flex;align-items:center;gap:8px">
-                            <div class="meta-chip" style="background:rgba(124,110,247,.1);color:var(--purple-2);border-color:rgba(124,110,247,.2)">
-                                {{ applicant_counts.get(job.id, 0) }} aplicatii
-                            </div>
+                            <a href="/posturi/{{ job.id }}/aplicatii" class="meta-chip" style="background:rgba(124,110,247,.1);color:var(--purple-2);border-color:rgba(124,110,247,.2);text-decoration:none;cursor:pointer">
+                                {{ applicant_counts.get(job.id, 0) }} aplicatii →
+                            </a>
                             <div class="meta-chip {% if job.activ %}green{% else %}yellow{% endif %}">
                                 {% if job.activ %}Activ{% else %}Inactiv{% endif %}
                             </div>

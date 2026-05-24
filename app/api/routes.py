@@ -1165,11 +1165,13 @@ async def delete_job(job_id: int):
 async def toggle_job(job_id: int):
     db = SessionLocal()
     job = db.query(JobPost).filter(JobPost.id == job_id).first()
+    status_msg = "inactiv"
     if job:
         job.activ = not job.activ
         db.commit()
+        # Citim valoarea inainte sa inchidem sesiunea
+        status_msg = "activ" if job.activ else "inactiv"
     db.close()
-    status_msg = "activ" if job and job.activ else "inactiv"
     return RedirectResponse(url=f"/posturi?message=Post marcat ca {status_msg}.", status_code=303)
 
 

@@ -158,7 +158,7 @@
 
         .hero{
             display:grid;
-            grid-template-columns:1.1fr .9fr 220px;
+            grid-template-columns:1fr 1fr;
             gap:24px;align-items:stretch;
         }
         .hero-logo-wrap{
@@ -587,15 +587,17 @@
 
                 </div>
 
-                <div class="hero-logo-wrap">
-                    <img src="/static/images/LOGO%20NEXAS.jpg" alt="NEXAS HR">
-                </div>
+              
 
                 <div class="hero-panel">
                     <div class="mini-title">
                         Potriviri recomandate
                         <span>{{ total }} candidati</span>
                     </div>
+                    
+                      <div class="hero-logo-wrap">
+                    <img src="/static/images/LOGO%20NEXAS.jpg" alt="NEXAS HR">
+                </div>
                     <div class="mini-list">
                         {% set shown = namespace(count=0) %}
                         {% for job_title, job_candidates in jobs.items() %}

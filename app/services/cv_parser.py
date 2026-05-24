@@ -536,6 +536,7 @@ def normalize_data(data, file, target_job, cv_text, profile):
 def save_candidate_to_db(data, file, target_job):
     try:
         db = SessionLocal()
+        status = recommendation_to_status(data.get("recommendation", "CONSIDER"))
         candidate = Candidate(
             name=as_text(data.get("name","")),
             email=as_text(data.get("email","")),
@@ -550,15 +551,24 @@ def save_candidate_to_db(data, file, target_job):
             weaknesses=as_text(data.get("weaknesses","")),
             summary=as_text(data.get("summary","")),
             job_title=target_job,
-            status=recommendation_to_status(data.get("recommendation","CONSIDER")),
+            status=status,
             cv_file=file
         )
         db.add(candidate)
         db.commit()
+        # Citim id-ul inainte sa inchidem sesiunea
+        candidate_id = candidate.id
         db.close()
-        print("✓ SALVAT IN BAZA DE DATE:", data.get("name",""), "-", candidate.status)
+        print("✓ SALVAT IN BAZA DE DATE:", data.get("name",""), "-", status)
+        return candidate_id
     except Exception as e:
         print("EROARE LA SALVARE IN DB:", e)
+        try:
+            db.rollback()
+            db.close()
+        except Exception:
+            pass
+        return None
 
 
 # ─── PARALLEL TASK ────────────────────────────────────────────────────────────

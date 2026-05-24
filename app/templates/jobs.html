@@ -159,7 +159,17 @@
                     <div class="job-card-desc">{{ job.descriere }}</div>
                     {% endif %}
                     <div class="job-card-actions">
-                        <button class="btn btn-edit" onclick="openEdit({{ job.id }}, {{ job|tojson }})">Editeaza</button>
+                        <button class="btn btn-edit" onclick="openEdit(
+                            {{ job.id }},
+                            {{ job.titlu|tojson }},
+                            {{ (job.departament or '')|tojson }},
+                            {{ (job.locatie or '')|tojson }},
+                            {{ (job.tip_contract or 'Full-time')|tojson }},
+                            {{ (job.descriere or '')|tojson }},
+                            {{ (job.responsabilitati or '')|tojson }},
+                            {{ (job.cerinte or '')|tojson }},
+                            {{ (job.ce_oferim or '')|tojson }}
+                        )">Editeaza</button>
                         <form method="post" action="/posturi/{{ job.id }}/toggle" style="display:inline">
                             <button class="btn {% if job.activ %}btn-toggle-off{% else %}btn-toggle-on{% endif %}" type="submit">
                                 {% if job.activ %}Dezactiveaza{% else %}Activeaza{% endif %}
@@ -207,16 +217,16 @@
 </div>
 
 <script>
-function openEdit(id, job) {
+function openEdit(id, titlu, departament, locatie, tip_contract, descriere, responsabilitati, cerinte, ce_oferim) {
     document.getElementById('editForm').action = '/posturi/' + id + '/editeaza';
-    document.getElementById('edit_titlu').value = job.titlu || '';
-    document.getElementById('edit_departament').value = job.departament || '';
-    document.getElementById('edit_locatie').value = job.locatie || '';
-    document.getElementById('edit_tip_contract').value = job.tip_contract || 'Full-time';
-    document.getElementById('edit_descriere').value = job.descriere || '';
-    document.getElementById('edit_responsabilitati').value = job.responsabilitati || '';
-    document.getElementById('edit_cerinte').value = job.cerinte || '';
-    document.getElementById('edit_ce_oferim').value = job.ce_oferim || '';
+    document.getElementById('edit_titlu').value = titlu || '';
+    document.getElementById('edit_departament').value = departament || '';
+    document.getElementById('edit_locatie').value = locatie || '';
+    document.getElementById('edit_tip_contract').value = tip_contract || 'Full-time';
+    document.getElementById('edit_descriere').value = descriere || '';
+    document.getElementById('edit_responsabilitati').value = responsabilitati || '';
+    document.getElementById('edit_cerinte').value = cerinte || '';
+    document.getElementById('edit_ce_oferim').value = ce_oferim || '';
     document.getElementById('editModal').classList.add('open');
 }
 function closeEdit() {

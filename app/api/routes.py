@@ -1005,61 +1005,33 @@ async def upload_cv_files(cv_files: list[UploadFile] = File(...)):
 @router.post("/descarca-gmail")
 async def descarca_gmail():
     """
-    Descarca CV-uri noi din Gmail fara a face analiza.
-    Duplicatele sunt verificate pe Cloudinary - nu re-descarca CV-uri existente.
+    Descarca CV-uri noi din Gmail direct pe Cloudinary.
+    Filtreaza dupa subiectul mailului (CV, job, angajare etc.)
+    Nu salveaza pe disk local. Nu face analiza.
     """
-    gmail_result = download_cv_attachments(max_results=30)
-
-    message = (
-        f"Gmail verificat. "
-        f"CV-uri noi descarcate: {gmail_result['downloaded_count']}. "
-        f"CV-uri deja existente (sarite): {gmail_result['skipped_count']}. "
-        f"Acum poti rula analiza pentru jobul dorit."
-    )
-
-    return RedirectResponse(
-        url=f"/?message={message}",
-        status_code=303
-    )
-
-
-@router.post("/gmail-si-analiza")
-async def gmail_and_analyze(target_job: str = Form("")):
-    """
-    Descarca CV-uri noi din Gmail + analizeaza pentru jobul specificat.
-    Duplicatele sunt verificate pe Cloudinary.
-    """
-    gmail_result = download_cv_attachments(max_results=30)
-
+    gmail_result = download_cv_attachments(max_results=50)
     downloaded = gmail_result["downloaded_count"]
     skipped = gmail_result["skipped_count"]
 
-    if target_job.strip() and downloaded > 0:
-        try:
-            analysis_result = process_cvs_for_job(target_job.strip())
-            message = (
-                f"Gmail verificat. CV-uri noi: {downloaded}, sarite: {skipped}. "
-                f"Analiza finalizata: {analysis_result.get('saved', 0)} candidati salvati pentru {target_job}."
-            )
-        except Exception as e:
-            message = (
-                f"Gmail verificat. CV-uri noi: {downloaded}, sarite: {skipped}. "
-                f"Eroare la analiza: {str(e)}"
-            )
-    elif target_job.strip() and downloaded == 0:
-        try:
-            analysis_result = process_cvs_for_job(target_job.strip())
-            message = (
-                f"Gmail verificat. Nu exista CV-uri noi (toate deja descarcate). "
-                f"Analiza din cache: {analysis_result.get('saved', 0)} candidati pentru {target_job}."
-            )
-        except Exception as e:
-            message = f"Gmail verificat. CV-uri noi: 0. Eroare la analiza: {str(e)}"
+    if downloaded > 0:
+        message = f"Gmail verificat. CV-uri noi salvate pe Cloudinary: {downloaded}. Deja existente (sarite): {skipped}. Poti rula acum analiza din Potrivire pe job."
     else:
-        message = (
-            f"Gmail verificat. CV-uri noi descarcate: {downloaded}, sarite: {skipped}. "
-            f"Nu ai specificat un job pentru analiza."
-        )
+        message = f"Gmail verificat. Nu exista CV-uri noi. Toate CV-urile ({skipped}) sunt deja salvate pe Cloudinary."
+
+    return RedirectResponse(url=f"/?message={message}", status_code=303)
+
+
+@router.post("/gmail-si-analiza")
+async def gmail_and_analyze():
+    """Alias pentru /descarca-gmail — compatibilitate dashboard."""
+    gmail_result = download_cv_attachments(max_results=50)
+    downloaded = gmail_result["downloaded_count"]
+    skipped = gmail_result["skipped_count"]
+
+    if downloaded > 0:
+        message = f"Gmail verificat. CV-uri noi salvate: {downloaded}. Sarite: {skipped}. Poti rula acum analiza din Potrivire pe job."
+    else:
+        message = f"Gmail verificat. Nu exista CV-uri noi. Toate ({skipped}) sunt deja pe Cloudinary."
 
     return RedirectResponse(url=f"/?message={message}", status_code=303)
 

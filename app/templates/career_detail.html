@@ -142,7 +142,7 @@
             <div class="form-title">Aplica pentru acest post</div>
             <div class="form-sub">Completeaza formularul si incarca CV-ul tau.</div>
 
-            <form method="post" action="/cariere/{{ job.id }}/aplica" enctype="multipart/form-data">
+            <form method="post" action="/cariere/{{ job.id }}/aplica" enctype="multipart/form-data" id="applyForm">
                 <div class="field">
                     <label>Nume complet *</label>
                     <input type="text" name="nume" placeholder="Ion Popescu" required>
@@ -160,18 +160,29 @@
                     <input type="file" name="cv_file" accept=".pdf,.doc,.docx" required>
                 </div>
                 <button class="btn-apply" type="submit" id="submitBtn">Trimite aplicatia →</button>
-                <div class="form-note">
+                <div class="form-note" id="submitNote">
                     Prin trimiterea acestui formular esti de acord cu procesarea datelor tale in scopul recrutarii.
                     Vei primi o confirmare pe email.
                 </div>
             </form>
             <script>
-            document.querySelector('form[action*="/aplica"]').addEventListener('submit', function() {
-                const btn = document.getElementById('submitBtn');
-                btn.disabled = true;
-                btn.textContent = 'Se trimite... ⏳';
-                btn.style.opacity = '0.75';
-            });
+            const applyForm = document.getElementById('applyForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitNote = document.getElementById('submitNote');
+
+            if (applyForm && submitBtn && submitNote) {
+                applyForm.addEventListener('submit', function() {
+                    submitBtn.textContent = 'Se trimite aplicatia...';
+                    submitBtn.style.opacity = '0.85';
+                    submitNote.textContent = 'Te rugam sa astepti. Incarcarea poate dura cateva secunde daca serverul porneste de pe Render.';
+
+                    setTimeout(function() {
+                        submitBtn.textContent = 'Trimite aplicatia →';
+                        submitBtn.style.opacity = '1';
+                        submitNote.textContent = 'Daca nu ai primit confirmarea, incearca din nou. Nu inchide pagina in timpul incarcarii.';
+                    }, 60000);
+                });
+            }
             </script>
         </div>
     </div>

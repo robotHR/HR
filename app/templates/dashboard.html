@@ -550,6 +550,24 @@
             font-size:12px;color:var(--muted);
             line-height:1.55;
         }
+        .empty-recommendations{
+            padding:22px 18px;
+            text-align:center;
+            color:var(--muted);
+            font-size:13px;
+            font-weight:600;
+            background:rgba(255,255,255,.025);
+        }
+        .empty-recommendations strong{
+            display:block;
+            color:#fff;
+            font-size:13px;
+            margin-bottom:4px;
+        }
+        .empty-recommendations span{
+            color:var(--muted);
+            font-size:12px;
+        }
         .row-actions{display:flex;gap:6px;flex-wrap:nowrap}
         .btn-details{
             background:linear-gradient(135deg,var(--purple),var(--purple-2));
@@ -840,6 +858,12 @@
         {% endif %}
 
         {% for job_title, job_candidates in jobs.items() %}
+            {% set recommended = namespace(count=0) %}
+            {% for item in job_candidates %}
+                {% if (item.score or 0) >= 50 %}
+                    {% set recommended.count = recommended.count + 1 %}
+                {% endif %}
+            {% endfor %}
             <section class="job-block">
                 <div class="job-title-row accordion-header" onclick="toggleAccordion(this)">
                     <div class="job-title-left">
@@ -851,7 +875,7 @@
                         </div>
                     </div>
                     <div class="job-head-actions">
-                        <div class="job-count">{{ job_candidates|length }} candidati</div>
+                        <div class="job-count">{{ recommended.count }} recomandati</div>
                         <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:rgba(255,255,255,.72);transition:transform .25s"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                 </div>
@@ -917,6 +941,14 @@
                         </tr>
                         {% endif %}
                         {% endfor %}
+                        {% if recommended.count == 0 %}
+                        <tr>
+                            <td colspan="6" class="empty-recommendations">
+                                <strong>Nu exista candidati potriviti pentru acest post.</strong>
+                                <span>Candidatii analizati au scor sub 50 sau nu au fost inca potriviti de AI pentru acest rol.</span>
+                            </td>
+                        </tr>
+                        {% endif %}
                         </tbody>
                     </table>
                 </div>

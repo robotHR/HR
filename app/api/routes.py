@@ -1451,23 +1451,143 @@ async def apply_to_job(
     except Exception:
         pass
 
-    # Analiza + salvare + emailuri — IN BACKGROUND
-    background_tasks.add_task(
-        _background_analyze_and_save,
-        cv_bytes=cv_bytes,
-        final_filename=final_filename,
-        local_path=local_path,
-        job_title=job_titlu,
-        job_id=job_id,
-        job_locatie=job_locatie,
-        nume=nume,
-        email=email,
-        telefon=telefon
-    )
+    # Analiza se face INAINTE de salvare.
+    # Asa nu mai apar candidati cu scor 0 in lista.
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    with open(local_path, "wb") as f:
+        f.write(cv_bytes)
 
-    # Redirect INSTANT — Ion nu asteapta analiza
-    return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
+    try:
+        cv_text = extract_text_from_file(local_path)
 
-    return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
+        if not cv_text or len(cv_text.strip()) < 80:
+            # Nu salvam candidat cu scor 0.
+            # Utilizatorul vede eroare si poate incarca un CV text-based, nu scanat ca poza.
+            try:
+                if os.path.exists(local_path):
+                    os.remove(local_path)
+            except Exception:
+                pass
+            return RedirectResponse(
+                url=f"/cariere/{job_id}?error=CV-ul nu poate fi citit automat. Incarca un PDF/DOCX cu text selectabil, nu poza scanata.",
+                status_code=303
+            )
+
+        profile = match_job_profile(job_titlu) or build_fallback_profile(job_titlu)
+        ai_response = analyze_cv_with_ai(cv_text, job_titlu)
+        data = parse_ai_response(ai_response)
+
+        if not data:
+            try:
+                if os.path.exists(local_path):
+                    os.remove(local_path)
+            except Exception:
+                pass
+            return RedirectResponse(
+                url=f"/cariere/{job_id}?error=Analiza AI nu a returnat un rezultat valid. Incearca din nou.",
+                status_code=303
+            )
+
+        normalized = normalize_data(data, final_filename, job_titlu, cv_text, profile)
+        score = clean_score(normalized.get("score", 0))
+        status = recommendation_to_status(normalized.get("recommendation", "CONSIDER"))
+
+        # Daca AI nu a dat scor real, nu salvam in lista ca 0.
+        if score <= 0:
+            try:
+                if os.path.exists(local_path):
+                    os.remove(local_path)
+            except Exception:
+                pass
+            return RedirectResponse(
+                url=f"/cariere/{job_id}?error=CV-ul a fost citit, dar scorul AI nu a putut fi calculat. Incearca din nou.",
+                status_code=303
+            )
+
+        db = SessionLocal()
+        candidate = Candidate(
+            name=as_text(normalized.get("name", nume)) or nume,
+            email=as_text(normalized.get("email", email)) or email,
+            phone=as_text(normalized.get("phone", telefon)) or telefon,
+            position=as_text(normalized.get("position", job_titlu)),
+            experience=as_text(normalized.get("years_experience", "")),
+            skills=as_text(normalized.get("skills", "")),
+            companies=as_text(normalized.get("companies", "")),
+            score=score,
+            level=as_text(normalized.get("level", "")),
+            strengths=as_text(normalized.get("strengths", "")),
+            weaknesses=as_text(normalized.get("weaknesses", "")),
+            summary=as_text(normalized.get("summary", "")),
+            job_title=job_titlu,
+            job_id=job_id,
+            status=status,
+            cv_file=final_filename
+        )
+        db.add(candidate)
+        db.commit()
+        candidate_id = candidate.id
+        db.close()
+
+        log_candidate_event(
+            candidate_id=candidate_id,
+            event_type="aplicatie",
+            title=f"Aplicatie directa - {job_titlu}",
+            description=f"CV analizat AI. Scor: {score}. Status: {status}."
+        )
+
+        hr_email = os.getenv("GMAIL_EMAIL", "")
+        if hr_email:
+            try:
+                send_email_api(
+                    to_email=hr_email,
+                    subject=f"Aplicatie noua: {candidate.name} - {job_titlu} (scor: {score})",
+                    body=f"""Aplicatie noua primita pe NEXAS HR.
+
+Candidat: {candidate.name}
+Email: {candidate.email}
+Telefon: {candidate.phone or 'necompletat'}
+Post: {job_titlu}
+Locatie: {job_locatie or 'nespecificata'}
+Scor AI: {score}/100
+Status: {status}
+
+Vezi candidatul: https://hr-g66k.onrender.com/candidat/{candidate_id}
+"""
+                )
+            except Exception:
+                pass
+
+        try:
+            send_email_api(
+                to_email=email,
+                subject=f"CV-ul tau pentru postul {job_titlu} a fost primit",
+                body=f"""Buna ziua, {nume},
+
+Va multumim pentru interesul acordat postului de {job_titlu}{' in ' + job_locatie if job_locatie else ''}.
+
+CV-ul dumneavoastra a fost primit si analizat.
+
+Vom reveni cu un raspuns in cel mai scurt timp posibil daca profilul dumneavoastra corespunde cerintelor postului.
+
+Cu respect,
+Echipa HR NEXAS
+"""
+            )
+        except Exception:
+            pass
+
+        return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
+
+    except Exception as e:
+        try:
+            if os.path.exists(local_path):
+                os.remove(local_path)
+        except Exception:
+            pass
+        print(f"EROARE aplicare cariere {final_filename}: {e}")
+        return RedirectResponse(
+            url=f"/cariere/{job_id}?error=Analiza AI a esuat. Verifica OPENROUTER_API_KEY si incearca din nou.",
+            status_code=303
+        )
 
 

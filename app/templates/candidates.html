@@ -10,18 +10,16 @@
         *{margin:0;padding:0;box-sizing:border-box}
         :root{
             --bg:#151d31;
-            --bg-2:#1a2339;
             --sidebar:#11182a;
             --surface:rgba(28,37,64,.86);
             --surface-2:rgba(33,43,72,.88);
             --glass:rgba(255,255,255,.045);
-            --glass-2:rgba(255,255,255,.065);
             --line:rgba(255,255,255,.10);
             --line-2:rgba(255,255,255,.15);
             --text:#ffffff;
-            --soft:rgba(255,255,255,.82);
-            --muted:rgba(255,255,255,.66);
-            --faint:rgba(255,255,255,.52);
+            --soft:rgba(255,255,255,.84);
+            --muted:rgba(255,255,255,.68);
+            --faint:rgba(255,255,255,.54);
             --blue:#5da9ff;
             --blue-2:#7cc4ff;
             --blue-soft:rgba(93,169,255,.14);
@@ -53,10 +51,7 @@
         .logo-text .accent{color:var(--blue-2)}
         .logo-sub{font-size:10px;color:var(--muted);letter-spacing:2.6px;text-transform:uppercase;margin-top:7px;font-weight:700}
         .nav{display:flex;flex-direction:column;gap:4px;padding:16px 12px;flex:1}
-        .nav a{
-            display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:12px;
-            font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;transition:.18s ease;position:relative;
-        }
+        .nav a{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:12px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;transition:.18s ease;position:relative}
         .nav a:hover{color:#fff;background:rgba(255,255,255,.055)}
         .nav a.active{color:#fff;background:linear-gradient(90deg,rgba(93,169,255,.20),rgba(93,169,255,.07));box-shadow:inset 0 0 0 1px rgba(93,169,255,.16)}
         .nav a.active:before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:58%;border-radius:0 4px 4px 0;background:var(--blue)}
@@ -67,18 +62,15 @@
         .page-title{font-family:'Syne',sans-serif;font-size:30px;line-height:1.05;color:#fff;letter-spacing:-.7px;margin-bottom:7px}
         .page-sub{font-size:14px;color:var(--muted);line-height:1.55}
         .head-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--blue-line);background:var(--blue-soft);color:var(--blue-2);padding:9px 13px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
-        .stats-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px;margin-bottom:20px}
+        .stats-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:20px}
         .stat-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;min-height:92px;box-shadow:0 18px 60px rgba(0,0,0,.16)}
         .stat-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:10px}
         .stat-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:-.4px}
         .filters{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-xl);padding:22px;margin-bottom:22px;box-shadow:0 22px 80px rgba(0,0,0,.18)}
         .filters h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-2);font-weight:800;margin-bottom:15px}
-        .filter-grid{display:grid;grid-template-columns:2fr 1fr 1.35fr .85fr auto;gap:10px}
-        input,select,textarea{
-            width:100%;border:1px solid var(--line-2);border-radius:14px;background:rgba(255,255,255,.06);
-            color:#fff;padding:12px 14px;font-size:13px;font-weight:600;outline:none;transition:.18s ease;
-        }
-        input:focus,select:focus,textarea:focus{border-color:var(--blue-line);box-shadow:0 0 0 3px rgba(93,169,255,.10)}
+        .filter-grid{display:grid;grid-template-columns:2fr 1fr 1.2fr 1.1fr .8fr auto;gap:10px}
+        input,select{width:100%;border:1px solid var(--line-2);border-radius:14px;background:rgba(255,255,255,.06);color:#fff;padding:12px 14px;font-size:13px;font-weight:600;outline:none;transition:.18s ease}
+        input:focus,select:focus{border-color:var(--blue-line);box-shadow:0 0 0 3px rgba(93,169,255,.10)}
         input::placeholder{color:rgba(255,255,255,.55)}
         select option{background:#151d31;color:#fff}
         .filter-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
@@ -88,36 +80,47 @@
         .btn-clear{background:rgba(255,255,255,.055);color:var(--soft);border:1px solid var(--line-2)}
         .btn-export{background:rgba(34,199,184,.16);color:#7ef4e8;border:1px solid rgba(34,199,184,.30)}
         .btn-cv{background:rgba(93,169,255,.12);color:var(--blue-2);border:1px solid var(--blue-line)}
-        .table-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-xl);overflow:hidden;box-shadow:0 24px 90px rgba(0,0,0,.20)}
-        table{width:100%;border-collapse:collapse}
-        th{text-align:left;color:var(--soft);text-transform:uppercase;letter-spacing:.13em;font-size:10px;font-weight:800;padding:15px 16px;background:rgba(255,255,255,.035);border-bottom:1px solid var(--line)}
-        td{padding:16px;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:middle;color:var(--soft);font-size:13px}
-        tr:last-child td{border-bottom:0}
-        tr:hover{background:rgba(93,169,255,.045)}
-        .candidate-main{display:flex;align-items:center;gap:12px;min-width:250px}
-        .avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(93,169,255,.14);border:1px solid var(--blue-line);color:var(--blue-2);font-family:'Syne',sans-serif;font-size:14px;font-weight:800;flex-shrink:0}
-        .name{font-size:14px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:3px}
+        .empty{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-xl);padding:32px;color:var(--muted);font-size:14px;text-align:center}
+        .candidate-list{display:grid;gap:14px}
+        .candidate-card{
+            background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.028)),var(--surface);
+            border:1px solid rgba(93,169,255,.15);
+            border-radius:22px;
+            padding:18px;
+            box-shadow:0 20px 70px rgba(0,0,0,.18);
+        }
+        .candidate-card:hover{border-color:rgba(124,196,255,.30);background:linear-gradient(135deg,rgba(93,169,255,.08),rgba(255,255,255,.025)),var(--surface)}
+        .card-grid{display:grid;grid-template-columns:minmax(250px,1.35fr) minmax(260px,1.25fr) minmax(220px,1fr) auto;gap:18px;align-items:center}
+        .candidate-main{display:flex;align-items:center;gap:13px;min-width:0}
+        .avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(93,169,255,.14);border:1px solid var(--blue-line);color:var(--blue-2);font-family:'Syne',sans-serif;font-size:14px;font-weight:800;flex-shrink:0}
+        .name{font-size:15px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:4px}
         .small{font-size:12px;color:var(--muted);line-height:1.55}
-        .job{font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.3}.job span{color:var(--blue-2)}
-        .score-cell{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#07111f;box-shadow:inset 0 -10px 18px rgba(0,0,0,.12)}
+        .mini-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-2);font-weight:900;margin-bottom:7px}
+        .best-role{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:16px;padding:12px}
+        .score-cell{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#07111f;box-shadow:inset 0 -10px 18px rgba(0,0,0,.12);flex-shrink:0}
         .score-green{background:var(--green)}.score-yellow{background:var(--yellow)}.score-red{background:var(--red)}
-        .tag{display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1.2;padding:6px 10px;border-radius:999px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;max-width:150px;text-align:center}
+        .role-title{font-size:14px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:3px}
+        .role-sub{font-size:12px;color:var(--muted);line-height:1.45}
+        .matches{display:flex;flex-wrap:wrap;gap:8px}
+        .match-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border-radius:999px;border:1px solid rgba(93,169,255,.22);background:rgba(93,169,255,.10);color:#fff;font-size:12px;font-weight:800;max-width:100%}
+        .match-chip strong{color:var(--blue-2);font-weight:900}
+        .match-chip.low{border-color:rgba(255,107,112,.22);background:rgba(255,107,112,.08)}
+        .match-more{font-size:12px;color:var(--muted);margin-top:8px}
+        .actions-inline{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:112px}
+        .tag{display:inline-flex;align-items:center;justify-content:center;font-size:10px;line-height:1.2;padding:6px 10px;border-radius:999px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-top:8px}
         .tag-green{background:rgba(34,199,184,.12);color:#7ef4e8;border:1px solid rgba(34,199,184,.26)}
         .tag-yellow{background:rgba(245,158,11,.12);color:#fcd38a;border:1px solid rgba(245,158,11,.26)}
         .tag-red{background:rgba(255,107,112,.12);color:#ffb4b7;border:1px solid rgba(255,107,112,.26)}
         .tag-default{background:rgba(93,169,255,.12);color:var(--blue-2);border:1px solid var(--blue-line)}
-        .summary{font-size:13px;color:var(--soft);line-height:1.48;max-height:68px;overflow:hidden;max-width:620px}
-        .actions-inline{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start}
-        .empty{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-xl);padding:32px;color:var(--muted);font-size:14px;text-align:center}
-        @media(max-width:1280px){.stats-row{grid-template-columns:repeat(4,minmax(0,1fr))}.filter-grid{grid-template-columns:1fr 1fr}.filter-grid button{width:100%}.table-card{overflow-x:auto}table{min-width:1060px}}
-        @media(max-width:860px){.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:22px}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-grid{grid-template-columns:1fr}.page-head{display:block}.head-pill{margin-top:14px}}
+        @media(max-width:1280px){.stats-row{grid-template-columns:repeat(3,minmax(0,1fr))}.filter-grid{grid-template-columns:1fr 1fr}.filter-grid button{width:100%}.card-grid{grid-template-columns:1fr 1fr}.actions-inline{flex-direction:row;grid-column:1/-1}}
+        @media(max-width:860px){.layout{display:block}.sidebar{position:relative;width:100%;height:auto}.main{margin-left:0;width:100%;padding:22px}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-grid{grid-template-columns:1fr}.page-head{display:block}.head-pill{margin-top:14px}.card-grid{grid-template-columns:1fr}.candidate-card{padding:15px}.actions-inline{flex-direction:row}.btn{width:100%}}
     </style>
 </head>
 <body>
 <div class="layout">
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-text">N<span class="accent">E</span>XAS</div>
+            <div class="logo-text">N<span class="accent">E</span>XAS <span class="accent">HR</span></div>
             <div class="logo-sub">HR Platform</div>
         </div>
         <nav class="nav">
@@ -134,65 +137,90 @@
             <div>
                 <div class="eyebrow">Baza de candidati</div>
                 <h1 class="page-title">Candidati</h1>
-                <div class="page-sub">Arhiva completa cu toti candidatii, scorurile AI si statusurile HR.</div>
+                <div class="page-sub">Candidati unici, cu rolurile pentru care se potrivesc si scorul AI pe fiecare post.</div>
             </div>
-            <div class="head-pill">{{ stats.filtered }} candidati afisati</div>
+            <div class="head-pill">{{ stats.filtered }} candidati unici afisati</div>
         </div>
 
         <div class="stats-row">
-            <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">{{ stats.total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Analize totale</div><div class="stat-value">{{ stats.total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Candidati unici</div><div class="stat-value">{{ stats.unique_total }}</div></div>
             <div class="stat-card"><div class="stat-label">Afisati</div><div class="stat-value">{{ stats.filtered }}</div></div>
-            <div class="stat-card"><div class="stat-label">Potential</div><div class="stat-value">{{ stats.de_analizat + stats.selectat }}</div></div>
+            <div class="stat-card"><div class="stat-label">Potriviri afisate</div><div class="stat-value">{{ stats.analyses_filtered }}</div></div>
             <div class="stat-card"><div class="stat-label">Interviu</div><div class="stat-value">{{ stats.interviu }}</div></div>
             <div class="stat-card"><div class="stat-label">Angajati</div><div class="stat-value">{{ stats.angajat }}</div></div>
-            <div class="stat-card"><div class="stat-label">Alte roluri</div><div class="stat-value">{{ stats.refuzat }}</div></div>
-            <div class="stat-card"><div class="stat-label">Exclusi</div><div class="stat-value">{{ stats.exclus }}</div></div>
         </div>
 
         <section class="filters">
             <h2>Filtre candidati</h2>
             <form method="get" action="/candidati" class="filter-grid" id="filterForm">
-                <input type="text" name="q" value="{{ q }}" placeholder="Cauta dupa nume, email, telefon sau fisier CV">
+                <input type="text" name="q" value="{{ q }}" placeholder="Cauta nume, email, telefon, companie sau text din CV">
                 <select name="status"><option value="">Toate statusurile</option>{% for item in all_statuses %}<option value="{{ item }}" {% if item == status %}selected{% endif %}>{{ status_display(item) }}</option>{% endfor %}</select>
                 <select name="job"><option value="">Toate posturile</option>{% for item in all_jobs %}<option value="{{ item }}" {% if item == job %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+                <input type="text" name="skill" value="{{ skill }}" placeholder="Skill cautat, ex: Excel, SAP, casier">
                 <input type="number" name="min_score" value="{{ min_score }}" min="0" max="100" placeholder="Scor minim">
                 <button class="btn btn-primary" type="submit">Filtreaza</button>
             </form>
             <div class="filter-actions">
                 <a class="btn btn-clear" href="/candidati">Reseteaza filtrele</a>
-                <a class="btn btn-export" href="/candidati/export?q={{ q }}&status={{ status }}&job={{ job }}&min_score={{ min_score }}">Export Excel</a>
+                <a class="btn btn-export" href="/candidati/export?q={{ q }}&status={{ status }}&job={{ job }}&skill={{ skill }}&min_score={{ min_score }}">Export Excel</a>
             </div>
         </section>
 
-        {% if candidates|length == 0 %}
+        {% if candidate_rows|length == 0 %}
             <div class="empty">Nu exista candidati pentru filtrele alese.</div>
         {% else %}
-            <section class="table-card">
-                <table>
-                    <thead><tr><th>Candidat</th><th>Post</th><th>Scor</th><th>Status</th><th>Rezumat</th><th>Actiuni</th></tr></thead>
-                    <tbody>
-                        {% for candidate in candidates %}
-                            <tr>
-                                <td>
-                                    <div class="candidate-main">
-                                        <div class="avatar">{{ (candidate.name or "?")[0] | upper }}</div>
+            <section class="candidate-list">
+                {% for row in candidate_rows %}
+                    {% set candidate = row.candidate %}
+                    {% set best = row.best_match %}
+                    <article class="candidate-card">
+                        <div class="card-grid">
+                            <div class="candidate-main">
+                                <div class="avatar">{{ (candidate.name or "?")[0] | upper }}</div>
+                                <div>
+                                    <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
+                                    <div class="small">{{ candidate.email or "Email lipsa" }}</div>
+                                    <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
+                                    <div class="small">Companii: {{ candidate.companies or "Nespecificat" }}</div>
+                                    <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="mini-label">Cel mai bun rol</div>
+                                {% if best %}
+                                    <div class="best-role">
+                                        <div class="score-cell {% if (best.score or 0) >= 75 %}score-green{% elif (best.score or 0) >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ best.score }}</div>
                                         <div>
-                                            <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
-                                            <div class="small">{{ candidate.email or "Email lipsa" }}</div>
-                                            <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
-                                            <div class="small">Companii: {{ candidate.companies or "Nespecificat" }}</div>
+                                            <div class="role-title">{{ best.job_title }}</div>
+                                            <div class="role-sub">Post potrivit: {{ best.position }}</div>
                                         </div>
                                     </div>
-                                </td>
-                                <td><div class="job">{{ candidate.job_title or "Nespecificat" }}</div><div class="small">Post potrivit: {{ candidate.position or "Nespecificat" }}</div></td>
-                                <td><div class="score-cell {% if (candidate.score or 0) >= 75 %}score-green{% elif (candidate.score or 0) >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ candidate.score or 0 }}</div></td>
-                                <td><span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span></td>
-                                <td><div class="summary">{{ clean_summary(candidate.summary) }}</div></td>
-                                <td><div class="actions-inline"><a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a><a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a></div></td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                {% else %}
+                                    <div class="small">Nu exista inca potrivire AI.</div>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <div class="mini-label">Posturi potrivite</div>
+                                <div class="matches">
+                                    {% for match in row.matches[:5] %}
+                                        <span class="match-chip {% if (match.score or 0) < 50 %}low{% endif %}">{{ match.job_title }} <strong>{{ match.score }}</strong></span>
+                                    {% endfor %}
+                                </div>
+                                {% if row.match_count > 5 %}
+                                    <div class="match-more">+ {{ row.match_count - 5 }} potriviri suplimentare</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="actions-inline">
+                                <a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a>
+                                <a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
             </section>
         {% endif %}
     </main>

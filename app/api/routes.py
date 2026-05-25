@@ -548,6 +548,111 @@ def apply_candidate_filters(candidates, q="", status="", job="", min_score=0):
     return filtered
 
 
+def candidate_identity_key(candidate):
+    """Grupeaza acelasi om dupa email, telefon sau fisier CV."""
+    email_value = (candidate.email or "").strip().lower()
+    phone_value = re.sub(r"\D+", "", candidate.phone or "")
+    cv_value = (candidate.cv_file or "").strip().lower()
+
+    if email_value:
+        return f"email:{email_value}"
+    if phone_value:
+        return f"phone:{phone_value}"
+    if cv_value:
+        return f"cv:{cv_value}"
+    return f"candidate:{candidate.id}"
+
+
+def candidate_search_blob(candidate):
+    parts = [
+        candidate.name,
+        candidate.email,
+        candidate.phone,
+        candidate.cv_file,
+        candidate.job_title,
+        candidate.position,
+        candidate.companies,
+        candidate.experience,
+        candidate.skills,
+        candidate.summary,
+        candidate.strengths,
+        candidate.weaknesses,
+        candidate.level,
+    ]
+    return " ".join([str(part) for part in parts if part]).lower()
+
+
+def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", min_score=0):
+    """
+    Intoarce o lista unica de candidati.
+    Fiecare rand contine candidatul principal si toate potrivirile pe posturi.
+    """
+    grouped = defaultdict(list)
+    for candidate in candidates:
+        grouped[candidate_identity_key(candidate)].append(candidate)
+
+    rows = []
+    q_value = (q or "").strip().lower()
+    status_value = (status or "").strip()
+    job_value = (job or "").strip().lower()
+    skill_value = (skill or "").strip().lower()
+
+    for _, items in grouped.items():
+        sorted_items = sorted(items, key=lambda item: (item.score or 0, item.id or 0), reverse=True)
+        best = sorted_items[0]
+        best_score = best.score or 0
+
+        if min_score and best_score < min_score:
+            continue
+
+        if status_value and not any((item.status or "") == status_value for item in sorted_items):
+            continue
+
+        if job_value and not any(
+            job_value in (item.job_title or "").lower()
+            or job_value in (item.position or "").lower()
+            for item in sorted_items
+        ):
+            continue
+
+        if skill_value and not any(skill_value in candidate_search_blob(item) for item in sorted_items):
+            continue
+
+        if q_value and not any(q_value in candidate_search_blob(item) for item in sorted_items):
+            continue
+
+        matches = []
+        seen_jobs = set()
+        for item in sorted_items:
+            job_name = item.job_title or item.position or "Nespecificat"
+            key = (job_name or "").strip().lower()
+            if key in seen_jobs:
+                continue
+            seen_jobs.add(key)
+            matches.append({
+                "id": item.id,
+                "job_title": job_name,
+                "position": item.position or "Nespecificat",
+                "score": item.score or 0,
+                "status": item.status or "NOU",
+                "summary": clean_summary(item.summary),
+                "cv_file": item.cv_file,
+            })
+
+        rows.append({
+            "candidate": best,
+            "best_match": matches[0] if matches else None,
+            "matches": matches,
+            "best_score": best_score,
+            "match_count": len(matches),
+            "emails": sorted({item.email for item in sorted_items if item.email}),
+            "phones": sorted({item.phone for item in sorted_items if item.phone}),
+        })
+
+    rows = sorted(rows, key=lambda row: (row["best_score"], row["candidate"].id or 0), reverse=True)
+    return rows
+
+
 def candidate_last_event_text(candidate_id):
     event = get_last_candidate_event(candidate_id)
 
@@ -651,16 +756,18 @@ async def dashboard(request: Request):
 
 
 @router.get("/candidati", response_class=HTMLResponse)
-async def candidates_page(request: Request, q: str = "", status: str = "", job: str = "", min_score: int = 0):
+async def candidates_page(request: Request, q: str = "", status: str = "", job: str = "", skill: str = "", min_score: int = 0):
     candidates, total = load_candidates()
+    candidate_rows = build_unique_candidate_rows(candidates, q=q, status=status, job=job, skill=skill, min_score=min_score)
+
     all_jobs = sorted(list({candidate.job_title for candidate in candidates if candidate.job_title}))
     all_statuses = sorted(list({candidate.status for candidate in candidates if candidate.status}))
 
-    filtered = apply_candidate_filters(candidates, q=q, status=status, job=job, min_score=min_score)
-
     stats = {
         "total": len(candidates),
-        "filtered": len(filtered),
+        "unique_total": len(build_unique_candidate_rows(candidates)),
+        "filtered": len(candidate_rows),
+        "analyses_filtered": sum(len(row["matches"]) for row in candidate_rows),
         "interviu": len([c for c in candidates if c.status == "INTERVIU"]),
         "selectat": len([c for c in candidates if c.status == "SELECTAT"]),
         "angajat": len([c for c in candidates if c.status == "ANGAJAT"]),
@@ -674,7 +781,8 @@ async def candidates_page(request: Request, q: str = "", status: str = "", job: 
         name="candidates.html",
         context={
             "request": request,
-            "candidates": filtered,
+            "candidates": [row["candidate"] for row in candidate_rows],
+            "candidate_rows": candidate_rows,
             "total": total,
             "stats": stats,
             "all_jobs": all_jobs,
@@ -682,15 +790,17 @@ async def candidates_page(request: Request, q: str = "", status: str = "", job: 
             "q": q,
             "status": status,
             "job": job,
+            "skill": skill,
             "min_score": min_score
         }
     )
 
 
 @router.get("/candidati/export")
-async def export_candidates(q: str = "", status: str = "", job: str = "", min_score: int = 0):
+async def export_candidates(q: str = "", status: str = "", job: str = "", skill: str = "", min_score: int = 0):
     candidates, total = load_candidates()
-    filtered = apply_candidate_filters(candidates, q=q, status=status, job=job, min_score=min_score)
+    rows = build_unique_candidate_rows(candidates, q=q, status=status, job=job, skill=skill, min_score=min_score)
+    filtered = [row["candidate"] for row in rows]
 
     output = generate_candidates_excel(filtered)
     filename = f"nexas_hr_candidati_{int(time.time())}.xlsx"

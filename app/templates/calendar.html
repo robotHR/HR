@@ -574,10 +574,11 @@ function renderCalendar() {
       col.appendChild(slot);
     }
 
-    // interview cards
+    // interview cards — cu layout overlap
     const dayInterviews = interviews.filter(iv => iv.data === dayStr);
+    const layout = computeOverlapLayout(dayInterviews);
     for (const iv of dayInterviews) {
-      const card = renderInterviewCard(iv);
+      const card = renderInterviewCard(iv, layout.get(iv.id));
       col.appendChild(card);
     }
 
@@ -602,16 +603,81 @@ function renderCalendar() {
   updateWeekLabel();
 }
 
-function renderInterviewCard(iv) {
-  const [hours, mins] = iv.ora.split(':').map(Number);
-  const startMin = hours*60 + mins;
+function timeToMin(ora) {
+  const [h, m] = ora.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function computeOverlapLayout(dayInterviews) {
+  // Grupeaza interviurile care se suprapun in timp
+  // Fiecare grup primeste aceeasi latime impartita egal
+  const sorted = [...dayInterviews].sort((a, b) => a.ora.localeCompare(b.ora));
+  const layout = new Map(); // id -> { col, total }
+
+  // Construim coloane: fiecare interviu merge in prima coloana libera
+  // unde nu se suprapune cu nimic existent
+  const columns = []; // columns[i] = ultimul end-minute din coloana i
+
+  // Pasul 1: asignam fiecare interviu la o coloana
+  const assigned = new Map(); // id -> colIndex
+  for (const iv of sorted) {
+    const start = timeToMin(iv.ora);
+    const end   = start + (iv.durata || 60);
+    let placed  = false;
+    for (let c = 0; c < columns.length; c++) {
+      if (columns[c] <= start) {
+        columns[c] = end;
+        assigned.set(iv.id, c);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      assigned.set(iv.id, columns.length);
+      columns.push(end);
+    }
+  }
+
+  // Pasul 2: pentru fiecare interviu, gasim cate coloane are grupul sau
+  // (toate interviurile care se suprapun cu el, direct sau indirect)
+  // Simplu: parcurgem si vedem care e numarul maxim de coloane simultane
+  // intr-o fereastra de timp
+  for (const iv of sorted) {
+    const start = timeToMin(iv.ora);
+    const end   = start + (iv.durata || 60);
+    // cate interviuri se suprapun cu acesta (inclusiv el)?
+    const concurrent = sorted.filter(other => {
+      const os = timeToMin(other.ora);
+      const oe = os + (other.durata || 60);
+      return os < end && oe > start;
+    });
+    const maxCol = Math.max(...concurrent.map(o => assigned.get(o.id))) + 1;
+    layout.set(iv.id, { col: assigned.get(iv.id), total: maxCol });
+  }
+
+  return layout;
+}
+
+function renderInterviewCard(iv, pos) {
+  const col   = pos ? pos.col   : 0;
+  const total = pos ? pos.total : 1;
+
+  const startMin = timeToMin(iv.ora);
   const topPx    = ((startMin - HOUR_START*60) / 60) * HOUR_PX;
   const heightPx = Math.max(28, ((iv.durata||60) / 60) * HOUR_PX - 3);
+
+  // Latime si offset orizontal in functie de overlap
+  const GAP      = 3;  // px intre carduri
+  const colW     = `calc(${100/total}% - ${GAP}px)`;
+  const colLeft  = `calc(${col * (100/total)}% + ${col > 0 ? GAP/2 : GAP/2}px)`;
 
   const card = document.createElement('div');
   card.className = `interview-card status-${iv.status}`;
   card.style.top    = topPx + 'px';
   card.style.height = heightPx + 'px';
+  card.style.left   = colLeft;
+  card.style.right  = 'auto';
+  card.style.width  = colW;
   card.innerHTML = `
     <div class="card-time">${iv.ora}</div>
     <div class="card-name">${iv.candidate_name}</div>

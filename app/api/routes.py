@@ -16,6 +16,7 @@ from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.models.job_post_model import JobPost
+from app.models.interview_model import Interview
 from app.services.cv_parser import (
     process_cvs_for_job,
     extract_text_from_file,
@@ -926,35 +927,16 @@ async def open_candidate_cv(candidate_id: int):
     return JSONResponse({"error": "CV-ul nu a fost gasit."}, status_code=404)
 
 
+@router.get("/candidat/{candidate_id}/trimite-interviu")
+async def redirect_to_calendar_for_interview(candidate_id: int):
+    """Redirecteaza catre pagina calendar cu candidatul preselectat."""
+    return RedirectResponse(url=f"/calendar?candidate_id={candidate_id}", status_code=303)
+
+
 @router.post("/candidat/{candidate_id}/trimite-interviu")
-async def send_interview(candidate_id: int):
-    candidate = get_candidate_by_id(candidate_id)
-
-    if not candidate:
-        return RedirectResponse(url="/?message=Candidatul nu a fost gasit.", status_code=303)
-
-    if not candidate.email:
-        return RedirectResponse(url=f"/candidat/{candidate_id}?error=Candidatul nu are email extras din CV.", status_code=303)
-
-    try:
-        send_interview_email(to_email=candidate.email, candidate_name=candidate.name, job_title=candidate.job_title)
-        update_candidate_status(
-            candidate_id,
-            "INTERVIU",
-            event_title="Email interviu trimis",
-            event_description=f"Email trimis catre {candidate.email}."
-        )
-
-        return RedirectResponse(
-            url=f"/candidat/{candidate_id}?message=Email trimis. Status actualizat: Interviu.",
-            status_code=303
-        )
-
-    except Exception as e:
-        return RedirectResponse(
-            url=f"/candidat/{candidate_id}?error=Eroare la trimiterea emailului: {str(e)}",
-            status_code=303
-        )
+async def redirect_to_calendar_for_interview_post(candidate_id: int):
+    """Redirecteaza catre pagina calendar cu candidatul preselectat (POST fallback)."""
+    return RedirectResponse(url=f"/calendar?candidate_id={candidate_id}", status_code=303)
 
 
 @router.post("/candidat/{candidate_id}/refuza")
@@ -1747,3 +1729,196 @@ async def apply_to_job(
     return RedirectResponse(url=f"/cariere/{job_id}?success=1", status_code=303)
 
 
+
+# ─── CALENDAR INTERVIURI ──────────────────────────────────────────────────────
+
+@router.get("/calendar", response_class=HTMLResponse)
+async def calendar_page(request: Request, candidate_id: int = None):
+    preselected = None
+    if candidate_id:
+        preselected = get_candidate_by_id(candidate_id)
+    return templates.TemplateResponse("calendar.html", {
+        "request": request,
+        "preselected_candidate": preselected,
+    })
+
+
+@router.get("/calendar/api/week")
+async def get_week_interviews(start: str):
+    """
+    Returneaza JSON cu toate interviurile dintr-o saptamana.
+    start = "YYYY-MM-DD" (luni)
+    """
+    from datetime import datetime, timedelta
+    try:
+        start_dt = datetime.strptime(start, "%Y-%m-%d")
+        end_dt = start_dt + timedelta(days=6)
+        end_str = end_dt.strftime("%Y-%m-%d")
+    except ValueError:
+        return JSONResponse({"error": "Format data invalid. Foloseste YYYY-MM-DD."}, status_code=400)
+
+    db = SessionLocal()
+    interviews = db.query(Interview).filter(
+        Interview.data >= start,
+        Interview.data <= end_str
+    ).order_by(Interview.data, Interview.ora).all()
+    db.close()
+
+    return JSONResponse([{
+        "id": i.id,
+        "candidate_id": i.candidate_id,
+        "candidate_name": i.candidate_name or "—",
+        "job_title": i.job_title or "—",
+        "data": i.data,
+        "ora": i.ora,
+        "locatie": i.locatie or "",
+        "durata": i.durata or 60,
+        "status": i.status or "programat",
+    } for i in interviews])
+
+
+@router.get("/calendar/api/candidati-search")
+async def search_candidates_for_calendar(q: str = ""):
+    """Autocomplete candidati pentru modalul de programare."""
+    db = SessionLocal()
+    q_lower = f"%{q.lower()}%"
+    candidates = db.query(Candidate).filter(
+        Candidate.visible_in_dashboard == 1,
+        (Candidate.name.ilike(q_lower)) | (Candidate.email.ilike(q_lower))
+    ).limit(10).all()
+    db.close()
+    return JSONResponse([{
+        "id": c.id,
+        "name": c.name or "—",
+        "email": c.email or "",
+        "job_title": c.job_title or "",
+    } for c in candidates])
+
+
+@router.post("/calendar/api/interview")
+async def create_interview_api(
+    background_tasks: BackgroundTasks,
+    candidate_id: int = Form(...),
+    data: str = Form(...),
+    ora: str = Form(...),
+    locatie: str = Form(""),
+    durata: int = Form(60),
+):
+    """Salveaza interviul in DB si trimite email candidatului."""
+    candidate = get_candidate_by_id(candidate_id)
+    if not candidate:
+        return JSONResponse({"error": "Candidatul nu a fost gasit."}, status_code=404)
+
+    db = SessionLocal()
+    interview = Interview(
+        candidate_id=candidate_id,
+        candidate_name=candidate.name,
+        candidate_email=candidate.email,
+        job_title=candidate.job_title,
+        data=data,
+        ora=ora,
+        locatie=locatie,
+        durata=durata,
+        status="programat",
+    )
+    db.add(interview)
+    db.commit()
+    interview_id = interview.id
+    db.close()
+
+    # Actualizeaza statusul candidatului
+    update_candidate_status(
+        candidate_id,
+        "INTERVIU",
+        event_title="Interviu programat",
+        event_description=f"Interviu programat pe {data} la ora {ora}. Locatie: {locatie or 'nespecificata'}."
+    )
+
+    # Trimite email in background
+    if candidate.email:
+        background_tasks.add_task(
+            _send_interview_scheduled_email,
+            to_email=candidate.email,
+            candidate_name=candidate.name or "Candidat",
+            job_title=candidate.job_title or "postul pentru care ati aplicat",
+            data=data,
+            ora=ora,
+            locatie=locatie,
+        )
+
+    return JSONResponse({
+        "success": True,
+        "interview": {
+            "id": interview_id,
+            "candidate_id": candidate_id,
+            "candidate_name": candidate.name or "—",
+            "job_title": candidate.job_title or "—",
+            "data": data,
+            "ora": ora,
+            "locatie": locatie,
+            "durata": durata,
+            "status": "programat",
+        }
+    })
+
+
+@router.post("/calendar/api/interview/{interview_id}/sterge")
+async def delete_interview_api(interview_id: int):
+    """Sterge un interviu programat."""
+    db = SessionLocal()
+    interview = db.query(Interview).filter(Interview.id == interview_id).first()
+    if not interview:
+        db.close()
+        return JSONResponse({"error": "Interviul nu a fost gasit."}, status_code=404)
+    db.delete(interview)
+    db.commit()
+    db.close()
+    return JSONResponse({"success": True})
+
+
+def _send_interview_scheduled_email(
+    to_email: str,
+    candidate_name: str,
+    job_title: str,
+    data: str,
+    ora: str,
+    locatie: str,
+):
+    """Trimite email de confirmare interviu cu data, ora si locatia."""
+    try:
+        # Formatam data frumos: "2026-06-10" → "10 Iunie 2026"
+        from datetime import datetime
+        luni = {
+            "01": "Ianuarie", "02": "Februarie", "03": "Martie",
+            "04": "Aprilie", "05": "Mai", "06": "Iunie",
+            "07": "Iulie", "08": "August", "09": "Septembrie",
+            "10": "Octombrie", "11": "Noiembrie", "12": "Decembrie"
+        }
+        try:
+            parts = data.split("-")
+            data_formatata = f"{int(parts[2])} {luni.get(parts[1], parts[1])} {parts[0]}"
+        except Exception:
+            data_formatata = data
+
+        locatie_line = f"\nLocatia / Link: {locatie}" if locatie else ""
+
+        send_email_api(
+            to_email=to_email,
+            subject=f"Confirmare interviu — {job_title}",
+            body=f"""Buna ziua, {candidate_name},
+
+Va informam ca ati fost selectat(a) pentru un interviu pentru postul de {job_title}.
+
+Data: {data_formatata}
+Ora: {ora}{locatie_line}
+
+Va rugam sa confirmati participarea raspunzand la acest email.
+
+In caz ca nu puteti participa, va rugam sa ne anuntati cat mai curand posibil.
+
+Cu respect,
+Echipa HR NEXAS
+"""
+        )
+    except Exception as e:
+        print(f"[CALENDAR] WARN email interviu esuat catre {to_email}: {e}")

@@ -12,6 +12,7 @@ from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
 from app.models.cv_analysis_model import CvAnalysis
 from app.models.job_post_model import JobPost
+from app.models.interview_model import Interview
 
 Base.metadata.create_all(bind=engine)
 

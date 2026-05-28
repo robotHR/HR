@@ -70,6 +70,86 @@
         .empty-icon{font-size:48px;margin-bottom:16px}
         .empty-title{font-size:18px;font-weight:700;color:var(--gray-600);margin-bottom:8px}
 
+        /* SEARCH BAR */
+        .search-bar{
+            max-width:1100px;
+            margin:-32px auto 0;
+            padding:0 24px;
+            position:relative;
+            z-index:5;
+        }
+        .search-bar-inner{
+            background:var(--white);
+            border:1px solid var(--gray-200);
+            border-radius:var(--radius-xl);
+            box-shadow:0 8px 40px rgba(15,23,42,.12), 0 2px 8px rgba(37,99,235,.06);
+            padding:18px 20px;
+            display:flex;
+            gap:12px;
+            align-items:center;
+        }
+        .search-input-wrap{
+            flex:1;
+            position:relative;
+            display:flex;
+            align-items:center;
+        }
+        .search-icon{
+            position:absolute;
+            left:14px;
+            color:var(--gray-400);
+            pointer-events:none;
+            font-size:15px;
+            line-height:1;
+        }
+        .search-bar input{
+            width:100%;
+            border:1.5px solid var(--gray-200);
+            border-radius:var(--radius-md);
+            padding:11px 14px 11px 40px;
+            font-size:14px;
+            font-family:'DM Sans',sans-serif;
+            color:var(--gray-800);
+            background:var(--gray-50);
+            outline:none;
+            transition:border-color .2s, box-shadow .2s, background .2s;
+        }
+        .search-bar input:focus{
+            border-color:var(--blue-2);
+            background:var(--white);
+            box-shadow:0 0 0 3px rgba(37,99,235,.1);
+        }
+        .search-bar input::placeholder{color:var(--gray-400)}
+        .search-divider{width:1px;height:36px;background:var(--gray-200);flex-shrink:0}
+        .search-bar select{
+            min-width:160px;
+            border:1.5px solid var(--gray-200);
+            border-radius:var(--radius-md);
+            padding:11px 36px 11px 14px;
+            font-size:13px;
+            font-weight:600;
+            font-family:'DM Sans',sans-serif;
+            color:var(--gray-700);
+            background:var(--gray-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+            -webkit-appearance:none;
+            appearance:none;
+            outline:none;
+            cursor:pointer;
+            transition:border-color .2s, box-shadow .2s, background .2s;
+            flex-shrink:0;
+        }
+        .search-bar select:focus{
+            border-color:var(--blue-2);
+            background-color:var(--white);
+            box-shadow:0 0 0 3px rgba(37,99,235,.1);
+        }
+        .search-bar select:hover{border-color:var(--blue-mid)}
+        @media(max-width:680px){
+            .search-bar-inner{flex-direction:column;gap:10px}
+            .search-divider{display:none}
+            .search-bar select{width:100%;min-width:unset}
+        }
+
         /* FOOTER */
         .footer{background:var(--gray-900);color:rgba(255,255,255,.4);text-align:center;padding:28px;font-size:13px;margin-top:64px}
         .footer strong{color:rgba(255,255,255,.7)}
@@ -112,15 +192,22 @@
 </section>
 
 <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Cauta dupa titlu, departament, locatie..." oninput="filterJobs()">
-    <select id="locationFilter" onchange="filterJobs()">
-        <option value="">Toate locatiile</option>
-        {% for job in jobs %}{% if job.locatie %}<option value="{{ job.locatie }}">{{ job.locatie }}</option>{% endif %}{% endfor %}
-    </select>
-    <select id="deptFilter" onchange="filterJobs()">
-        <option value="">Toate departamentele</option>
-        {% for job in jobs %}{% if job.departament %}<option value="{{ job.departament }}">{{ job.departament }}</option>{% endif %}{% endfor %}
-    </select>
+    <div class="search-bar-inner">
+        <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Cauta dupa titlu, departament, locatie..." oninput="filterJobs()">
+        </div>
+        <div class="search-divider"></div>
+        <select id="locationFilter" onchange="filterJobs()">
+            <option value="">Toate locatiile</option>
+            {% for job in jobs %}{% if job.locatie %}<option value="{{ job.locatie }}">{{ job.locatie }}</option>{% endif %}{% endfor %}
+        </select>
+        <div class="search-divider"></div>
+        <select id="deptFilter" onchange="filterJobs()">
+            <option value="">Toate departamentele</option>
+            {% for job in jobs %}{% if job.departament %}<option value="{{ job.departament }}">{{ job.departament }}</option>{% endif %}{% endfor %}
+        </select>
+    </div>
 </div>
 
 <div class="content">

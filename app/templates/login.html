@@ -157,7 +157,7 @@
             margin-bottom:32px;
         }
         .logo-img-wrap img{
-            max-height:90px;max-width:100%;
+            max-height: 180px; max-width:100%;
             border-radius:14px;
             object-fit:contain;
             filter:drop-shadow(0 4px 24px rgba(37,99,235,.25));
@@ -279,6 +279,7 @@
             .left{min-height:45vh;padding:36px 28px}
             .left-title{font-size:clamp(36px,8vw,60px)}
             .right{width:100%;padding:36px 28px 56px;border-left:none;border-top:1px solid rgba(255,255,255,.07)}
+            .logo-img-wrap img{ max-height: 180px; }
         }
         @media(max-width:480px){
             .left{padding:28px 20px;min-height:38vh}
@@ -326,13 +327,8 @@
             <img src="/static/images/LOGO%20NEXAS.jpg" alt="NEXAS HR Platform">
         </div>
 
-        <div class="login-title">Bun venit înapoi</div>
-        <div class="login-sub">Platforma AI pentru analiza CV-urilor si potrivirea candidatilor cu rolurile disponibile.</div>
-
-        <div class="status">
-            <span class="status-dot"></span>
-            Toate sistemele sunt operationale
-        </div>
+    
+       
 
         <form method="post" action="/login">
 

@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar Interviuri — NEXAS HR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d1424;
+  --surface:   #131c30;
+  --surface-2: #182036;
+  --line:      rgba(255,255,255,.07);
+  --line-2:    rgba(255,255,255,.10);
+  --muted:     #4a5878;
+  --soft:      #8896b0;
+  --blue:      #4a95f6;
+  --blue-2:    #7ab8ff;
+  --blue-soft: rgba(93,169,255,.12);
+  --blue-line: rgba(93,169,255,.22);
+  --teal:      #22c7b8;
+  --teal-2:    #5ee6da;
+  --teal-soft: rgba(34,199,184,.12);
+  --teal-line: rgba(34,199,184,.25);
+  --green:     #22c7b8;
+  --yellow:    #f59e0b;
+  --red:       #ff6b70;
+  --radius:    14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: #fff; font-family: 'DM Sans', sans-serif; }
+
+/* ── LAYOUT ── */
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 220px; position: fixed; inset: 0 auto 0 0; z-index: 20;
+  background: linear-gradient(180deg, rgba(17,24,42,.98), rgba(14,20,36,.98));
+  border-right: 1px solid var(--line); display: flex; flex-direction: column;
+}
+.sidebar-logo { padding: 28px 22px 24px; border-bottom: 1px solid var(--line); }
+.logo-text { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -.6px; line-height: 1; }
+.logo-text .accent { color: var(--blue-2); }
+.logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 2.6px; text-transform: uppercase; margin-top: 7px; font-weight: 700; }
+.nav { display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; flex: 1; }
+.nav a {
+  display: flex; align-items: center; gap: 10px; padding: 11px 13px;
+  border-radius: 12px; font-size: 13px; font-weight: 700; color: var(--muted);
+  text-decoration: none; transition: .18s ease; position: relative;
+}
+.nav a svg { width: 16px; height: 16px; opacity: .75; flex-shrink: 0; }
+.nav a:hover { color: #fff; background: rgba(255,255,255,.055); }
+.nav a.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(93,169,255,.20), rgba(93,169,255,.07));
+  box-shadow: inset 0 0 0 1px rgba(93,169,255,.16);
+}
+.nav a.active::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 58%; border-radius: 0 4px 4px 0; background: var(--blue);
+}
+.nav a.active svg { color: var(--blue-2); opacity: 1; }
+.nav a.logout-link { margin-top: auto; color: #ff9ca0; }
+.nav a.logout-link:hover { background: rgba(248,113,113,.08); color: #f87171; }
+
+.main { margin-left: 220px; width: calc(100% - 220px); min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 64px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; padding: 0 28px; gap: 16px;
+  background: rgba(13,20,36,.90); backdrop-filter: blur(18px);
+  position: sticky; top: 0; z-index: 10; flex-shrink: 0;
+}
+.topbar-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -.3px; }
+.topbar-sub { font-size: 12px; color: var(--soft); font-weight: 600; }
+.week-nav { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.btn-nav {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 800;
+  border: 1px solid var(--line-2); background: rgba(255,255,255,.055);
+  color: var(--soft); cursor: pointer; transition: .18s; white-space: nowrap;
+}
+.btn-nav:hover { color: #fff; border-color: var(--blue-line); background: var(--blue-soft); }
+.btn-nav svg { width: 14px; height: 14px; }
+.btn-today {
+  padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 800;
+  background: var(--blue-soft); border: 1px solid var(--blue-line);
+  color: var(--blue-2); cursor: pointer; transition: .18s;
+}
+.btn-today:hover { background: rgba(93,169,255,.20); color: #fff; }
+.week-label { font-size: 13px; font-weight: 800; color: #fff; min-width: 180px; text-align: center; }
+.btn-add-interview {
+  display: flex; align-items: center; gap: 8px; padding: 9px 18px;
+  border-radius: 13px; font-size: 13px; font-weight: 800;
+  background: linear-gradient(135deg, var(--teal), #4a95f6);
+  color: #07111f; border: none; cursor: pointer; transition: .18s;
+  box-shadow: 0 6px 20px rgba(34,199,184,.20);
+}
+.btn-add-interview:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(34,199,184,.30); }
+.btn-add-interview svg { width: 15px; height: 15px; }
+
+/* ── CALENDAR GRID ── */
+.cal-outer { flex: 1; overflow-y: auto; padding: 0; }
+.cal-container { min-width: 800px; }
+
+.cal-header {
+  display: grid; grid-template-columns: 58px repeat(7, 1fr);
+  border-bottom: 1px solid var(--line);
+  background: rgba(13,20,36,.95);
+  position: sticky; top: 0; z-index: 9;
+}
+.cal-header-empty { border-right: 1px solid var(--line); }
+.cal-day-header {
+  padding: 14px 10px 12px; text-align: center;
+  border-right: 1px solid var(--line);
+  transition: background .18s;
+}
+.cal-day-header:last-child { border-right: none; }
+.cal-day-name { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+.cal-day-num {
+  font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+  color: var(--soft); margin-top: 4px; line-height: 1;
+}
+.cal-day-header.is-today .cal-day-name { color: var(--teal-2); }
+.cal-day-header.is-today .cal-day-num {
+  color: #07111f;
+  background: linear-gradient(135deg, var(--teal), #4a95f6);
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 4px auto 0; font-size: 18px;
+}
+
+.cal-body { display: grid; grid-template-columns: 58px repeat(7, 1fr); }
+
+.cal-hours { border-right: 1px solid var(--line); }
+.cal-hour-label {
+  height: 64px; display: flex; align-items: flex-start; justify-content: flex-end;
+  padding: 8px 10px 0 0; font-size: 11px; font-weight: 700; color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+.cal-hour-label:last-child { border-bottom: none; }
+
+.cal-day-col {
+  position: relative; border-right: 1px solid var(--line);
+  cursor: pointer;
+}
+.cal-day-col:last-child { border-right: none; }
+.cal-day-col.is-today { background: rgba(93,169,255,.025); }
+
+.cal-slot {
+  height: 64px; border-bottom: 1px solid var(--line);
+  transition: background .12s;
+  position: relative;
+}
+.cal-slot:last-child { border-bottom: none; }
+.cal-slot:hover { background: rgba(93,169,255,.055); }
+.cal-slot.half-mark::after {
+  content: ""; position: absolute; left: 8px; right: 8px; top: 50%;
+  border-top: 1px dashed rgba(255,255,255,.06);
+}
+
+/* ── INTERVIEW CARD ── */
+.interview-card {
+  position: absolute; left: 4px; right: 4px; z-index: 3;
+  border-radius: 10px; padding: 7px 9px; overflow: hidden;
+  cursor: pointer; transition: transform .15s, box-shadow .15s;
+  min-height: 28px;
+}
+.interview-card:hover { transform: translateY(-1px) scale(1.01); z-index: 5; }
+.interview-card.status-programat {
+  background: linear-gradient(135deg, rgba(34,199,184,.85), rgba(74,149,246,.75));
+  border: 1px solid rgba(34,199,184,.40);
+  box-shadow: 0 4px 16px rgba(34,199,184,.18);
+}
+.interview-card.status-finalizat {
+  background: linear-gradient(135deg, rgba(74,90,120,.80), rgba(50,65,95,.75));
+  border: 1px solid rgba(255,255,255,.10);
+}
+.interview-card.status-anulat {
+  background: rgba(255,107,112,.15);
+  border: 1px solid rgba(255,107,112,.30);
+}
+.card-time { font-size: 10px; font-weight: 900; color: rgba(7,17,31,.80); line-height: 1; margin-bottom: 3px; }
+.card-name { font-size: 11px; font-weight: 800; color: #07111f; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-job  { font-size: 10px; color: rgba(7,17,31,.65); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.interview-card.status-finalizat .card-time,
+.interview-card.status-finalizat .card-name,
+.interview-card.status-finalizat .card-job { color: var(--soft); }
+
+/* current time line */
+.current-time-line {
+  position: absolute; left: 0; right: 0; height: 2px; z-index: 4; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+}
+.current-time-line::before {
+  content: ""; position: absolute; left: -1px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--teal);
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(7,17,31,.75); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .22s;
+}
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+.modal {
+  background: linear-gradient(135deg, #182036, #131c30);
+  border: 1px solid var(--line-2); border-radius: var(--radius-xl);
+  padding: 32px; width: 100%; max-width: 480px;
+  box-shadow: 0 40px 100px rgba(0,0,0,.50);
+  transform: translateY(16px) scale(.97); transition: transform .22s;
+  position: relative;
+}
+.modal-overlay.visible .modal { transform: translateY(0) scale(1); }
+.modal-close {
+  position: absolute; top: 18px; right: 18px; width: 32px; height: 32px;
+  border-radius: 50%; border: 1px solid var(--line-2);
+  background: rgba(255,255,255,.06); color: var(--soft);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: .18s; font-size: 16px;
+}
+.modal-close:hover { color: #fff; background: rgba(255,255,255,.12); }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.modal-sub { font-size: 13px; color: var(--soft); margin-bottom: 24px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: grid; gap: 7px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 10px; font-weight: 900; color: var(--blue-2); text-transform: uppercase; letter-spacing: .12em; }
+.field input, .field select {
+  width: 100%; padding: 11px 14px; border-radius: 13px;
+  border: 1px solid var(--line-2); background: rgba(255,255,255,.06);
+  color: #fff; font-size: 13px; font-weight: 600; outline: none;
+  transition: border-color .18s, box-shadow .18s; font-family: 'DM Sans', sans-serif;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--blue-line); box-shadow: 0 0 0 3px rgba(93,169,255,.10);
+}
+.field input::placeholder { color: rgba(255,255,255,.35); }
+.field select option { background: #131c30; color: #fff; }
+.candidate-search-wrap { position: relative; }
+.candidate-dropdown {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 20;
+  background: #182036; border: 1px solid var(--line-2); border-radius: 13px;
+  overflow: hidden; box-shadow: 0 16px 40px rgba(0,0,0,.35);
+}
+.candidate-option {
+  padding: 10px 14px; cursor: pointer; transition: background .12s;
+  font-size: 13px; font-weight: 600; color: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.candidate-option:last-child { border-bottom: none; }
+.candidate-option:hover { background: rgba(93,169,255,.10); color: var(--blue-2); }
+.candidate-option .opt-job { font-size: 11px; color: var(--soft); font-weight: 600; margin-top: 2px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+.btn-modal-cancel {
+  flex: 1; padding: 12px; border-radius: 13px; font-size: 13px; font-weight: 800;
+  background: rgba(255,255,255,.06); border: 1px solid var(--line-2);
+  color: var(--soft); cursor: pointer; transition: .18s; font-family: 'DM Sans', sans-serif;
+}
+.btn-modal-cancel:hover { color: #fff; border-color: var(--line-2); background: rgba(255,255,255,.10); }
+.btn-modal-save {
+  flex: 2; padding: 12px; border-radius: 13px; font-size: 13px; font-weight: 800;
+  background: linear-gradient(135deg, var(--teal), #4a95f6);
+  border: none; color: #07111f; cursor: pointer; transition: .18s;
+  box-shadow: 0 6px 20px rgba(34,199,184,.20); font-family: 'DM Sans', sans-serif;
+}
+.btn-modal-save:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(34,199,184,.30); }
+.btn-modal-save:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* ── INTERVIEW DETAIL POPUP ── */
+.detail-popup {
+  position: fixed; z-index: 200; background: #182036;
+  border: 1px solid var(--line-2); border-radius: var(--radius-lg);
+  padding: 18px; min-width: 240px; max-width: 300px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.45);
+  display: none;
+}
+.detail-popup.visible { display: block; }
+.detail-name { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+.detail-job { font-size: 12px; color: var(--teal-2); font-weight: 700; margin-bottom: 12px; }
+.detail-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--soft); font-weight: 600; margin-bottom: 6px; }
+.detail-row svg { width: 13px; height: 13px; color: var(--blue-2); flex-shrink: 0; }
+.detail-row a { color: var(--blue-2); text-decoration: none; }
+.detail-row a:hover { text-decoration: underline; }
+.detail-actions { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.btn-detail-cand {
+  flex: 1; padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 800;
+  background: var(--blue-soft); border: 1px solid var(--blue-line);
+  color: var(--blue-2); cursor: pointer; text-align: center; text-decoration: none;
+  display: flex; align-items: center; justify-content: center; transition: .15s;
+}
+.btn-detail-cand:hover { background: rgba(93,169,255,.20); }
+.btn-detail-delete {
+  padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 800;
+  background: rgba(255,107,112,.10); border: 1px solid rgba(255,107,112,.25);
+  color: #ffb4b7; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 5px; transition: .15s;
+}
+.btn-detail-delete:hover { background: rgba(255,107,112,.20); }
+.btn-detail-delete svg { width: 13px; height: 13px; }
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 300;
+  padding: 14px 20px; border-radius: 14px; font-size: 13px; font-weight: 800;
+  background: #182036; border: 1px solid var(--teal-line); color: var(--teal-2);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  transform: translateY(20px); opacity: 0; transition: .25s; pointer-events: none;
+}
+.toast.visible { transform: translateY(0); opacity: 1; }
+.toast.error { border-color: rgba(255,107,112,.30); color: #ffb4b7; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">NEXAS<span class="accent">.</span></div>
+      <div class="logo-sub">HR Platform</div>
+    </div>
+    <nav class="nav">
+      <a href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Panou principal
+      </a>
+      <a href="/candidati">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Candidati
+      </a>
+      <a href="/analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Statistici
+      </a>
+      <a href="/posturi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Posturi vacante
+      </a>
+      <a href="/calendar" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendar
+      </a>
+      <a class="logout-link" href="/logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Deconectare
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Calendar Interviuri</div>
+        <div class="topbar-sub" id="topbar-sub">Se incarca...</div>
+      </div>
+      <div class="week-nav">
+        <button class="btn-nav" id="btn-prev" onclick="changeWeek(-1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="week-label" id="week-label">—</span>
+        <button class="btn-nav" id="btn-next" onclick="changeWeek(1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="btn-today" onclick="goToday()">Azi</button>
+        <button class="btn-add-interview" onclick="openModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Programează interviu
+        </button>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="cal-outer">
+      <div class="cal-container" id="cal-container">
+        <!-- generat dinamic prin JS -->
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODAL PROGRAMARE ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Programează interviu</div>
+    <div class="modal-sub" id="modal-sub">Completează detaliile și salvează. Email-ul va fi trimis automat.</div>
+    <div class="form-grid">
+      <div class="field full candidate-search-wrap" id="candidate-field-wrap">
+        <label>Candidat</label>
+        <input type="text" id="candidate-search" placeholder="Caută candidat după nume..." autocomplete="off" oninput="onCandidateSearch(this.value)">
+        <div class="candidate-dropdown" id="candidate-dropdown" style="display:none"></div>
+        <input type="hidden" id="selected-candidate-id">
+      </div>
+      <div class="field">
+        <label>Data</label>
+        <input type="date" id="input-data">
+      </div>
+      <div class="field">
+        <label>Ora</label>
+        <input type="time" id="input-ora" step="900">
+      </div>
+      <div class="field full">
+        <label>Locație / Link Meet</label>
+        <input type="text" id="input-locatie" placeholder="ex: Str. Mihai Eminescu 10 sau meet.google.com/...">
+      </div>
+      <div class="field">
+        <label>Durată (minute)</label>
+        <select id="input-durata">
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60" selected>60 min</option>
+          <option value="90">90 min</option>
+          <option value="120">120 min</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Anulează</button>
+      <button class="btn-modal-save" id="btn-save" onclick="saveInterview()">
+        Salvează &amp; trimite email
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DETAIL POPUP ── -->
+<div class="detail-popup" id="detail-popup">
+  <div class="detail-name" id="dp-name"></div>
+  <div class="detail-job" id="dp-job"></div>
+  <div class="detail-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span id="dp-data"></span>
+  </div>
+  <div class="detail-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span id="dp-ora"></span>
+  </div>
+  <div class="detail-row" id="dp-locatie-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="dp-locatie"></span>
+  </div>
+  <div class="detail-actions">
+    <a class="btn-detail-cand" id="dp-link" href="#">Vezi candidat</a>
+    <button class="btn-detail-delete" id="dp-delete" onclick="deleteInterview()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      Șterge
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const HOUR_START  = 8;   // 08:00
+const HOUR_END    = 20;  // 20:00
+const HOUR_PX     = 64;  // px per ora
+const DAYS_RO     = ['Lun','Mar','Mie','Joi','Vin','Sâm','Dum'];
+const MONTHS_RO   = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+const MONTHS_SHORT= ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── STATE ──
+let currentWeekStart = getMonday(new Date());
+let interviews       = [];
+let selectedInterview= null;
+let preselectedCandidate = null;
+let searchTimeout    = null;
+
+// ── PRESELECTED CANDIDATE (din URL) ──
+{% if preselected_candidate %}
+preselectedCandidate = {
+  id:        {{ preselected_candidate.id }},
+  name:      {{ preselected_candidate.name | tojson }},
+  email:     {{ (preselected_candidate.email or '') | tojson }},
+  job_title: {{ (preselected_candidate.job_title or '') | tojson }},
+};
+{% endif %}
+
+// ── DATE UTILS ──
+function getMonday(d) {
+  const date = new Date(d);
+  const day  = date.getDay();
+  const diff = (day === 0) ? -6 : 1 - day;
+  date.setDate(date.getDate() + diff);
+  date.setHours(0,0,0,0);
+  return date;
+}
+function dateToStr(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function strToDate(s) {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function formatDateRo(s) {
+  const d = strToDate(s);
+  return `${d.getDate()} ${MONTHS_RO[d.getMonth()]} ${d.getFullYear()}`;
+}
+function isToday(d) {
+  const t = new Date();
+  return d.getDate()===t.getDate() && d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear();
+}
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+// ── RENDER CALENDAR ──
+function renderCalendar() {
+  const container = document.getElementById('cal-container');
+  container.innerHTML = '';
+
+  // header
+  const header = document.createElement('div');
+  header.className = 'cal-header';
+  const emptyCell = document.createElement('div');
+  emptyCell.className = 'cal-hour-label cal-header-empty';
+  header.appendChild(emptyCell);
+
+  for (let i=0; i<7; i++) {
+    const day = addDays(currentWeekStart, i);
+    const cell = document.createElement('div');
+    cell.className = 'cal-day-header' + (isToday(day) ? ' is-today' : '');
+    cell.innerHTML = `<div class="cal-day-name">${DAYS_RO[i]}</div><div class="cal-day-num">${day.getDate()}</div>`;
+    header.appendChild(cell);
+  }
+  container.appendChild(header);
+
+  // body
+  const body = document.createElement('div');
+  body.className = 'cal-body';
+
+  // hour labels column
+  const hoursCol = document.createElement('div');
+  hoursCol.className = 'cal-hours';
+  for (let h=HOUR_START; h<HOUR_END; h++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'cal-hour-label';
+    lbl.textContent = `${String(h).padStart(2,'0')}:00`;
+    hoursCol.appendChild(lbl);
+  }
+  body.appendChild(hoursCol);
+
+  // day columns
+  for (let i=0; i<7; i++) {
+    const day = addDays(currentWeekStart, i);
+    const dayStr = dateToStr(day);
+    const col = document.createElement('div');
+    col.className = 'cal-day-col' + (isToday(day) ? ' is-today' : '');
+
+    // slots
+    for (let h=HOUR_START; h<HOUR_END; h++) {
+      const slot = document.createElement('div');
+      slot.className = 'cal-slot half-mark';
+      slot.dataset.date = dayStr;
+      slot.dataset.hour = h;
+      slot.addEventListener('click', (e) => {
+        if (e.target.closest('.interview-card')) return;
+        closeDetailPopup();
+        openModal(dayStr, `${String(h).padStart(2,'0')}:00`);
+      });
+      col.appendChild(slot);
+    }
+
+    // interview cards
+    const dayInterviews = interviews.filter(iv => iv.data === dayStr);
+    for (const iv of dayInterviews) {
+      const card = renderInterviewCard(iv);
+      col.appendChild(card);
+    }
+
+    // current time line (only for today)
+    if (isToday(day)) {
+      const now = new Date();
+      const totalMinutes = now.getHours()*60 + now.getMinutes();
+      const startMinutes = HOUR_START * 60;
+      const endMinutes   = HOUR_END   * 60;
+      if (totalMinutes >= startMinutes && totalMinutes <= endMinutes) {
+        const topPx = ((totalMinutes - startMinutes) / 60) * HOUR_PX;
+        const line = document.createElement('div');
+        line.className = 'current-time-line';
+        line.style.top = topPx + 'px';
+        col.appendChild(line);
+      }
+    }
+
+    body.appendChild(col);
+  }
+  container.appendChild(body);
+  updateWeekLabel();
+}
+
+function renderInterviewCard(iv) {
+  const [hours, mins] = iv.ora.split(':').map(Number);
+  const startMin = hours*60 + mins;
+  const topPx    = ((startMin - HOUR_START*60) / 60) * HOUR_PX;
+  const heightPx = Math.max(28, ((iv.durata||60) / 60) * HOUR_PX - 3);
+
+  const card = document.createElement('div');
+  card.className = `interview-card status-${iv.status}`;
+  card.style.top    = topPx + 'px';
+  card.style.height = heightPx + 'px';
+  card.innerHTML = `
+    <div class="card-time">${iv.ora}</div>
+    <div class="card-name">${iv.candidate_name}</div>
+    ${heightPx > 44 ? `<div class="card-job">${iv.job_title}</div>` : ''}
+  `;
+  card.addEventListener('click', (e) => { e.stopPropagation(); showDetailPopup(iv, e); });
+  return card;
+}
+
+// ── WEEK LABEL ──
+function updateWeekLabel() {
+  const end = addDays(currentWeekStart, 6);
+  const s = currentWeekStart;
+  const e = end;
+  let label;
+  if (s.getMonth() === e.getMonth()) {
+    label = `${s.getDate()} – ${e.getDate()} ${MONTHS_SHORT[s.getMonth()]} ${s.getFullYear()}`;
+  } else {
+    label = `${s.getDate()} ${MONTHS_SHORT[s.getMonth()]} – ${e.getDate()} ${MONTHS_SHORT[e.getMonth()]} ${s.getFullYear()}`;
+  }
+  document.getElementById('week-label').textContent = label;
+  document.getElementById('topbar-sub').textContent =
+    `Săptămâna ${s.getDate()} – ${e.getDate()} ${MONTHS_SHORT[s.getMonth()]} ${s.getFullYear()}`;
+}
+
+// ── FETCH INTERVIEWS ──
+async function fetchInterviews() {
+  const startStr = dateToStr(currentWeekStart);
+  try {
+    const res  = await fetch(`/calendar/api/week?start=${startStr}`);
+    interviews = await res.json();
+    renderCalendar();
+  } catch(e) {
+    console.error('Eroare fetch interviuri:', e);
+    interviews = [];
+    renderCalendar();
+  }
+}
+
+// ── NAVIGATION ──
+function changeWeek(dir) {
+  currentWeekStart = addDays(currentWeekStart, dir * 7);
+  fetchInterviews();
+}
+function goToday() {
+  currentWeekStart = getMonday(new Date());
+  fetchInterviews();
+}
+
+// ── MODAL ──
+function openModal(date, time) {
+  const overlay = document.getElementById('modal-overlay');
+
+  // Reset
+  document.getElementById('input-locatie').value = '';
+  document.getElementById('input-durata').value  = '60';
+  document.getElementById('btn-save').disabled   = false;
+  document.getElementById('btn-save').textContent = 'Salvează & trimite email';
+
+  // Data si ora din slot
+  if (date) document.getElementById('input-data').value = date;
+  else {
+    const today = dateToStr(new Date());
+    document.getElementById('input-data').value = today;
+  }
+  if (time) document.getElementById('input-ora').value = time;
+  else document.getElementById('input-ora').value = '09:00';
+
+  // Candidat preselectat
+  if (preselectedCandidate) {
+    document.getElementById('candidate-search').value    = preselectedCandidate.name;
+    document.getElementById('selected-candidate-id').value = preselectedCandidate.id;
+    document.getElementById('candidate-search').readOnly = true;
+    document.getElementById('modal-sub').textContent =
+      `Interviu pentru ${preselectedCandidate.name} — ${preselectedCandidate.job_title || ''}`;
+  } else {
+    document.getElementById('candidate-search').value    = '';
+    document.getElementById('selected-candidate-id').value = '';
+    document.getElementById('candidate-search').readOnly = false;
+    document.getElementById('modal-sub').textContent =
+      'Completează detaliile și salvează. Email-ul va fi trimis automat.';
+  }
+  document.getElementById('candidate-dropdown').style.display = 'none';
+  overlay.classList.add('visible');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  document.getElementById('candidate-dropdown').style.display = 'none';
+}
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ── CANDIDATE SEARCH ──
+async function onCandidateSearch(q) {
+  document.getElementById('selected-candidate-id').value = '';
+  clearTimeout(searchTimeout);
+  if (q.length < 2) {
+    document.getElementById('candidate-dropdown').style.display = 'none';
+    return;
+  }
+  searchTimeout = setTimeout(async () => {
+    try {
+      const res  = await fetch(`/calendar/api/candidati-search?q=${encodeURIComponent(q)}`);
+      const list = await res.json();
+      renderCandidateDropdown(list);
+    } catch(e) {}
+  }, 250);
+}
+function renderCandidateDropdown(list) {
+  const dd = document.getElementById('candidate-dropdown');
+  if (!list.length) { dd.style.display = 'none'; return; }
+  dd.innerHTML = list.map(c => `
+    <div class="candidate-option" onclick="selectCandidate(${c.id}, ${JSON.stringify(c.name)}, ${JSON.stringify(c.job_title)})">
+      ${c.name}
+      <div class="opt-job">${c.job_title || c.email}</div>
+    </div>
+  `).join('');
+  dd.style.display = 'block';
+}
+function selectCandidate(id, name, job) {
+  document.getElementById('candidate-search').value       = name;
+  document.getElementById('selected-candidate-id').value  = id;
+  document.getElementById('candidate-dropdown').style.display = 'none';
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.candidate-search-wrap'))
+    document.getElementById('candidate-dropdown').style.display = 'none';
+});
+
+// ── SAVE INTERVIEW ──
+async function saveInterview() {
+  const candidateId = document.getElementById('selected-candidate-id').value;
+  const data        = document.getElementById('input-data').value;
+  const ora         = document.getElementById('input-ora').value;
+  const locatie     = document.getElementById('input-locatie').value;
+  const durata      = document.getElementById('input-durata').value;
+
+  if (!candidateId) { showToast('Selectează un candidat.', true); return; }
+  if (!data)         { showToast('Alege o dată.', true); return; }
+  if (!ora)          { showToast('Alege o oră.', true); return; }
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled    = true;
+  btn.textContent = 'Se salvează...';
+
+  const form = new FormData();
+  form.append('candidate_id', candidateId);
+  form.append('data', data);
+  form.append('ora', ora);
+  form.append('locatie', locatie);
+  form.append('durata', durata);
+
+  try {
+    const res  = await fetch('/calendar/api/interview', { method: 'POST', body: form });
+    const json = await res.json();
+    if (json.success) {
+      interviews.push(json.interview);
+      renderCalendar();
+      closeModal();
+      showToast('Interviu programat! Email-ul va fi trimis candidatului.');
+      preselectedCandidate = null;
+    } else {
+      showToast(json.error || 'Eroare la salvare.', true);
+      btn.disabled = false;
+      btn.textContent = 'Salvează & trimite email';
+    }
+  } catch(e) {
+    showToast('Eroare de conexiune.', true);
+    btn.disabled = false;
+    btn.textContent = 'Salvează & trimite email';
+  }
+}
+
+// ── DETAIL POPUP ──
+function showDetailPopup(iv, e) {
+  selectedInterview = iv;
+  const popup = document.getElementById('detail-popup');
+  document.getElementById('dp-name').textContent    = iv.candidate_name;
+  document.getElementById('dp-job').textContent     = iv.job_title;
+  document.getElementById('dp-data').textContent    = formatDateRo(iv.data);
+  document.getElementById('dp-ora').textContent     = `${iv.ora} (${iv.durata || 60} min)`;
+  document.getElementById('dp-link').href           = `/candidat/${iv.candidate_id}`;
+  if (iv.locatie) {
+    document.getElementById('dp-locatie').textContent = iv.locatie;
+    document.getElementById('dp-locatie-row').style.display = 'flex';
+  } else {
+    document.getElementById('dp-locatie-row').style.display = 'none';
+  }
+
+  // Pozitionare popup langa card
+  const rect = e.currentTarget.getBoundingClientRect();
+  const vw   = window.innerWidth;
+  popup.style.display = 'block';
+  const pw = popup.offsetWidth;
+  let left = rect.right + 10;
+  if (left + pw > vw - 16) left = rect.left - pw - 10;
+  popup.style.left = Math.max(8, left) + 'px';
+  popup.style.top  = Math.min(rect.top, window.innerHeight - popup.offsetHeight - 16) + 'px';
+  popup.classList.add('visible');
+}
+function closeDetailPopup() {
+  document.getElementById('detail-popup').classList.remove('visible');
+  selectedInterview = null;
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.detail-popup') && !e.target.closest('.interview-card'))
+    closeDetailPopup();
+});
+
+// ── DELETE INTERVIEW ──
+async function deleteInterview() {
+  if (!selectedInterview) return;
+  if (!confirm(`Ștergi interviul cu ${selectedInterview.candidate_name}?`)) return;
+  try {
+    const res  = await fetch(`/calendar/api/interview/${selectedInterview.id}/sterge`, { method: 'POST' });
+    const json = await res.json();
+    if (json.success) {
+      interviews = interviews.filter(iv => iv.id !== selectedInterview.id);
+      renderCalendar();
+      closeDetailPopup();
+      showToast('Interviul a fost șters.');
+    }
+  } catch(e) {
+    showToast('Eroare la ștergere.', true);
+  }
+}
+
+// ── TOAST ──
+function showToast(msg, error) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast visible' + (error ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeModal(); closeDetailPopup(); }
+});
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  fetchInterviews();
+  // Daca avem candidat preselectat, deschidem modalul dupa render
+  if (preselectedCandidate) {
+    setTimeout(() => openModal(), 400);
+  }
+  // Refresh current time line la fiecare minut
+  setInterval(() => renderCalendar(), 60000);
+});
+</script>
+</body>
+</html>

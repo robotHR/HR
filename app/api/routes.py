@@ -1737,10 +1737,11 @@ async def calendar_page(request: Request, candidate_id: int = None):
     preselected = None
     if candidate_id:
         preselected = get_candidate_by_id(candidate_id)
-    return templates.TemplateResponse("calendar.html", {
-        "request": request,
-        "preselected_candidate": preselected,
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="calendar.html",
+        context={"request": request, "preselected_candidate": preselected}
+    )
 
 
 @router.get("/calendar/api/week")

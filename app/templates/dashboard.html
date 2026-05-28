@@ -193,59 +193,99 @@
         .hero-right{
             margin-top:0;
         }
+        /* ─── AI WAVE CARD ───────────────── */
         .dashboard-image-card{
             width:100%;
-            height:180px;
-            height:auto;
-            min-height:0;
-            align-self:center;
+            height:100%;
+            min-height:240px;
+            align-self:stretch;
             border-radius:var(--radius-lg);
             overflow:hidden;
-            background:linear-gradient(135deg,rgba(93,169,255,.08),rgba(45,212,191,.035));
-            border:1px solid var(--line);
+            background:linear-gradient(160deg,#0c1628 0%,#0d1f3c 60%,#0a1a30 100%);
+            border:1px solid rgba(93,169,255,.18);
             position:relative;
-            box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
-            transition:transform .35s ease, opacity .35s ease, box-shadow .35s ease;
-        }
-        .dashboard-image-card::before{
-            content:'';
-            position:absolute;
-            inset:0;
-            background:radial-gradient(circle at 35% 20%,rgba(124,196,255,.14),transparent 34%),radial-gradient(circle at 80% 80%,rgba(45,212,191,.08),transparent 30%);
-            pointer-events:none;
-            z-index:1;
-        }
-        .dashboard-image-card img{
-            width:100%;
-            height:100%;
-            display:block;
-            object-fit:contain;
-            object-position:center center;
-            opacity:.96;
-            position:absolute;
-            inset:0;
-            transition:transform .35s ease, opacity .35s ease;
+            box-shadow:inset 0 0 60px rgba(93,169,255,.04), 0 0 0 1px rgba(255,255,255,.03);
+            transition:transform .35s ease, box-shadow .35s ease;
         }
         .dashboard-image-card.is-small{
             transform:scale(.972);
-            opacity:.96;
-            box-shadow:inset 0 0 0 1px rgba(255,255,255,.02), 0 12px 36px rgba(0,0,0,.18);
+            box-shadow:inset 0 0 40px rgba(93,169,255,.04), 0 12px 36px rgba(0,0,0,.18);
         }
-        .dashboard-image-card.is-small img{
-            transform:scale(.985);
-            opacity:.92;
-        }
-        .dashboard-image-card .image-fallback{
-            position:absolute;
-            inset:0;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            text-align:center;
-            padding:24px;
-            color:var(--muted);
-            font-size:13px;
+        /* grid lines background */
+        .dashboard-image-card::before{
+            content:'';
+            position:absolute;inset:0;
+            background-image:
+                linear-gradient(rgba(93,169,255,.06) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(93,169,255,.06) 1px,transparent 1px);
+            background-size:40px 40px;
+            pointer-events:none;
             z-index:0;
+        }
+        /* top glow */
+        .dashboard-image-card::after{
+            content:'';
+            position:absolute;
+            top:-60px;left:50%;
+            transform:translateX(-50%);
+            width:70%;height:120px;
+            background:radial-gradient(ellipse,rgba(93,169,255,.12),transparent 70%);
+            pointer-events:none;
+            z-index:0;
+        }
+        .ai-wave-inner{
+            position:absolute;inset:0;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            gap:16px;z-index:2;padding:20px;
+        }
+        .ai-wave-header{
+            display:flex;align-items:center;gap:8px;
+            font-size:10px;font-weight:700;
+            letter-spacing:.18em;text-transform:uppercase;
+            color:rgba(93,169,255,.6);
+        }
+        .ai-pulse-dot{
+            width:7px;height:7px;border-radius:50%;
+            background:#2dd4bf;
+            box-shadow:0 0 10px rgba(45,212,191,.8);
+            animation:pulseDot 1.4s ease-in-out infinite;
+        }
+        @keyframes pulseDot{
+            0%,100%{transform:scale(1);opacity:1}
+            50%{transform:scale(1.5);opacity:.5}
+        }
+        .ai-canvas-wrap{
+            width:100%;position:relative;
+            display:flex;align-items:center;justify-content:center;
+        }
+        #aiWaveCanvas{
+            width:100%;height:90px;
+            display:block;
+        }
+        .ai-wave-status{
+            font-size:11px;font-weight:600;
+            color:rgba(45,212,191,.75);
+            letter-spacing:.06em;
+            min-height:16px;
+            transition:opacity .3s;
+        }
+        .ai-wave-stats{
+            display:flex;gap:24px;
+            border-top:1px solid rgba(93,169,255,.1);
+            padding-top:14px;width:100%;
+            justify-content:center;
+        }
+        .ai-mini-stat{text-align:center}
+        .ai-mini-num{
+            font-family:'Syne',sans-serif;
+            font-size:18px;font-weight:800;
+            color:#fff;line-height:1;letter-spacing:-.5px;
+        }
+        .ai-mini-label{
+            font-size:10px;font-weight:600;
+            letter-spacing:.1em;text-transform:uppercase;
+            color:rgba(255,255,255,.3);margin-top:3px;
         }
 
         .eyebrow{
@@ -761,8 +801,30 @@
                 </div>
 
                 <div class="dashboard-image-card">
-                    <div class="image-fallback">Imagine NEXAS HR</div>
-                    <img src="/static/images/LOGO%20NEXAS.jpg" alt="NEXAS HR Platform">
+                    <div class="ai-wave-inner">
+                        <div class="ai-wave-header">
+                            <span class="ai-pulse-dot"></span>
+                            Agent AI activ
+                        </div>
+                        <div class="ai-canvas-wrap">
+                            <canvas id="aiWaveCanvas"></canvas>
+                        </div>
+                        <div class="ai-wave-status" id="aiWaveStatus">Initializare agent...</div>
+                        <div class="ai-wave-stats">
+                            <div class="ai-mini-stat">
+                                <div class="ai-mini-num">{{ total }}</div>
+                                <div class="ai-mini-label">CV analizate</div>
+                            </div>
+                            <div class="ai-mini-stat">
+                                <div class="ai-mini-num">{{ jobs|length }}</div>
+                                <div class="ai-mini-label">Posturi active</div>
+                            </div>
+                            <div class="ai-mini-stat">
+                                <div class="ai-mini-num">AI</div>
+                                <div class="ai-mini-label">Mod analiza</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1050,18 +1112,214 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener("DOMContentLoaded", function(){
     const imageCard = document.querySelector(".dashboard-image-card");
     if(!imageCard) return;
-
     function resizeHeroImage(){
-        if(window.scrollY > 70){
-            imageCard.classList.add("is-small");
-        } else {
-            imageCard.classList.remove("is-small");
-        }
+        if(window.scrollY > 70){ imageCard.classList.add("is-small"); }
+        else { imageCard.classList.remove("is-small"); }
     }
-
     resizeHeroImage();
     window.addEventListener("scroll", resizeHeroImage, { passive:true });
 });
+</script>
+
+<script>
+(function(){
+    const canvas = document.getElementById('aiWaveCanvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('aiWaveStatus');
+
+    const messages = [
+        'Analizez CV-uri primite...',
+        'Calculez scor compatibilitate...',
+        'Potrivesc candidati cu posturile...',
+        'Extrag competente cheie...',
+        'Evaluez experienta profesionala...',
+        'Genererez recomandari AI...',
+        'Procesez date candidati...',
+        'Verific criterii de selectie...',
+    ];
+    let msgIdx = 0;
+    let msgTimer = 0;
+
+    // wave state
+    const points = [];
+    const TOTAL_POINTS = 120;
+    let scanX = 0;
+    let time = 0;
+
+    // spike events
+    const spikes = [];
+    let nextSpike = 60;
+
+    function initPoints(){
+        points.length = 0;
+        for(let i = 0; i < TOTAL_POINTS; i++){
+            points.push({ y: 0, target: 0, vel: 0 });
+        }
+    }
+
+    function resize(){
+        const wrap = canvas.parentElement;
+        canvas.width = wrap.offsetWidth;
+        canvas.height = 90;
+        initPoints();
+    }
+
+    function scheduleSpike(){
+        nextSpike = Math.floor(Math.random() * 80 + 40);
+    }
+
+    function update(){
+        time++;
+        scanX = (scanX + 1.2) % canvas.width;
+
+        // spike scheduler
+        nextSpike--;
+        if(nextSpike <= 0){
+            const idx = Math.floor((scanX / canvas.width) * TOTAL_POINTS);
+            const height = Math.random() * 38 + 18;
+            const dir = Math.random() > 0.5 ? 1 : -1;
+            spikes.push({ idx, height: height * dir, decay: 0.82, life: 1 });
+            scheduleSpike();
+
+            // update status message
+            msgTimer++;
+            if(msgTimer % 3 === 0){
+                msgIdx = (msgIdx + 1) % messages.length;
+                if(statusEl){
+                    statusEl.style.opacity = '0';
+                    setTimeout(function(){
+                        statusEl.textContent = messages[msgIdx];
+                        statusEl.style.opacity = '1';
+                    }, 200);
+                }
+            }
+        }
+
+        // apply spikes to points
+        spikes.forEach(function(sp){
+            sp.life *= sp.decay;
+            const spread = 6;
+            for(let d = -spread; d <= spread; d++){
+                const i = sp.idx + d;
+                if(i >= 0 && i < TOTAL_POINTS){
+                    const dist = Math.abs(d);
+                    const falloff = Math.exp(-dist * 0.5);
+                    points[i].vel += sp.height * sp.life * falloff * 0.18;
+                }
+            }
+        });
+
+        // remove dead spikes
+        for(let i = spikes.length - 1; i >= 0; i--){
+            if(spikes[i].life < 0.01) spikes.splice(i, 1);
+        }
+
+        // spring physics on points
+        points.forEach(function(p){
+            const spring = -p.y * 0.12;
+            const damp = -p.vel * 0.28;
+            p.vel += spring + damp;
+            p.y += p.vel;
+        });
+    }
+
+    function draw(){
+        const W = canvas.width;
+        const H = canvas.height;
+        const midY = H / 2;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // scanline glow (vertical moving line)
+        const scanGrad = ctx.createLinearGradient(scanX - 30, 0, scanX + 4, 0);
+        scanGrad.addColorStop(0, 'rgba(93,169,255,0)');
+        scanGrad.addColorStop(0.7, 'rgba(93,169,255,0.06)');
+        scanGrad.addColorStop(1, 'rgba(93,169,255,0.18)');
+        ctx.fillStyle = scanGrad;
+        ctx.fillRect(scanX - 30, 0, 34, H);
+
+        // draw wave — trail (left of scan, dimmer)
+        ctx.beginPath();
+        for(let i = 0; i < TOTAL_POINTS; i++){
+            const x = (i / (TOTAL_POINTS - 1)) * W;
+            const y = midY + points[i].y;
+            const px = x / W;
+            const scanPx = scanX / W;
+            if(px > scanPx) continue; // only draw behind scan
+            if(i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = 'rgba(93,169,255,0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // draw wave — active (near scan, bright)
+        const activePx = 0.12;
+        ctx.beginPath();
+        for(let i = 0; i < TOTAL_POINTS; i++){
+            const x = (i / (TOTAL_POINTS - 1)) * W;
+            const y = midY + points[i].y;
+            const px = x / W;
+            const scanPx = scanX / W;
+            const dist = scanPx - px;
+            if(dist < 0 || dist > activePx) continue;
+            if(ctx.currentPath && ctx.currentPath.length === 0) ctx.moveTo(x, y);
+            else { if(dist === 0 || px === scanPx - activePx) ctx.moveTo(x,y); else ctx.lineTo(x, y); }
+        }
+
+        // simpler active segment
+        ctx.beginPath();
+        let started = false;
+        for(let i = 0; i < TOTAL_POINTS; i++){
+            const x = (i / (TOTAL_POINTS - 1)) * W;
+            const y = midY + points[i].y;
+            const px = x / W;
+            const scanPx = scanX / W;
+            const dist = scanPx - px;
+            if(dist >= 0 && dist <= activePx){
+                const alpha = 1 - dist / activePx;
+                if(!started){ ctx.moveTo(x, y); started = true; }
+                else ctx.lineTo(x, y);
+            }
+        }
+        ctx.strokeStyle = 'rgba(45,212,191,0.95)';
+        ctx.lineWidth = 2.2;
+        ctx.shadowColor = '#2dd4bf';
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // cursor dot at scan head
+        ctx.beginPath();
+        ctx.arc(scanX, midY + (points[Math.floor((scanX/W)*TOTAL_POINTS)] || {y:0}).y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#2dd4bf';
+        ctx.shadowColor = '#2dd4bf';
+        ctx.shadowBlur = 16;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // baseline (flat line ahead of scan)
+        ctx.beginPath();
+        ctx.moveTo(scanX, midY);
+        ctx.lineTo(W, midY);
+        ctx.strokeStyle = 'rgba(93,169,255,0.15)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+
+    function loop(){
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    if(statusEl) statusEl.textContent = messages[0];
+    scheduleSpike();
+    loop();
+})();
 </script>
 
 </body>

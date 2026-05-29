@@ -57,18 +57,15 @@ def sync_from_cloudinary():
         if not filename:
             continue
 
-        # Pastreaza doar CV-uri
         ext = os.path.splitext(filename)[1].lower()
         if ext not in (".pdf", ".docx", ".doc"):
             continue
 
         local_path = os.path.join(UPLOAD_FOLDER, filename)
 
-        # Daca exista deja local, skip
         if os.path.exists(local_path):
             continue
 
-        # Descarca din Cloudinary
         buffer, mime = stream_cv_from_cloudinary(filename)
         if buffer:
             with open(local_path, "wb") as f:
@@ -79,6 +76,7 @@ def sync_from_cloudinary():
     if synced > 0:
         logger.info(f"Sincronizare Cloudinary completa: {synced} fisiere descarcate local")
     return synced
+
 TEMP_FOLDER = "/tmp/nexas_hr"
 os.makedirs(TEMP_FOLDER, exist_ok=True)
 
@@ -88,14 +86,10 @@ client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPEN
 # ─── CACHE FUNCTIONS ──────────────────────────────────────────────────────────
 
 def _normalize_job_key(job_title):
-    """Normalizeaza titlul jobului pentru cache key consistent."""
     return normalize_text(job_title).strip()
 
 
 def get_cached_analysis(cv_file, job_title):
-    """
-    Returneaza rezultatul din cache daca exista, altfel None.
-    """
     key = _normalize_job_key(job_title)
     db = SessionLocal()
     try:
@@ -114,10 +108,6 @@ def get_cached_analysis(cv_file, job_title):
 
 
 def save_analysis_to_cache(cv_file, job_title, data):
-    """
-    Salveaza rezultatul analizei in cache.
-    Daca exista deja, actualizeaza.
-    """
     key = _normalize_job_key(job_title)
     db = SessionLocal()
     try:
@@ -338,7 +328,16 @@ def build_prompt(text, target_job):
   "risk_level": "low|medium|high|critical",
   "retention_probability": 0,
   "wage_alignment": "aligned|higher|lower|unknown",
-  "summary": ""
+  "summary": "",
+  "decision_reason": "",
+  "missing_requirements": [],
+  "must_verify_by_phone": [],
+  "recommended_next_action": "CALL_NOW|CALL_LATER|KEEP_FOR_OTHER_ROLE|REJECT",
+  "priority": "HIGH|MEDIUM|LOW",
+  "manager_summary": "",
+  "phone_call_script": "",
+  "better_role_match": "",
+  "reject_reason_internal": ""
 }
 """
     return (
@@ -358,9 +357,20 @@ def build_prompt(text, target_job):
         "- Daca overqualification_risk este high, final_score maxim 40.\n"
         "- Daca lipseste o cerinta din reject_if_missing, final_score maxim 35.\n"
         "- Daca postul cere permis si permisul cerut lipseste, final_score maxim 30.\n\n"
+        "REGULI PENTRU CAMPURILE NOI DE DECIZIE:\n"
+        "- decision_reason = 1-2 propozitii clare de ce a primit acest scor. Concret, nu generic. Ex: 'Are 4 ani experienta directa in logistica si lucrul cu documente. Lipseste confirmarea pentru program in ture.'\n"
+        "- missing_requirements = lista cu ce lipseste concret din CV, formulat specific. Ex: ['Nu apare permis categoria B', 'Nu apare experienta cu Excel', 'Nu apare disponibilitatea pentru ture', 'Nu apare salariul dorit']. Daca nu lipseste nimic important, lasa lista goala.\n"
+        "- must_verify_by_phone = 3-5 intrebari scurte, concrete, de pus la telefon. Ex: ['Ai permis categoria B valabil?', 'Poti incepe in urmatoarele 2 saptamani?', 'Care este salariul net dorit?', 'Ai disponibilitate pentru program in ture?']\n"
+        "- recommended_next_action = CALL_NOW daca scor >= 75, CALL_LATER daca scor 55-74, KEEP_FOR_OTHER_ROLE daca scor < 55 dar candidatul e bun pe alt rol, REJECT daca nu are potential real.\n"
+        "- priority = HIGH daca scor >= 80, MEDIUM daca scor 60-79, LOW daca scor < 60.\n"
+        "- manager_summary = maxim 3 randuri pentru manager. Fara jargon HR. Ex: 'Candidat recomandat pentru interviu. Are 4 ani experienta relevanta si indeplineste cerintele principale. Trebuie verificata disponibilitatea pentru program si salariul dorit.'\n"
+        "- phone_call_script = text gata de folosit la telefon, in romani, natural, profesional. Include salut, motiv apel, 3-4 intrebari cheie si inchidere. Maxim 8 randuri.\n"
+        "- better_role_match = daca candidatul ar fi mai potrivit pentru alt rol decat cel cautat, scrie acel rol. Altfel lasa gol.\n"
+        "- reject_reason_internal = motiv scurt de respingere pentru uz intern HR. Nu se trimite candidatului. Scrie doar daca recommendation este NO sau REJECT.\n"
+        "- interview_questions = 4-6 intrebari specifice pentru interviu, bazate pe CV-ul acestui candidat.\n\n"
         "SCORING:\n"
         "85-100 STRONG_YES, 70-84 YES, 55-69 MAYBE, 40-54 NO, sub 40 REJECT.\n\n"
-        "Raspunde STRICT in JSON valid, fara markdown, folosind schema:\n" + schema + "\nCV:\n" + text[:10000]
+        "Raspunde STRICT in JSON valid, fara markdown, folosind schema:\n" + schema + "\nCV:\n" + text[:15000]
     )
 
 
@@ -430,6 +440,33 @@ def recommendation_to_status(rec):
     return {"HIRE":"ADMIS","CONSIDER":"DE ANALIZAT","REJECT":"RESPINS"}.get(str(rec).upper().strip(), "NOU")
 
 
+def _compute_priority(score, data):
+    """Calculeaza priority local ca fallback daca AI nu returneaza corect."""
+    ai_priority = as_text(data.get("priority", "")).upper().strip()
+    if ai_priority in ("HIGH", "MEDIUM", "LOW"):
+        return ai_priority
+    if score >= 80:
+        return "HIGH"
+    if score >= 60:
+        return "MEDIUM"
+    return "LOW"
+
+
+def _compute_next_action(score, data):
+    """Calculeaza recommended_next_action local ca fallback."""
+    ai_action = as_text(data.get("recommended_next_action", "")).upper().strip()
+    if ai_action in ("CALL_NOW", "CALL_LATER", "KEEP_FOR_OTHER_ROLE", "REJECT"):
+        return ai_action
+    if score >= 75:
+        return "CALL_NOW"
+    if score >= 55:
+        return "CALL_LATER"
+    better = as_text(data.get("better_role_match", "")).strip()
+    if better:
+        return "KEEP_FOR_OTHER_ROLE"
+    return "REJECT"
+
+
 def apply_local_safety_rules(data, target_job, cv_text, profile):
     cv = normalize_text(cv_text)
     combined = normalize_text(" ".join([as_text(data.get(k,"")) for k in ["name","position","summary","strengths","skills"]]) + " " + cv[:3000])
@@ -439,6 +476,9 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
         data["score"] = min(clean_score(data.get("score",0)), 35)
         data["recommendation"] = "REJECT"
         data["summary"] = set_summary_risk(data.get("summary",""), over_risk="high", level_risk="high")
+        data["priority"] = "LOW"
+        data["recommended_next_action"] = "REJECT"
+        data["reject_reason_internal"] = "Supracalificare ridicata pentru rol operational."
     req = detect_required_license(target_job, profile)
     if req:
         r = req.lower()
@@ -448,6 +488,14 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
             data["recommendation"] = "REJECT"
             clean_visible = strip_risk_text(data.get("summary",""))
             data["summary"] = set_summary_risk(f"Lipseste confirmarea clara pentru permis categoria {req}. {clean_visible}", over_risk="high", level_risk="high")
+            data["priority"] = "LOW"
+            data["recommended_next_action"] = "REJECT"
+            missing = as_text(data.get("missing_requirements", ""))
+            permis_item = f"Nu apare permis categoria {req} in CV"
+            if permis_item not in missing:
+                existing = [x.strip() for x in missing.split(",") if x.strip()] if missing else []
+                existing.insert(0, permis_item)
+                data["missing_requirements"] = existing
     return data
 
 
@@ -515,6 +563,9 @@ def normalize_data(data, file, target_job, cv_text, profile):
         data.get("position")
     )
 
+    priority = _compute_priority(score, data)
+    recommended_next_action = _compute_next_action(score, data)
+
     normalized = {
         "name": name,
         "email": data.get("email",""),
@@ -528,7 +579,18 @@ def normalize_data(data, file, target_job, cv_text, profile):
         "strengths": data.get("strengths",""),
         "weaknesses": data.get("gaps", data.get("weaknesses","")),
         "summary": summary,
-        "recommendation": rec
+        "recommendation": rec,
+        # ── Campuri noi decizie ──
+        "decision_reason":         as_text(data.get("decision_reason", "")),
+        "missing_requirements":    as_text(data.get("missing_requirements", [])),
+        "must_verify_by_phone":    as_text(data.get("must_verify_by_phone", [])),
+        "recommended_next_action": recommended_next_action,
+        "priority":                priority,
+        "manager_summary":         as_text(data.get("manager_summary", "")),
+        "phone_call_script":       as_text(data.get("phone_call_script", "")),
+        "interview_questions":     as_text(data.get("interview_questions", [])),
+        "better_role_match":       as_text(data.get("better_role_match", "")),
+        "reject_reason_internal":  as_text(data.get("reject_reason_internal", "")),
     }
     return apply_local_safety_rules(normalized, target_job, cv_text, profile)
 
@@ -552,11 +614,21 @@ def save_candidate_to_db(data, file, target_job):
             summary=as_text(data.get("summary","")),
             job_title=target_job,
             status=status,
-            cv_file=file
+            cv_file=file,
+            # ── Campuri noi ──
+            decision_reason=as_text(data.get("decision_reason","")),
+            missing_requirements=as_text(data.get("missing_requirements","")),
+            must_verify_by_phone=as_text(data.get("must_verify_by_phone","")),
+            recommended_next_action=as_text(data.get("recommended_next_action","")),
+            priority=as_text(data.get("priority","")),
+            manager_summary=as_text(data.get("manager_summary","")),
+            phone_call_script=as_text(data.get("phone_call_script","")),
+            interview_questions=as_text(data.get("interview_questions","")),
+            better_role_match=as_text(data.get("better_role_match","")),
+            reject_reason_internal=as_text(data.get("reject_reason_internal","")),
         )
         db.add(candidate)
         db.commit()
-        # Citim id-ul inainte sa inchidem sesiunea
         candidate_id = candidate.id
         db.close()
         print("✓ SALVAT IN BAZA DE DATE:", data.get("name",""), "-", status)
@@ -580,13 +652,11 @@ def _process_single_cv(args):
     """
     file, target_job, profile = args
 
-    # 1. Verifica cache
     cached = get_cached_analysis(file, target_job)
     if cached:
         logger.info(f"CACHE HIT: {file} pentru {target_job}")
         return {"file": file, "data": cached, "from_cache": True, "error": None}
 
-    # 2. Citeste text din fisier
     path = os.path.join(UPLOAD_FOLDER, file)
     if not os.path.exists(path):
         return {"file": file, "data": None, "from_cache": False, "error": "Fisier negasit local"}
@@ -595,7 +665,6 @@ def _process_single_cv(args):
     if not text:
         return {"file": file, "data": None, "from_cache": False, "error": "Nu s-a putut extrage text"}
 
-    # 3. Analiza AI
     try:
         ai_response = analyze_cv_with_ai(text, target_job)
         data = parse_ai_response(ai_response)
@@ -603,8 +672,6 @@ def _process_single_cv(args):
             return {"file": file, "data": None, "from_cache": False, "error": "Raspuns AI invalid"}
 
         normalized = normalize_data(data, file, target_job, text, profile)
-
-        # 4. Salveaza in cache pentru viitor
         save_analysis_to_cache(file, target_job, normalized)
 
         return {"file": file, "data": normalized, "from_cache": False, "error": None}
@@ -623,13 +690,11 @@ def process_cvs_for_job(target_job):
     profile = match_job_profile(target_job) or build_fallback_profile(target_job)
     print("Profil job folosit:", profile.get("job_title"), "-", profile.get("domain"))
 
-    # Sincronizeaza fisierele din Cloudinary inainte de analiza
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     synced = sync_from_cloudinary()
     if synced > 0:
         print(f"Sincronizare Cloudinary: {synced} fisiere descarcate local")
 
-    # Colecteaza fisierele CV disponibile
     try:
         all_files = [
             f for f in os.listdir(UPLOAD_FOLDER)
@@ -641,13 +706,11 @@ def process_cvs_for_job(target_job):
     if not all_files:
         return {"ok": False, "message": "Nu exista CV-uri. Verifica Cloudinary sau incarca CV-uri.", "saved": 0}
 
-    # Numara cate sunt din cache vs. noi
     cache_hits = 0
     fresh_analyses = 0
     saved = 0
     results = []
 
-    # Procesare paralela — max 5 fire simultane (evita rate limiting API)
     tasks = [(file, target_job, profile) for file in all_files]
 
     print(f"\nProcesez {len(tasks)} CV-uri pentru postul: {target_job}")
@@ -680,7 +743,9 @@ def process_cvs_for_job(target_job):
             results.append({
                 "name": data.get("name"),
                 "score": data.get("score"),
-                "recommendation": data.get("recommendation")
+                "recommendation": data.get("recommendation"),
+                "priority": data.get("priority"),
+                "recommended_next_action": data.get("recommended_next_action"),
             })
 
     results.sort(key=lambda x: x.get("score", 0), reverse=True)

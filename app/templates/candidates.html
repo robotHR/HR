@@ -276,6 +276,32 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .tag-blue{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
 .tag-muted{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
 
+/* ── AI SCORE BADGE — sub best-role ── */
+.ai-badge{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  margin-top:5px;
+}
+.ai-badge.top{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.ai-badge.potential{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
+.ai-badge.other{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+
+/* ── MATCH CHIPS colorate după scor ── */
+.match-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 9px;border-radius:8px;
+  font-size:11px;color:var(--soft);
+  background:rgba(255,255,255,.04);border:1px solid var(--line);
+  transition:.15s;
+}
+.match-chip strong{font-weight:800;font-size:11px}
+.match-chip.chip-top{background:var(--tsoft);border-color:var(--tline);color:var(--t2)}
+.match-chip.chip-top strong{color:var(--t2)}
+.match-chip.chip-potential{background:var(--ysoft);border-color:var(--yline);color:#fcd38a}
+.match-chip.chip-potential strong{color:#fcd38a}
+.match-chip:hover{border-color:var(--bline);background:var(--bsoft)}
+
 /* ─── BOTTOM NAV hidden on desktop ─── */
 .bnav{display:none}
 
@@ -516,10 +542,17 @@ table,th,td{font-size:13px}
                                 <div class="mini-label">Cel mai bun rol</div>
                                 {% if best %}
                                     <div class="best-role">
-                                        <div class="score-cell {% if (best.score or 0) >= 75 %}score-green{% elif (best.score or 0) >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ best.score }}</div>
+                                        <div class="score-cell {% if (best.score or 0) >= 75 %}score-green{% elif (best.score or 0) >= 50 %}score-yellow{% else %}score-red{% endif %}">{{ best.score }}</div>
                                         <div class="role-info">
                                             <div class="role-title">{{ best.job_title }}</div>
                                             <div class="role-sub">{{ best.position }}</div>
+                                            {% if (best.score or 0) >= 75 %}
+                                                <span class="ai-badge top">Top Candidat</span>
+                                            {% elif (best.score or 0) >= 50 %}
+                                                <span class="ai-badge potential">Potential</span>
+                                            {% else %}
+                                                <span class="ai-badge other">Potrivit Altor Roluri</span>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 {% else %}
@@ -527,15 +560,19 @@ table,th,td{font-size:13px}
                                 {% endif %}
                             </div>
 
-                            <!-- COL 3: posturi potrivite -->
+                            <!-- COL 3: posturi potrivite (doar 50+) -->
                             <div class="col-matches">
                                 <div class="mini-label">Posturi potrivite</div>
                                 <div class="matches">
-                                    {% for match in row.matches[:5] %}
-                                        <span class="match-chip {% if (match.score or 0) < 50 %}low{% endif %}">{{ match.job_title }}<strong>{{ match.score }}</strong></span>
+                                    {% set shown = [] %}
+                                    {% for match in row.matches %}
+                                        {% if (match.score or 0) >= 50 and shown|length < 5 %}
+                                            {% set _ = shown.append(match) %}
+                                            <span class="match-chip {% if (match.score or 0) >= 75 %}chip-top{% else %}chip-potential{% endif %}">{{ match.job_title }}<strong>{{ match.score }}</strong></span>
+                                        {% endif %}
                                     {% endfor %}
-                                    {% if row.match_count > 5 %}
-                                        <span class="match-more">+{{ row.match_count - 5 }} mai multe</span>
+                                    {% if shown|length == 0 %}
+                                        <span class="match-more">Nicio potrivire relevanta</span>
                                     {% endif %}
                                 </div>
                             </div>

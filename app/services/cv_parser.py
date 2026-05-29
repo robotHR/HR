@@ -350,7 +350,7 @@ def build_prompt(text, target_job):
         "- Extrage companiile/institutiile unde a lucrat candidatul si pune-le in companies. Nu inventa companii. Daca nu apar clar, lasa lista goala.\n"
         "- Extrage functiile ocupate si pune-le in positions_held.\n"
         "- current_position = ultima functie sau functia dominanta din CV.\n"
-        "- recommended_role_for_candidate = rolul real potrivit candidatului, pe baza CV-ului. Nu copia automat postul cautat.\n"
+        "- recommended_role_for_candidate = jobul cel mai potrivit pentru acest candidat pe piata muncii din Romania, bazat STRICT pe educatia, experienta si skillurile din CV. IGNORA complet postul cautat. Gandeste independent: daca omul are experienta de contabil, scrie 'Contabil'. Daca are experienta de sofer, scrie 'Sofer'. Daca are facultate tehnica si experienta in mentenanta, scrie 'Tehnician mentenanta'. NU copia job_title. NU lasa gol. Scrie intotdeauna un job concret si real.\n"
         "- summary trebuie sa fie un rezumat HR curat. Nu include in summary textele: Risc supracalificare, Nepotrivire nivel, overqualification_risk, level_mismatch. Acestea exista separat in JSON.\n"
         "- Respecta must_have, nice_to_have, reject_if_missing, red_flags si max_score_rules.\n"
         "- Alege candidatul potrivit pentru postul cautat, nu candidatul cu cel mai impresionant CV.\n"

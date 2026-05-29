@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Login | NEXAS HR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -285,7 +285,13 @@
             .left{padding:28px 20px;min-height:38vh}
             .right{padding:28px 20px 48px}
         }
-    </style>
+    
+/* ─── PREVENT iOS ZOOM ON INPUTS ─── */
+@media(max-width:768px){
+  .field input{font-size:16px !important}
+}
+
+</style>
 </head>
 <body>
 

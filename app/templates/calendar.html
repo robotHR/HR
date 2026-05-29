@@ -312,6 +312,82 @@ html, body { height: 100%; background: var(--bg); color: #fff; font-family: 'DM 
 }
 .toast.visible { transform: translateY(0); opacity: 1; }
 .toast.error { border-color: rgba(255,107,112,.30); color: #ffb4b7; }
+
+/* ─── BOTTOM NAV hidden on desktop ─── */
+.bnav{display:none}
+
+/* ─── MOBILE RESPONSIVE ─── */
+@media(max-width:768px){
+  body{overflow:hidden !important}
+  .sidebar{display:none !important}
+  .layout{height:100dvh;height:100vh;overflow:hidden}
+  .main{
+    margin-left:0 !important;
+    width:100% !important;
+    height:100%;
+    overflow-y:auto !important;
+    padding-bottom:72px !important;
+  }
+  /* candidate_detail topbar stays full-width */
+  .topbar{left:0 !important}
+  /* calendar scrolls horizontally on mobile */
+  .cal-container{overflow-x:auto}
+  /* stats row stacks on mobile */
+  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  /* kpis stack */
+  .kpis{grid-template-columns:repeat(2,1fr) !important}
+  /* two-col stacks */
+  .two-col{grid-template-columns:1fr !important}
+  /* form-grid single col */
+  .form-grid{grid-template-columns:1fr !important}
+  .full{grid-column:auto !important}
+  /* filter grid */
+  .filter-grid{flex-direction:column !important;align-items:stretch !important}
+  .filter-grid input,.filter-grid select{width:100% !important;font-size:16px !important}
+  /* hero grid */
+  .hero-grid{grid-template-columns:1fr !important}
+  .source-grid{grid-template-columns:1fr !important}
+  .hero-stats{grid-template-columns:repeat(2,1fr) !important}
+  /* jobs page */
+  .page-hero{padding:20px 16px !important}
+  /* tables scroll */
+  .cand-table-wrap,.table-card{overflow-x:auto !important}
+  /* candidate cards */
+  .card-grid{grid-template-columns:1fr !important}
+  .cand-card{grid-template-columns:44px 1fr !important}
+  .cand-right{grid-column:1/-1;flex-direction:row !important;justify-content:flex-end !important}
+  /* modal full screen */
+  .modal{width:calc(100% - 24px) !important;top:50% !important;left:12px !important;transform:translateY(-50%) !important}
+  /* week nav shrinks */
+  .week-label{display:none !important}
+  .btn-add-interview span,.wbtn-new-lbl{display:none}
+
+  /* BOTTOM NAV */
+  .bnav{
+    display:flex !important;
+    position:fixed;bottom:0;left:0;right:0;z-index:1000;
+    height:62px;
+    background:linear-gradient(180deg,#0d1520,#0a1219);
+    border-top:1px solid rgba(255,255,255,.09);
+    padding:0 4px;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .bn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;cursor:pointer;color:rgba(255,255,255,.46);
+    font-family:'DM Sans',sans-serif;
+    font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+    text-decoration:none;position:relative;-webkit-tap-highlight-color:transparent;
+    transition:.14s;
+  }
+  .bn svg{width:20px;height:20px}
+  .bn.on{color:#7cc4ff}
+  .bn.on::after{
+    content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:22px;height:2px;background:#7cc4ff;border-radius:0 0 2px 2px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -930,5 +1006,13 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(() => renderCalendar(), 60000);
 });
 </script>
+
+<nav class="bnav">
+  <a class="bn" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Panou</span></a>
+  <a class="bn" href="/candidati"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Candidati</span></a>
+  <a class="bn" href="/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Statistici</span></a>
+  <a class="bn" href="/posturi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><span>Posturi</span></a>
+  <a class="bn on" href="/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
+</nav>
 </body>
 </html>

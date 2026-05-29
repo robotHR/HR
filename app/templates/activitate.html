@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activitate recenta | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 8%,rgba(93,169,255,.14),transparent 34%),
+    radial-gradient(circle at 88% 85%,rgba(34,199,184,.08),transparent 30%),
+    linear-gradient(135deg,#121827,#171f33 50%,#1d263d);
+}
+:root{
+  --s1:#1a2238;--s2:#202a44;
+  --line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.14);
+  --soft:rgba(255,255,255,.82);--muted:rgba(255,255,255,.50);
+  --blue:#5da9ff;--b2:#7cc4ff;--bsoft:rgba(93,169,255,.13);--bline:rgba(93,169,255,.26);
+  --teal:#22c7b8;--t2:#5ee6da;--tsoft:rgba(34,199,184,.13);--tline:rgba(34,199,184,.26);
+  --yellow:#f59e0b;--ysoft:rgba(245,158,11,.13);--yline:rgba(245,158,11,.26);
+  --red:#ff6b70;--rsoft:rgba(255,107,112,.13);--rline:rgba(255,107,112,.26);
+  --rl:18px;--rxl:22px;
+}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  width:220px;position:fixed;top:0;bottom:0;left:0;z-index:20;
+  background:linear-gradient(180deg,#101825,#141b2d);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;
+}
+.brand{padding:24px 20px 20px;border-bottom:1px solid var(--line)}
+.brand-main{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.brand-main span{color:var(--b2)}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
+.nav{display:flex;flex-direction:column;gap:2px;padding:12px 10px;flex:1}
+.nav a{
+  display:flex;align-items:center;gap:9px;padding:10px 12px;
+  border-radius:10px;font-size:13px;font-weight:700;color:var(--muted);
+  text-decoration:none;transition:.15s;
+}
+.nav a:hover{color:#fff;background:rgba(255,255,255,.055)}
+.nav a.active{color:#fff;background:rgba(93,169,255,.15)}
+.nav a.logout-link{color:rgba(252,165,165,.72);margin-top:auto}
+.nav a.logout-link:hover{color:#fca5a5;background:rgba(248,113,113,.08)}
+.main{margin-left:220px;width:calc(100% - 220px);min-height:100vh;padding:26px 28px 36px}
+.eyebrow{font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:7px}
+.page-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.4px;margin-bottom:5px}
+.page-sub{font-size:13px;color:var(--soft)}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px}
+.filters{background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);padding:13px 16px;margin-bottom:16px}
+.filters h2{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.13em;margin-bottom:10px}
+.filter-grid{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+select,input{
+  padding:9px 13px;border-radius:11px;border:1px solid var(--line2);
+  background:rgba(255,255,255,.06);color:#fff;font-size:13px;font-weight:600;
+  outline:none;font-family:'DM Sans',sans-serif;-webkit-appearance:none;
+}
+select:focus,input:focus{border-color:var(--bline)}
+select option{background:#1a2238;color:#fff}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
+  border-radius:11px;font-size:13px;font-weight:800;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;text-decoration:none;white-space:nowrap;transition:.15s;
+}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--b2));color:#07111f}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--soft)}
+.btn-ghost:hover{color:#fff;border-color:var(--bline)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat-card{background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);padding:16px 18px}
+.stat-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:5px}
+.stat-value{font-size:28px;font-weight:800;color:#fff}
+.timeline{display:flex;flex-direction:column;gap:8px}
+.event-card{
+  background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);
+  padding:14px 16px;display:flex;gap:14px;align-items:flex-start;transition:.15s;
+}
+.event-card:hover{border-color:var(--bline)}
+.event-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-green{background:var(--teal)}
+.dot-blue{background:var(--blue)}
+.dot-yellow{background:var(--yellow)}
+.dot-red{background:var(--red)}
+.dot-default{background:rgba(255,255,255,.3)}
+.event-body{flex:1;min-width:0}
+.event-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.event-type-badge{
+  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;
+  padding:2px 7px;border-radius:999px;
+}
+.badge-green{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.badge-blue{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
+.badge-yellow{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
+.badge-red{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.badge-default{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
+.event-date{font-size:11px;color:var(--muted);font-weight:700}
+.event-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:3px}
+.event-desc{font-size:12px;color:var(--soft);line-height:1.5}
+.cand-link{font-size:12px;color:var(--b2);text-decoration:none;font-weight:700}
+.cand-link:hover{text-decoration:underline}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;
+  background:rgba(255,255,255,.02);border:1px dashed var(--line);border-radius:var(--rl)}
+.bnav{display:none}
+@media(max-width:768px){
+  .sidebar{display:none!important}
+  .main{margin-left:0!important;width:100%!important;padding:14px!important;padding-bottom:80px!important}
+  .stat-row{grid-template-columns:1fr 1fr!important}
+  .filter-grid{flex-direction:column!important}
+  .bnav{
+    display:flex!important;position:fixed;bottom:0;left:0;right:0;z-index:1000;
+    height:62px;background:linear-gradient(180deg,#0d1520,#0a1219);
+    border-top:1px solid rgba(255,255,255,.09);padding:0 4px;
+  }
+  .bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;color:rgba(255,255,255,.46);font-size:9px;font-weight:800;text-transform:uppercase;
+    text-decoration:none;}
+  .bn svg{width:20px;height:20px}
+  .bn.on{color:#7cc4ff}
+}
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-main">NEXAS <span>HR</span></div>
+            <div class="brand-sub">HR Platform</div>
+        </div>
+        <nav class="nav">
+            <a href="/">Panou principal</a>
+            <a href="/candidati">Candidati</a>
+            <a href="/analytics">Statistici</a>
+            <a href="/posturi">Posturi vacante</a>
+            <a href="/calendar">Calendar</a>
+            <a class="active" href="/activitate">Activitate recenta</a>
+            <a class="logout-link" href="/logout">Deconectare</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="page-head">
+            <div>
+                <div class="eyebrow">Istoric actiuni</div>
+                <h1 class="page-title">Activitate recenta</h1>
+                <div class="page-sub">Toate actiunile din platforma, filtrate dupa tip si perioada.</div>
+            </div>
+            <div style="font-size:13px;font-weight:800;color:var(--b2);background:var(--bsoft);border:1px solid var(--bline);padding:6px 14px;border-radius:999px">{{ total }} actiuni</div>
+        </div>
+
+        <div class="stat-row">
+            <div class="stat-card">
+                <div class="stat-label">Total actiuni</div>
+                <div class="stat-value">{{ total }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Perioada</div>
+                <div class="stat-value" style="font-size:20px">{{ zile }} zile</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Filtru activ</div>
+                <div class="stat-value" style="font-size:16px;padding-top:4px">{{ tip or "Toate tipurile" }}</div>
+            </div>
+        </div>
+
+        <section class="filters">
+            <h2>Filtre</h2>
+            <form method="get" action="/activitate" class="filter-grid">
+                <select name="tip">
+                    <option value="">Toate tipurile</option>
+                    {% for t in all_types %}
+                    <option value="{{ t }}" {% if t == tip %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+                <select name="zile">
+                    <option value="7" {% if zile == 7 %}selected{% endif %}>Ultimele 7 zile</option>
+                    <option value="30" {% if zile == 30 %}selected{% endif %}>Ultimele 30 zile</option>
+                    <option value="90" {% if zile == 90 %}selected{% endif %}>Ultimele 90 zile</option>
+                </select>
+                <button class="btn btn-primary" type="submit">Filtreaza</button>
+                <a class="btn btn-ghost" href="/activitate">Reseteaza</a>
+            </form>
+        </section>
+
+        {% if event_rows|length == 0 %}
+            <div class="empty">Nu exista actiuni pentru filtrele selectate.</div>
+        {% else %}
+        <div class="timeline">
+            {% for row in event_rows %}
+            {% set e = row.event %}
+            {% set c = row.candidate %}
+            {% set etype = e.event_type | upper %}
+            <div class="event-card">
+                <div class="event-dot
+                    {% if etype in ['ANGAJAT','EMAIL_INTERVIU','INTERVIU','APLICATIE'] %}dot-green
+                    {% elif etype in ['NOTE','EDIT','STATUS','REANALIZA'] %}dot-blue
+                    {% elif etype in ['SELECTAT','DE ANALIZAT'] %}dot-yellow
+                    {% elif etype in ['REFUZAT','EXCLUS','EMAIL_REFUZ'] %}dot-red
+                    {% else %}dot-default{% endif %}">
+                </div>
+                <div class="event-body">
+                    <div class="event-meta">
+                        <span class="event-type-badge
+                            {% if etype in ['ANGAJAT','EMAIL_INTERVIU','INTERVIU','APLICATIE'] %}badge-green
+                            {% elif etype in ['NOTE','EDIT','STATUS','REANALIZA'] %}badge-blue
+                            {% elif etype in ['SELECTAT','DE ANALIZAT'] %}badge-yellow
+                            {% elif etype in ['REFUZAT','EXCLUS','EMAIL_REFUZ'] %}badge-red
+                            {% else %}badge-default{% endif %}">
+                            {{ e.event_type }}
+                        </span>
+                        {% if c %}
+                            <a class="cand-link" href="/candidat/{{ c.id }}">{{ c.name or "Candidat" }}</a>
+                            {% if c.job_title %}
+                                <span style="font-size:11px;color:var(--muted)">· {{ c.job_title }}</span>
+                            {% endif %}
+                        {% endif %}
+                        <span class="event-date">{{ format_event_date(e.created_at) }}</span>
+                    </div>
+                    <div class="event-title">{{ e.title }}</div>
+                    {% if e.description %}
+                    <div class="event-desc">{{ e.description }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+<nav class="bnav">
+  <a class="bn" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Panou</span></a>
+  <a class="bn" href="/candidati"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Candidati</span></a>
+  <a class="bn on" href="/activitate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>Activitate</span></a>
+  <a class="bn" href="/posturi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><span>Posturi</span></a>
+  <a class="bn" href="/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
+</nav>
+</body>
+</html>

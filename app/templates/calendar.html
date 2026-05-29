@@ -318,51 +318,72 @@ html, body { height: 100%; background: var(--bg); color: #fff; font-family: 'DM 
 
 /* ─── MOBILE RESPONSIVE ─── */
 @media(max-width:768px){
-  body{overflow:hidden !important}
+  /* Let body scroll naturally - no overflow:hidden */
+  body{overflow-x:hidden !important}
+
+  /* Sidebar disappears */
   .sidebar{display:none !important}
-  .layout{height:100dvh;height:100vh;overflow:hidden}
+
+  /* Layout unblocks scroll */
+  .layout{
+    display:block !important;
+    height:auto !important;
+    min-height:100dvh;min-height:100vh;
+    overflow:visible !important;
+    padding-bottom:70px;
+  }
+
+  /* Main takes full width, no margin */
   .main{
     margin-left:0 !important;
     width:100% !important;
-    height:100%;
-    overflow-y:auto !important;
-    padding-bottom:72px !important;
+    padding-left:14px !important;
+    padding-right:14px !important;
+    padding-bottom:80px !important;
+    overflow-x:hidden !important;
+    box-sizing:border-box;
   }
-  /* candidate_detail topbar stays full-width */
-  .topbar{left:0 !important}
-  /* calendar scrolls horizontally on mobile */
-  .cal-container{overflow-x:auto}
-  /* stats row stacks on mobile */
-  .stats-row{grid-template-columns:repeat(2,1fr) !important}
-  /* kpis stack */
-  .kpis{grid-template-columns:repeat(2,1fr) !important}
-  /* two-col stacks */
-  .two-col{grid-template-columns:1fr !important}
-  /* form-grid single col */
-  .form-grid{grid-template-columns:1fr !important}
-  .full{grid-column:auto !important}
-  /* filter grid */
-  .filter-grid{flex-direction:column !important;align-items:stretch !important}
-  .filter-grid input,.filter-grid select{width:100% !important;font-size:16px !important}
-  /* hero grid */
-  .hero-grid{grid-template-columns:1fr !important}
-  .source-grid{grid-template-columns:1fr !important}
-  .hero-stats{grid-template-columns:repeat(2,1fr) !important}
-  /* jobs page */
-  .page-hero{padding:20px 16px !important}
-  /* tables scroll */
-  .cand-table-wrap,.table-card{overflow-x:auto !important}
-  /* candidate cards */
-  .card-grid{grid-template-columns:1fr !important}
-  .cand-card{grid-template-columns:44px 1fr !important}
-  .cand-right{grid-column:1/-1;flex-direction:row !important;justify-content:flex-end !important}
-  /* modal full screen */
-  .modal{width:calc(100% - 24px) !important;top:50% !important;left:12px !important;transform:translateY(-50%) !important}
-  /* week nav shrinks */
-  .week-label{display:none !important}
-  .btn-add-interview span,.wbtn-new-lbl{display:none}
 
-  /* BOTTOM NAV */
+  /* Grids collapse to single column */
+  .stats-row,.kpis{grid-template-columns:repeat(2,1fr) !important}
+  .hero-grid,.source-grid,.hero-stats,.page-hero,.two-col,.form-grid{grid-template-columns:1fr !important}
+  .full{grid-column:auto !important}
+
+  /* candidate_detail: prevent horizontal overflow */
+  .content{overflow-x:hidden !important;padding:14px !important}
+  .info-row{grid-template-columns:110px 1fr !important;gap:8px !important;word-break:break-word}
+  .hero-top{flex-wrap:wrap !important;gap:12px !important}
+  .hero-actions{flex-wrap:wrap !important;gap:8px !important}
+  .hero-actions .btn,.hero-actions a,.hero-actions button{min-width:0 !important;flex:1 !important;font-size:12px !important;padding:8px 10px !important}
+  .panel{overflow-x:hidden !important}
+  .tag-list{flex-wrap:wrap !important}
+  .timeline{overflow-x:hidden !important}
+
+  /* filters */
+  .filter-grid{flex-direction:column !important}
+  .filter-grid input,.filter-grid select{width:100% !important;font-size:16px !important}
+
+  /* tables scroll horizontally */
+  .cand-table-wrap,.table-card{overflow-x:auto !important}
+
+  /* cand-card on mobile */
+  .card-grid{grid-template-columns:1fr !important}
+  .candidate-card{overflow-x:hidden}
+
+  /* job_applicants */
+  .cand-card{grid-template-columns:42px 1fr !important}
+  .cand-right{grid-column:1/-1 !important;flex-direction:row !important;justify-content:flex-end !important}
+
+  /* jobs modal */
+  .modal{width:calc(100vw - 24px) !important;left:12px !important;right:12px !important}
+
+  /* week nav */
+  .week-label{min-width:0 !important;font-size:11px !important}
+
+  /* forms */
+  input,select,textarea{font-size:16px !important;-webkit-appearance:none}
+
+  /* ─── BOTTOM NAV ─── */
   .bnav{
     display:flex !important;
     position:fixed;bottom:0;left:0;right:0;z-index:1000;
@@ -378,7 +399,6 @@ html, body { height: 100%; background: var(--bg); color: #fff; font-family: 'DM 
     font-family:'DM Sans',sans-serif;
     font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
     text-decoration:none;position:relative;-webkit-tap-highlight-color:transparent;
-    transition:.14s;
   }
   .bn svg{width:20px;height:20px}
   .bn.on{color:#7cc4ff}
@@ -387,7 +407,59 @@ html, body { height: 100%; background: var(--bg); color: #fff; font-family: 'DM 
     width:22px;height:2px;background:#7cc4ff;border-radius:0 0 2px 2px;
   }
 }
+/* ─── CALENDAR MOBILE DAY VIEW ─── */
+@media(max-width:768px){
+  /* hide desktop grid on mobile */
+  .cal-header,.cal-body{display:none !important}
 
+  /* week strip */
+  .mob-wstrip{
+    display:flex;overflow-x:auto;scrollbar-width:none;
+    padding:8px 10px;gap:4px;
+    border-bottom:1px solid var(--line-2);
+    background:rgba(13,20,36,.98);flex-shrink:0;
+  }
+  .mob-wstrip::-webkit-scrollbar{display:none}
+  .mob-wday{
+    flex:1;min-width:42px;display:flex;flex-direction:column;
+    align-items:center;gap:3px;padding:8px 4px;border-radius:11px;
+    cursor:pointer;transition:.14s;-webkit-tap-highlight-color:transparent;
+  }
+  .mob-wday:active{background:rgba(255,255,255,.06)}
+  .mob-wday-n{font-size:9px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .mob-wday-d{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--soft);line-height:1}
+  .mob-wday.tod .mob-wday-n{color:var(--teal-2)}
+  .mob-wday.tod .mob-wday-d{
+    color:#07111f;background:linear-gradient(135deg,var(--teal),var(--blue));
+    width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;
+  }
+  .mob-wday.sel{background:rgba(93,169,255,.15)}
+  .mob-wday.sel .mob-wday-n,.mob-wday.sel .mob-wday-d{color:#fff}
+  .mob-wday-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);visibility:hidden}
+  .mob-wday.hasiv .mob-wday-dot{visibility:visible}
+
+  /* day view */
+  .mob-dayview{padding:12px 14px 16px}
+  .mob-ivcard{
+    display:flex;align-items:flex-start;gap:11px;
+    padding:14px;background:var(--surface);
+    border:1px solid var(--line-2);border-radius:14px;margin-bottom:9px;
+    cursor:pointer;transition:.14s;-webkit-tap-highlight-color:transparent;
+  }
+  .mob-ivcard:active{border-color:var(--blue-2);transform:scale(.99)}
+  .mob-ivtime{min-width:50px;text-align:center}
+  .mob-ivtime .t{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+  .mob-ivtime .d{font-size:10px;color:var(--muted);margin-top:2px}
+  .mob-ivdot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0}
+  .dot-act{background:var(--teal)} .dot-fin{background:rgba(255,255,255,.2)}
+  .mob-ivinfo{flex:1;min-width:0}
+  .mob-ivname{font-size:15px;font-weight:800;margin-bottom:3px}
+  .mob-ivjob{font-size:12px;color:var(--teal-2);font-weight:700;margin-bottom:4px}
+  .mob-ivloc{font-size:12px;color:var(--soft);display:flex;align-items:center;gap:4px}
+  .mob-empty{text-align:center;padding:48px 20px;color:var(--muted)}
+  .mob-empty p{font-size:14px;font-weight:700;color:var(--soft);margin-bottom:6px}
+  .mob-empty small{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -1005,6 +1077,64 @@ window.addEventListener('DOMContentLoaded', () => {
   // Refresh current time line la fiecare minut
   setInterval(() => renderCalendar(), 60000);
 });
+
+// ── MOBILE DAY VIEW ──
+const DAYS_RO_MOB = ['Lun','Mar','Mie','Joi','Vin','Sâm','Dum'];
+let selectedDay = dateToStr(new Date());
+function isMobileView(){return window.innerWidth<=768}
+
+// Wrap renderCalendar to detect mobile
+const _renderCalDesktop = renderCalendar;
+renderCalendar = function(){
+  if(isMobileView()){renderCalMobile();return}
+  _renderCalDesktop();
+};
+
+function renderCalMobile(){
+  const container = document.getElementById('cal-container');
+  container.innerHTML = '';
+
+  // Ensure week strip container
+  let strip = document.getElementById('mob-wstrip');
+  if(!strip){
+    strip = document.createElement('div');
+    strip.id='mob-wstrip';strip.className='mob-wstrip';
+    container.appendChild(strip);
+  } else {
+    strip.innerHTML='';
+  }
+
+  for(let i=0;i<7;i++){
+    const day=addDays(currentWeekStart,i);
+    const dayStr=dateToStr(day);
+    const hasIv=interviews.some(iv=>iv.data===dayStr);
+    const btn=document.createElement('div');
+    btn.className='mob-wday'+(isToday(day)?' tod':'')+(dayStr===selectedDay?' sel':'')+(hasIv?' hasiv':'');
+    btn.innerHTML=`<div class="mob-wday-n">${DAYS_RO_MOB[i]}</div><div class="mob-wday-d">${day.getDate()}</div><div class="mob-wday-dot"></div>`;
+    btn.onclick=()=>{selectedDay=dayStr;renderCalendar()};
+    strip.appendChild(btn);
+  }
+
+  let dayView=document.getElementById('mob-dayview');
+  if(!dayView){dayView=document.createElement('div');dayView.id='mob-dayview';dayView.className='mob-dayview';container.appendChild(dayView);}
+  else dayView.innerHTML='';
+
+  const dayIvs=interviews.filter(iv=>iv.data===selectedDay).sort((a,b)=>a.ora.localeCompare(b.ora));
+  if(!dayIvs.length){
+    dayView.innerHTML='<div class="mob-empty"><p>Niciun interviu programat</p><small>Apasa + pentru a programa un interviu in aceasta zi</small></div>';
+  } else {
+    dayIvs.forEach(iv=>{
+      const card=document.createElement('div');card.className='mob-ivcard';
+      card.innerHTML=`<div class="mob-ivtime"><div class="t">${iv.ora}</div><div class="d">${iv.durata||60}min</div></div><div class="mob-ivdot ${iv.status==='finalizat'?'dot-fin':'dot-act'}"></div><div class="mob-ivinfo"><div class="mob-ivname">${iv.candidate_name}</div><div class="mob-ivjob">${iv.job_title}</div>${iv.locatie?`<div class="mob-ivloc">📍 ${iv.locatie}</div>`:''}</div>`;
+      card.onclick=()=>{if(typeof showDetailPopup==='function')showDetailPopup(iv,{currentTarget:card})};
+      dayView.appendChild(card);
+    });
+  }
+  updateWeekLabel();
+}
+
+window.addEventListener('resize',()=>{if(typeof renderCalendar==='function')renderCalendar()});
+
 </script>
 
 <nav class="bnav">

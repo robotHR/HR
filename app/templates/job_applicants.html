@@ -80,51 +80,72 @@
 
 /* ─── MOBILE RESPONSIVE ─── */
 @media(max-width:768px){
-  body{overflow:hidden !important}
+  /* Let body scroll naturally - no overflow:hidden */
+  body{overflow-x:hidden !important}
+
+  /* Sidebar disappears */
   .sidebar{display:none !important}
-  .layout{height:100dvh;height:100vh;overflow:hidden}
+
+  /* Layout unblocks scroll */
+  .layout{
+    display:block !important;
+    height:auto !important;
+    min-height:100dvh;min-height:100vh;
+    overflow:visible !important;
+    padding-bottom:70px;
+  }
+
+  /* Main takes full width, no margin */
   .main{
     margin-left:0 !important;
     width:100% !important;
-    height:100%;
-    overflow-y:auto !important;
-    padding-bottom:72px !important;
+    padding-left:14px !important;
+    padding-right:14px !important;
+    padding-bottom:80px !important;
+    overflow-x:hidden !important;
+    box-sizing:border-box;
   }
-  /* candidate_detail topbar stays full-width */
-  .topbar{left:0 !important}
-  /* calendar scrolls horizontally on mobile */
-  .cal-container{overflow-x:auto}
-  /* stats row stacks on mobile */
-  .stats-row{grid-template-columns:repeat(2,1fr) !important}
-  /* kpis stack */
-  .kpis{grid-template-columns:repeat(2,1fr) !important}
-  /* two-col stacks */
-  .two-col{grid-template-columns:1fr !important}
-  /* form-grid single col */
-  .form-grid{grid-template-columns:1fr !important}
-  .full{grid-column:auto !important}
-  /* filter grid */
-  .filter-grid{flex-direction:column !important;align-items:stretch !important}
-  .filter-grid input,.filter-grid select{width:100% !important;font-size:16px !important}
-  /* hero grid */
-  .hero-grid{grid-template-columns:1fr !important}
-  .source-grid{grid-template-columns:1fr !important}
-  .hero-stats{grid-template-columns:repeat(2,1fr) !important}
-  /* jobs page */
-  .page-hero{padding:20px 16px !important}
-  /* tables scroll */
-  .cand-table-wrap,.table-card{overflow-x:auto !important}
-  /* candidate cards */
-  .card-grid{grid-template-columns:1fr !important}
-  .cand-card{grid-template-columns:44px 1fr !important}
-  .cand-right{grid-column:1/-1;flex-direction:row !important;justify-content:flex-end !important}
-  /* modal full screen */
-  .modal{width:calc(100% - 24px) !important;top:50% !important;left:12px !important;transform:translateY(-50%) !important}
-  /* week nav shrinks */
-  .week-label{display:none !important}
-  .btn-add-interview span,.wbtn-new-lbl{display:none}
 
-  /* BOTTOM NAV */
+  /* Grids collapse to single column */
+  .stats-row,.kpis{grid-template-columns:repeat(2,1fr) !important}
+  .hero-grid,.source-grid,.hero-stats,.page-hero,.two-col,.form-grid{grid-template-columns:1fr !important}
+  .full{grid-column:auto !important}
+
+  /* candidate_detail: prevent horizontal overflow */
+  .content{overflow-x:hidden !important;padding:14px !important}
+  .info-row{grid-template-columns:110px 1fr !important;gap:8px !important;word-break:break-word}
+  .hero-top{flex-wrap:wrap !important;gap:12px !important}
+  .hero-actions{flex-wrap:wrap !important;gap:8px !important}
+  .hero-actions .btn,.hero-actions a,.hero-actions button{min-width:0 !important;flex:1 !important;font-size:12px !important;padding:8px 10px !important}
+  .panel{overflow-x:hidden !important}
+  .tag-list{flex-wrap:wrap !important}
+  .timeline{overflow-x:hidden !important}
+
+  /* filters */
+  .filter-grid{flex-direction:column !important}
+  .filter-grid input,.filter-grid select{width:100% !important;font-size:16px !important}
+
+  /* tables scroll horizontally */
+  .cand-table-wrap,.table-card{overflow-x:auto !important}
+
+  /* cand-card on mobile */
+  .card-grid{grid-template-columns:1fr !important}
+  .candidate-card{overflow-x:hidden}
+
+  /* job_applicants */
+  .cand-card{grid-template-columns:42px 1fr !important}
+  .cand-right{grid-column:1/-1 !important;flex-direction:row !important;justify-content:flex-end !important}
+
+  /* jobs modal */
+  .modal{width:calc(100vw - 24px) !important;left:12px !important;right:12px !important}
+
+  /* week nav */
+  .week-label{min-width:0 !important;font-size:11px !important}
+
+  /* forms */
+  input,select,textarea{font-size:16px !important;-webkit-appearance:none}
+
+  /* ─── BOTTOM NAV ─── */
   .bnav{
     display:flex !important;
     position:fixed;bottom:0;left:0;right:0;z-index:1000;
@@ -140,7 +161,6 @@
     font-family:'DM Sans',sans-serif;
     font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
     text-decoration:none;position:relative;-webkit-tap-highlight-color:transparent;
-    transition:.14s;
   }
   .bn svg{width:20px;height:20px}
   .bn.on{color:#7cc4ff}
@@ -149,7 +169,6 @@
     width:22px;height:2px;background:#7cc4ff;border-radius:0 0 2px 2px;
   }
 }
-
 </style>
 </head>
 <body>

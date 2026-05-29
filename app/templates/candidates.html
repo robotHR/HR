@@ -183,30 +183,98 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .page-title{font-family:'DM Sans',sans-serif;font-size:24px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;margin-bottom:5px}
 /* ── FILTERS ── */
 .filters{background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);padding:13px 16px;margin-bottom:16px}
-.filter-grid{display:flex;gap:9px;flex-wrap:wrap;align-items:flex-end}
+.filters h2{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.13em;margin-bottom:10px}
+.filter-grid{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
 .filter-grid input,.filter-grid select{flex:1;min-width:130px;width:auto}
-.filter-actions{display:flex;gap:7px;flex-shrink:0}
+.filter-actions{display:flex;gap:7px;margin-top:8px}
+/* ── STATS ROW fix: 3+3 ── */
+.stats-row{grid-template-columns:repeat(3,1fr) !important}
+
 /* ── CANDIDATE LIST ── */
 .candidate-list{display:grid;gap:10px}
-.candidate-card{background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);padding:15px 18px;transition:.16s}
-.candidate-card:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,.18)}
-.card-grid{display:grid;grid-template-columns:200px 1fr auto;gap:13px;align-items:center}
-.candidate-main{display:flex;align-items:center;gap:10px}
-.avatar{width:40px;height:40px;font-size:14px}
-.name{font-size:13px;font-weight:800;color:#fff}
-.mini-label{font-size:11px;color:var(--muted);margin-top:1px}
-.best-role{font-size:11px;color:var(--soft)}
-.role-title{font-size:13px;font-weight:700;color:var(--soft)}
+
+.candidate-card{
+  background:var(--s1);
+  border:1px solid var(--line);
+  border-radius:var(--rxl);
+  padding:16px 20px;
+  transition:.18s;
+  position:relative;
+  overflow:hidden;
+}
+.candidate-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:3px 0 0 3px;
+  background:transparent;transition:.18s;
+}
+.candidate-card:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,0,0,.22)}
+.candidate-card:hover::before{background:var(--blue)}
+
+/* 4-column grid: info | best-role | matches | actions */
+.card-grid{
+  display:grid;
+  grid-template-columns:210px 180px 1fr auto;
+  gap:16px;
+  align-items:center;
+}
+
+/* COL 1 — candidat info */
+.candidate-main{display:flex;align-items:flex-start;gap:11px}
+.avatar{width:42px;height:42px;font-size:15px;flex-shrink:0;border-radius:50%}
+.cand-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.name{font-size:14px;font-weight:800;color:#fff;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.cand-status{margin-top:5px}
+
+/* COL 2 — best role */
+.col-best{display:flex;flex-direction:column;gap:6px}
+.mini-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em}
+.best-role{display:flex;align-items:center;gap:9px}
+.role-info{display:flex;flex-direction:column;gap:2px}
+.role-title{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
 .role-sub{font-size:11px;color:var(--muted)}
-.matches{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.match-chip{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
-.match-more{font-size:11px;color:var(--muted)}
-.actions-inline{display:flex;gap:6px;flex-shrink:0}
-.score-cell.score-green{background:var(--teal);color:#07111f;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
-.score-cell.score-yellow{background:var(--yellow);color:#07111f;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
-.score-cell.score-red{background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
-.score-cell.low{background:rgba(255,255,255,.08);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
-.tag{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
+
+/* Score circle */
+.score-cell{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;
+  flex-shrink:0;
+}
+.score-cell.score-green{background:var(--teal);color:#07111f}
+.score-cell.score-yellow{background:var(--yellow);color:#07111f}
+.score-cell.score-red{background:var(--red);color:#fff}
+
+/* COL 3 — matches */
+.col-matches{display:flex;flex-direction:column;gap:6px}
+.matches{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.match-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 9px;border-radius:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);
+  font-size:11px;color:var(--soft);
+  transition:.15s;
+}
+.match-chip:hover{border-color:var(--bline);background:var(--bsoft)}
+.match-chip strong{color:#fff;font-weight:800;font-size:11px}
+.match-chip.low{opacity:.55}
+.match-more{font-size:10px;color:var(--muted);padding:2px 0}
+
+/* COL 4 — actions */
+.actions-inline{display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:stretch;min-width:80px}
+.actions-inline .btn{justify-content:center;padding:8px 14px;font-size:12px}
+
+/* ── TAGS unified ── */
+.tag{
+  display:inline-flex;align-items:center;
+  padding:3px 9px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+}
+.tag-green{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.tag-yellow{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
+.tag-red{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.tag-blue{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
+.tag-muted{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
 
 /* ─── BOTTOM NAV hidden on desktop ─── */
 .bnav{display:none}
@@ -261,9 +329,33 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   /* tables scroll horizontally */
   .cand-table-wrap,.table-card{overflow-x:auto !important}
 
-  /* cand-card on mobile */
-  .card-grid{grid-template-columns:1fr !important}
-  .candidate-card{overflow-x:hidden}
+  /* candidate card — layout vertical curat pe mobile */
+  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  .card-grid{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:0 !important;
+  }
+  .candidate-card{overflow-x:hidden;padding:14px 16px !important}
+  .candidate-card::before{display:none}
+  .candidate-main{align-items:flex-start !important;margin-bottom:10px}
+  .cand-info{min-width:0;flex:1}
+  .name{font-size:14px !important;white-space:normal !important;overflow:visible !important}
+  .small{max-width:100% !important;white-space:normal !important;overflow:visible !important}
+  .col-best{padding:10px 0 !important;border-top:1px solid var(--line) !important}
+  .col-matches{padding:10px 0 !important;border-top:1px solid var(--line) !important}
+  .best-role{align-items:center !important}
+  .role-title{font-size:13px !important}
+  .matches{gap:5px !important}
+  .match-chip{font-size:11px !important;padding:4px 8px !important}
+  .actions-inline{
+    flex-direction:row !important;
+    padding-top:10px !important;
+    border-top:1px solid var(--line) !important;
+    min-width:unset !important;
+    align-items:stretch !important;
+  }
+  .actions-inline .btn{flex:1 !important;justify-content:center !important;font-size:13px !important;padding:10px 14px !important}
 
   /* job_applicants */
   .cand-card{grid-template-columns:42px 1fr !important}
@@ -404,48 +496,56 @@ table,th,td{font-size:13px}
                     {% set best = row.best_match %}
                     <article class="candidate-card">
                         <div class="card-grid">
+
+                            <!-- COL 1: info candidat -->
                             <div class="candidate-main">
                                 <div class="avatar">{{ (candidate.name or "?")[0] | upper }}</div>
-                                <div>
+                                <div class="cand-info">
                                     <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
                                     <div class="small">{{ candidate.email or "Email lipsa" }}</div>
                                     <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
-                                    <div class="small">Companii: {{ candidate.companies or "Nespecificat" }}</div>
-                                    <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
+                                    <div class="small">{{ candidate.companies or "Nespecificat" }}</div>
+                                    <div class="cand-status">
+                                        <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div>
+                            <!-- COL 2: cel mai bun rol -->
+                            <div class="col-best">
                                 <div class="mini-label">Cel mai bun rol</div>
                                 {% if best %}
                                     <div class="best-role">
                                         <div class="score-cell {% if (best.score or 0) >= 75 %}score-green{% elif (best.score or 0) >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ best.score }}</div>
-                                        <div>
+                                        <div class="role-info">
                                             <div class="role-title">{{ best.job_title }}</div>
-                                            <div class="role-sub">Post potrivit: {{ best.position }}</div>
+                                            <div class="role-sub">{{ best.position }}</div>
                                         </div>
                                     </div>
                                 {% else %}
-                                    <div class="small">Nu exista inca potrivire AI.</div>
+                                    <div class="role-sub">Fara potrivire AI</div>
                                 {% endif %}
                             </div>
 
-                            <div>
+                            <!-- COL 3: posturi potrivite -->
+                            <div class="col-matches">
                                 <div class="mini-label">Posturi potrivite</div>
                                 <div class="matches">
                                     {% for match in row.matches[:5] %}
-                                        <span class="match-chip {% if (match.score or 0) < 50 %}low{% endif %}">{{ match.job_title }} <strong>{{ match.score }}</strong></span>
+                                        <span class="match-chip {% if (match.score or 0) < 50 %}low{% endif %}">{{ match.job_title }}<strong>{{ match.score }}</strong></span>
                                     {% endfor %}
+                                    {% if row.match_count > 5 %}
+                                        <span class="match-more">+{{ row.match_count - 5 }} mai multe</span>
+                                    {% endif %}
                                 </div>
-                                {% if row.match_count > 5 %}
-                                    <div class="match-more">+ {{ row.match_count - 5 }} potriviri suplimentare</div>
-                                {% endif %}
                             </div>
 
+                            <!-- COL 4: actiuni -->
                             <div class="actions-inline">
                                 <a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a>
                                 <a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a>
                             </div>
+
                         </div>
                     </article>
                 {% endfor %}

@@ -15,6 +15,7 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from app.core.database import SessionLocal, engine
 from app.models.candidate_model import Candidate
 from app.models.candidate_event_model import CandidateEvent
+from app.models.cv_analysis_model import CvAnalysis
 from app.models.job_post_model import JobPost
 from app.models.interview_model import Interview
 from app.services.cv_parser import (
@@ -28,7 +29,8 @@ from app.services.cv_parser import (
     build_fallback_profile,
     clean_score,
     recommendation_to_status,
-    as_text
+    as_text,
+    normalize_text,
 )
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
@@ -100,6 +102,17 @@ def ensure_candidate_extra_columns():
 
 
 ensure_candidate_extra_columns()
+
+
+def ensure_interview_extra_columns():
+    if not inspect(engine).has_table("interviews"):
+        return
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT FALSE"))
+        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMP"))
+
+
+ensure_interview_extra_columns()
 
 
 def load_candidates():
@@ -755,10 +768,13 @@ templates.env.globals["calc_percent"] = calc_percent
 
 
 @router.get("/", response_class=HTMLResponse)
-async def dashboard(request: Request):
+async def dashboard(request: Request, background_tasks: BackgroundTasks):
     candidates, total = load_dashboard_candidates()
     jobs = group_candidates_by_job(candidates)
     message = request.query_params.get("message")
+
+    # ── Remindere interviuri (background, nu blocheaza pagina) ────────────────
+    _schedule_interview_reminders(background_tasks)
 
     # ── Agentul recomanda azi ──────────────────────────────────────────────────
     call_now   = sorted([c for c in candidates if (c.recommended_next_action or "") == "CALL_NOW"],
@@ -1550,6 +1566,21 @@ Echipa HR NEXAS
         pass
 
 
+def _make_candidate_visible_as_nou(candidate_id, summary_note):
+    """Helper: daca analiza esueaza, candidatul devine vizibil cu status NOU."""
+    try:
+        db = SessionLocal()
+        c = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+        if c:
+            c.status = "NOU"
+            c.visible_in_dashboard = 1
+            c.summary = summary_note
+            db.commit()
+        db.close()
+    except Exception as e:
+        print(f"[BG] WARN make_visible error candidat {candidate_id}: {e}")
+
+
 def _process_cv_background(
     candidate_id: int,
     local_path: str,
@@ -1565,9 +1596,29 @@ def _process_cv_background(
     """
     Ruleaza in background dupa ce utilizatorul a primit deja confirmare.
     Face: upload Cloudinary + extragere text + analiza AI + update DB + emailuri.
-    Orice eroare e logata fara sa afecteze utilizatorul.
+    Orice eroare face candidatul vizibil ca NOU — recruiterul poate verifica manual.
     """
     from app.services.cloudinary_service import upload_cv_bytes_to_cloudinary
+
+    # ── Email confirmare catre candidat — trimis IMEDIAT, indiferent de analiza ──
+    try:
+        send_email_api(
+            to_email=email,
+            subject=f"CV-ul tau pentru postul {job_titlu} a fost primit",
+            body=f"""Buna ziua, {nume},
+
+Va multumim pentru interesul acordat postului de {job_titlu}{' in ' + job_locatie if job_locatie else ''}.
+
+CV-ul dumneavoastra a fost primit si va fi analizat in cel mai scurt timp.
+
+Vom reveni cu un raspuns daca profilul dumneavoastra corespunde cerintelor postului.
+
+Cu respect,
+Echipa HR NEXAS
+"""
+        )
+    except Exception as e:
+        print(f"[BG] WARN email confirmare candidat esuat: {e}")
 
     # 1. Salveaza CV pe disc
     try:
@@ -1576,9 +1627,10 @@ def _process_cv_background(
             f.write(cv_bytes)
     except Exception as e:
         print(f"[BG] EROARE scriere fisier {final_filename}: {e}")
+        _make_candidate_visible_as_nou(candidate_id, "CV primit. Eroare la salvarea fisierului. Verifica manual.")
         return
 
-    # 2. Upload Cloudinary (nu blocheaza utilizatorul)
+    # 2. Upload Cloudinary
     try:
         upload_cv_bytes_to_cloudinary(cv_bytes, final_filename)
     except Exception as e:
@@ -1592,14 +1644,11 @@ def _process_cv_background(
         cv_text = None
 
     if not cv_text or len(cv_text.strip()) < 80:
-        print(f"[BG] CV needit/neselectabil, sterg candidatul {candidate_id}")
-        try:
-            db = SessionLocal()
-            db.query(Candidate).filter(Candidate.id == candidate_id).delete()
-            db.commit()
-            db.close()
-        except Exception:
-            pass
+        print(f"[BG] CV fara text suficient {candidate_id} — facut vizibil ca NOU")
+        _make_candidate_visible_as_nou(
+            candidate_id,
+            "CV primit dar nu s-a putut extrage text (posibil scanat sau protejat). Verifica manual CV-ul."
+        )
         try:
             if os.path.exists(local_path):
                 os.remove(local_path)
@@ -1617,7 +1666,11 @@ def _process_cv_background(
         data = None
 
     if not data:
-        print(f"[BG] AI nu a returnat date valide pentru {final_filename}, candidatul ramane in asteptare")
+        print(f"[BG] AI nu a returnat date valide pentru {final_filename} — facut vizibil ca NOU")
+        _make_candidate_visible_as_nou(
+            candidate_id,
+            "CV primit. Analiza AI nu a putut fi completata. Verifica manual CV-ul."
+        )
         return
 
     normalized = normalize_data(data, final_filename, job_titlu, cv_text, profile)
@@ -1625,7 +1678,11 @@ def _process_cv_background(
     status = recommendation_to_status(normalized.get("recommendation", "CONSIDER"))
 
     if score <= 0:
-        print(f"[BG] Scor 0 pentru {final_filename}, candidatul ramane in asteptare")
+        print(f"[BG] Scor 0 pentru {final_filename} — facut vizibil ca NOU")
+        _make_candidate_visible_as_nou(
+            candidate_id,
+            "CV primit. Scor AI = 0. Verifica manual daca CV-ul este valid pentru acest post."
+        )
         return
 
     # 5. Actualizeaza candidatul in DB cu datele AI
@@ -1646,7 +1703,7 @@ def _process_cv_background(
             candidate.weaknesses = as_text(normalized.get("weaknesses", ""))
             candidate.summary = as_text(normalized.get("summary", ""))
             candidate.status = status
-            # ── Campuri noi ──
+            candidate.visible_in_dashboard = 1
             candidate.decision_reason         = as_text(normalized.get("decision_reason", ""))
             candidate.missing_requirements    = as_text(normalized.get("missing_requirements", ""))
             candidate.must_verify_by_phone    = as_text(normalized.get("must_verify_by_phone", ""))
@@ -1693,27 +1750,240 @@ Vezi candidatul: https://hr-g66k.onrender.com/candidat/{candidate_id}
         except Exception as e:
             print(f"[BG] WARN email HR esuat: {e}")
 
+
+@router.post("/cariere/{job_id}/aplica")
+
+
+# ─── REANALIZA FORTATA ────────────────────────────────────────────────────────
+
+def _reanalyze_cv_background(candidate_id: int, cv_file: str, job_titlu: str):
+    """
+    Sterge cache-ul pentru acest CV+job si reanalizeaza de la zero.
+    Ruleaza in background — recruiterul primeste redirect instant.
+    """
+    # 1. Sterge din cache
+    key = normalize_text(job_titlu)
     try:
+        db = SessionLocal()
+        db.query(CvAnalysis).filter(
+            CvAnalysis.cv_file == cv_file,
+            CvAnalysis.job_title_normalized == key
+        ).delete()
+        db.commit()
+        db.close()
+    except Exception as e:
+        print(f"[REANALIZ] WARN stergere cache: {e}")
+
+    # 2. Obtine CV-ul (Cloudinary primul, local fallback)
+    local_path = os.path.join(UPLOAD_FOLDER, cv_file)
+    try:
+        buffer, mime = stream_cv_from_cloudinary(cv_file)
+        if buffer:
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            with open(local_path, "wb") as f:
+                f.write(buffer.read())
+    except Exception as e:
+        print(f"[REANALIZ] WARN Cloudinary fetch: {e}")
+
+    if not os.path.exists(local_path):
+        print(f"[REANALIZ] CV negasit local si pe Cloudinary: {cv_file}")
+        return
+
+    # 3. Extrage text
+    cv_text = extract_text_from_file(local_path)
+    if not cv_text or len(cv_text.strip()) < 80:
+        print(f"[REANALIZ] CV fara text suficient: {cv_file}")
+        return
+
+    # 4. Analizeaza
+    try:
+        profile = match_job_profile(job_titlu) or build_fallback_profile(job_titlu)
+        ai_response = analyze_cv_with_ai(cv_text, job_titlu)
+        data = parse_ai_response(ai_response)
+    except Exception as e:
+        print(f"[REANALIZ] EROARE AI: {e}")
+        return
+
+    if not data:
+        return
+
+    normalized = normalize_data(data, cv_file, job_titlu, cv_text, profile)
+    score = clean_score(normalized.get("score", 0))
+    status = recommendation_to_status(normalized.get("recommendation", "CONSIDER"))
+
+    # 5. Actualizeaza candidatul in DB
+    try:
+        db = SessionLocal()
+        candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+        if candidate:
+            candidate.position               = as_text(normalized.get("position", ""))
+            candidate.experience             = as_text(normalized.get("years_experience", ""))
+            candidate.skills                 = as_text(normalized.get("skills", ""))
+            candidate.companies              = as_text(normalized.get("companies", ""))
+            candidate.score                  = score
+            candidate.level                  = as_text(normalized.get("level", ""))
+            candidate.strengths              = as_text(normalized.get("strengths", ""))
+            candidate.weaknesses             = as_text(normalized.get("weaknesses", ""))
+            candidate.summary                = as_text(normalized.get("summary", ""))
+            candidate.status                 = status
+            candidate.decision_reason        = as_text(normalized.get("decision_reason", ""))
+            candidate.missing_requirements   = as_text(normalized.get("missing_requirements", ""))
+            candidate.must_verify_by_phone   = as_text(normalized.get("must_verify_by_phone", ""))
+            candidate.recommended_next_action= as_text(normalized.get("recommended_next_action", ""))
+            candidate.priority               = as_text(normalized.get("priority", ""))
+            candidate.manager_summary        = as_text(normalized.get("manager_summary", ""))
+            candidate.phone_call_script      = as_text(normalized.get("phone_call_script", ""))
+            candidate.interview_questions    = as_text(normalized.get("interview_questions", ""))
+            candidate.better_role_match      = as_text(normalized.get("better_role_match", ""))
+            candidate.reject_reason_internal = as_text(normalized.get("reject_reason_internal", ""))
+            db.commit()
+        db.close()
+    except Exception as e:
+        print(f"[REANALIZ] EROARE DB: {e}")
+        return
+
+    log_candidate_event(
+        candidate_id=candidate_id,
+        event_type="REANALIZA",
+        title="CV reanalizat fortat",
+        description=f"Cache sters si reanalizat. Scor nou: {score}. Status: {status}."
+    )
+    print(f"[REANALIZ] Done: {cv_file} → scor {score}, status {status}")
+
+
+@router.post("/candidat/{candidate_id}/reanalizeaza")
+async def force_reanalyze(candidate_id: int, background_tasks: BackgroundTasks):
+    candidate = get_candidate_by_id(candidate_id)
+
+    if not candidate:
+        return RedirectResponse(url="/candidati?message=Candidatul nu a fost gasit.", status_code=303)
+    if not candidate.cv_file or not candidate.job_title:
+        return RedirectResponse(
+            url=f"/candidat/{candidate_id}?error=CV-ul sau postul lipsesc, nu se poate reanaliza.",
+            status_code=303
+        )
+
+    background_tasks.add_task(
+        _reanalyze_cv_background,
+        candidate_id=candidate_id,
+        cv_file=candidate.cv_file,
+        job_titlu=candidate.job_title,
+    )
+
+    return RedirectResponse(
+        url=f"/candidat/{candidate_id}?message=Reanaliza pornita in fundal. Reincarca pagina in 30 de secunde.",
+        status_code=303
+    )
+
+
+# ─── REMINDER INTERVIURI ──────────────────────────────────────────────────────
+
+def _send_interview_reminder_email(idata: dict):
+    """Trimite email reminder cu o zi inainte de interviu si marcheaza trimis."""
+    from datetime import datetime as dt
+    try:
+        locatie_line = f"\nLocatia / Link: {idata['locatie']}" if idata.get("locatie") else ""
         send_email_api(
-            to_email=email,
-            subject=f"CV-ul tau pentru postul {job_titlu} a fost primit",
-            body=f"""Buna ziua, {nume},
+            to_email=idata["candidate_email"],
+            subject=f"Reminder interviu maine — {idata['job_title'] or 'postul aplicat'}",
+            body=f"""Buna ziua, {idata['candidate_name'] or 'Candidat'},
 
-Va multumim pentru interesul acordat postului de {job_titlu}{' in ' + job_locatie if job_locatie else ''}.
+Va reamintim ca maine, {idata['data']} la ora {idata['ora']}, aveti programat un interviu pentru postul de {idata['job_title'] or 'postul aplicat'}.{locatie_line}
 
-CV-ul dumneavoastra a fost primit si analizat.
-
-Vom reveni cu un raspuns in cel mai scurt timp posibil daca profilul dumneavoastra corespunde cerintelor postului.
+Va rugam sa confirmati participarea sau sa ne contactati daca aveti indisponibilitate.
 
 Cu respect,
 Echipa HR NEXAS
 """
         )
     except Exception as e:
-        print(f"[BG] WARN email candidat esuat: {e}")
+        print(f"[REMINDER] WARN email esuat interviu {idata['id']}: {e}")
+
+    try:
+        db = SessionLocal()
+        i = db.query(Interview).filter(Interview.id == idata["id"]).first()
+        if i:
+            i.reminder_sent = True
+            i.reminder_sent_at = dt.utcnow()
+            db.commit()
+        db.close()
+    except Exception as e:
+        print(f"[REMINDER] WARN update DB esuat: {e}")
 
 
-@router.post("/cariere/{job_id}/aplica")
+def _schedule_interview_reminders(background_tasks: BackgroundTasks):
+    """Verifica interviuri de maine si adauga reminder in background daca nu s-a trimis deja."""
+    from datetime import datetime, timedelta
+    tomorrow = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+    try:
+        db = SessionLocal()
+        upcoming = db.query(Interview).filter(
+            Interview.data == tomorrow,
+            Interview.reminder_sent.isnot(True),
+            Interview.status == "programat",
+            Interview.candidate_email.isnot(None),
+        ).all()
+        interviews_data = [{
+            "id": i.id,
+            "candidate_email": i.candidate_email,
+            "candidate_name": i.candidate_name,
+            "job_title": i.job_title,
+            "data": i.data,
+            "ora": i.ora,
+            "locatie": i.locatie,
+        } for i in upcoming]
+        db.close()
+        for idata in interviews_data:
+            background_tasks.add_task(_send_interview_reminder_email, idata)
+        if interviews_data:
+            print(f"[REMINDER] Programate {len(interviews_data)} remindere pentru {tomorrow}")
+    except Exception as e:
+        print(f"[REMINDER] WARN schedule error: {e}")
+
+
+# ─── ACTIVITATE RECENTA ───────────────────────────────────────────────────────
+
+@router.get("/activitate", response_class=HTMLResponse)
+async def activitate_page(request: Request, tip: str = "", zile: int = 30):
+    from datetime import datetime, timedelta
+    cutoff = datetime.utcnow() - timedelta(days=zile)
+
+    db = SessionLocal()
+    query = db.query(CandidateEvent).filter(CandidateEvent.created_at >= cutoff)
+    if tip:
+        query = query.filter(CandidateEvent.event_type == tip)
+    events = query.order_by(CandidateEvent.created_at.desc()).limit(300).all()
+
+    candidate_ids = list({e.candidate_id for e in events})
+    candidates_map = {}
+    if candidate_ids:
+        cands = db.query(Candidate).filter(Candidate.id.in_(candidate_ids)).all()
+        candidates_map = {c.id: c for c in cands}
+    db.close()
+
+    event_rows = [{"event": e, "candidate": candidates_map.get(e.candidate_id)} for e in events]
+
+    all_types = [
+        "aplicatie", "REANALIZA",
+        "INTERVIU", "EMAIL_INTERVIU", "SELECTAT", "ANGAJAT",
+        "REFUZAT", "EXCLUS", "EMAIL_REFUZ",
+        "NOTE", "EDIT", "STATUS",
+    ]
+
+    return templates.TemplateResponse(
+        request=request,
+        name="activitate.html",
+        context={
+            "request": request,
+            "event_rows": event_rows,
+            "tip": tip,
+            "zile": zile,
+            "all_types": all_types,
+            "total": len(event_rows),
+        }
+    )
+
+
 async def apply_to_job(
     background_tasks: BackgroundTasks,
     job_id: int,

@@ -560,19 +560,19 @@ table,th,td{font-size:13px}
                                 {% endif %}
                             </div>
 
-                            <!-- COL 3: posturi potrivite (doar 50+) -->
+                            <!-- COL 3: posturi potrivite (doar 50+, fara cel mai bun rol) -->
                             <div class="col-matches">
                                 <div class="mini-label">Posturi potrivite</div>
                                 <div class="matches">
                                     {% set shown = [] %}
                                     {% for match in row.matches %}
-                                        {% if (match.score or 0) >= 50 and shown|length < 5 %}
+                                        {% if (match.score or 0) >= 50 and shown|length < 5 and match.job_title != (best.job_title if best else '') %}
                                             {% set _ = shown.append(match) %}
                                             <span class="match-chip {% if (match.score or 0) >= 75 %}chip-top{% else %}chip-potential{% endif %}">{{ match.job_title }}<strong>{{ match.score }}</strong></span>
                                         {% endif %}
                                     {% endfor %}
                                     {% if shown|length == 0 %}
-                                        <span class="match-more">Nicio potrivire relevanta</span>
+                                        <span class="match-more">Nicio alta potrivire relevanta</span>
                                     {% endif %}
                                 </div>
                             </div>

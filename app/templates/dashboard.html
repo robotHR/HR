@@ -41,7 +41,7 @@ body{
   display:flex;flex-direction:column;
 }
 .brand,.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--line)}
-.brand-main,.logo-text{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1}
+.brand-main,.logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1}
 .brand-main span,.logo-text .accent{color:var(--b2)}
 .brand-sub,.logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
 .nav{display:flex;flex-direction:column;gap:2px;padding:12px 10px;flex:1}
@@ -67,9 +67,9 @@ body{
 }
 /* ── TYPOGRAPHY ── */
 .eyebrow{font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:7px}
-h1,.page-title,.hero-title{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;margin-bottom:5px}
+h1,.page-title,.hero-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;margin-bottom:5px}
 .page-sub,.hero-sub,.section-sub,.subtitle{font-size:13px;color:var(--soft);line-height:1.55}
-.section-title{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.section-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px}
 .section-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
 /* ── STAT CARDS ── */
 .stats-row,.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
@@ -84,7 +84,7 @@ h1,.page-title,.hero-title{font-family:'DM Sans',sans-serif;font-size:26px;font-
 }
 .stat-card:hover,.kpi:hover{border-color:var(--bline)}
 .stat-label,.kpi-lbl{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
-.stat-value,.kpi-val,.stat-num{font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1}
+.stat-value,.kpi-val,.stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1}
 .stat-value span,.kpi-val span{font-size:12px;font-weight:700;color:var(--b2);font-family:'DM Sans',sans-serif}
 .stat-help,.kpi-note{font-size:10px;color:var(--muted);margin-top:4px}
 /* ── CARDS / PANELS ── */
@@ -129,12 +129,12 @@ h1,.page-title,.hero-title{font-family:'DM Sans',sans-serif;font-size:26px;font-
 /* ── AVATARS / SCORES ── */
 .avatar,.mini-avatar,.row-avatar,.cand-avatar,.user-avatar{
   display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
-  font-family:'DM Sans',sans-serif;font-weight:800;color:#07111f;flex-shrink:0;
+  font-family:'Syne',sans-serif;font-weight:800;color:#07111f;flex-shrink:0;
   background:linear-gradient(135deg,var(--teal),var(--blue));
 }
 .score-num-badge,.score-cell{
   display:inline-flex;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:50%;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:800;
+  width:34px;height:34px;border-radius:50%;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
 }
 .score-bar-track,.bar-track{height:6px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden}
 .score-bar-fill,.bar-fill{height:100%;border-radius:999px}
@@ -179,13 +179,13 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .purple{color:var(--b2)}
 
 /* ── LOADING OVERLAY ── */
-.loading-overlay{position:fixed;inset:0;z-index:9999;background:rgba(13,20,36,.92);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center}
+.loading-overlay{position:fixed;inset:0;z-index:9999;background:rgba(13,20,36,.92);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
 .loading-box{background:var(--s1);border:1px solid var(--line2);border-radius:var(--rxl);padding:36px;text-align:center;max-width:420px;width:90%}
 .loader{width:44px;height:44px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--blue);animation:spin .9s linear infinite;margin:0 auto 20px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-box h2{font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#fff;margin-bottom:8px}
+.loading-box h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;margin-bottom:8px}
 .loading-box p{font-size:13px;color:var(--soft);margin-bottom:16px}
-.timer{font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;color:var(--b2);margin-bottom:14px}
+.timer{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--b2);margin-bottom:14px}
 .progress{height:4px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden;margin-bottom:14px}
 .progress-bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:999px;width:0;animation:prog 30s linear forwards}
 @keyframes prog{to{width:95%}}
@@ -210,15 +210,15 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .ai-wave-status{font-size:11px;color:var(--b2);font-weight:700;text-align:center;margin-bottom:10px}
 .ai-wave-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .ai-mini-stat{text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:9px;padding:8px 4px}
-.ai-mini-num{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800}
+.ai-mini-num{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
 .ai-mini-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
 /* Mini list */
 .mini-list{display:grid;gap:7px;margin-top:12px}
 .mini-row{display:flex;align-items:center;gap:9px;padding:9px 12px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px}
-.mini-avatar{width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:800;color:#07111f;flex-shrink:0}
+.mini-avatar{width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;color:#07111f;flex-shrink:0}
 .mini-title{flex:1;font-size:13px;font-weight:800;color:#fff}
 .mini-title span{font-size:11px;color:var(--muted);font-weight:600;margin-left:4px}
-.mini-score{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:var(--t2)}
+.mini-score{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--t2)}
 /* Source grid */
 .source-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .source-card{background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);padding:16px;display:flex;gap:12px;transition:.16s}
@@ -246,7 +246,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .job-icon{width:32px;height:32px;border-radius:8px;background:var(--bsoft);border:1px solid var(--bline);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:var(--b2);flex-shrink:0}
 .job-title-content{flex:1;min-width:0}
 .job-kicker{font-size:9px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.1em}
-.job-title{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:800;color:#fff}
+.job-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#fff}
 .job-title-left{display:flex;flex-direction:column}
 .job-description{font-size:10px;color:var(--muted)}
 .job-head-actions{display:flex;align-items:center;gap:9px;flex-shrink:0}
@@ -371,44 +371,6 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   }
 }
 
-
-
-/* =========================================================
-   NEXAS HR FONT SYSTEM SAFE
-   DM Sans = font principal
-   Syne = doar pe elementele marcate cu .syne-only
-   ========================================================= */
-:root{
-  --font-main:'DM Sans',sans-serif;
-  --font-accent:'Syne',sans-serif;
-}
-body,button,input,select,textarea,.nav a,.page-sub,.hero-sub,.section-sub,.subtitle,
-.card,.panel,.stat-label,.kpi-lbl,.field label,label,.btn,button[class^="btn"],button[class*=" btn"],
-.tag,.status-badge,.tag-chip,.chip,.row-badge,table,th,td{
-  font-family:var(--font-main) !important;
-}
-.syne-only,.syne-only *{
-  font-family:var(--font-accent) !important;
-}
-body{font-size:14px;line-height:1.45}
-.nav a{font-size:13px;font-weight:700}
-.brand-main,.logo-text{font-size:20px;font-weight:800;letter-spacing:-.03em}
-.brand-sub,.logo-sub{font-size:10px;letter-spacing:.20em}
-.eyebrow{font-size:10px;font-weight:900;letter-spacing:.16em}
-h1,.page-title,.hero-title{font-size:26px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
-.page-sub,.hero-sub,.section-sub,.subtitle{font-size:13px;line-height:1.55}
-.section-title{font-size:16px;font-weight:800;letter-spacing:-.02em}
-.card-title,.panel-title{font-size:11px;font-weight:900;letter-spacing:.13em}
-.stat-label,.kpi-lbl,.field label,label{font-size:10px;font-weight:900;letter-spacing:.10em}
-.stat-value,.kpi-val,.stat-num{font-size:28px;font-weight:800;letter-spacing:-.04em}
-.stat-help,.kpi-note,.helper-text,.loading-note{font-size:11px;line-height:1.5}
-.btn,button[class^="btn"],button[class*=" btn"]{font-size:13px;font-weight:800}
-input,select,textarea{font-size:14px;font-weight:600}
-.tag,.status-badge,.tag-chip,.chip,.row-badge{font-size:10px;font-weight:900;letter-spacing:.06em}
-.score-num-badge,.score-cell{font-size:13px;font-weight:800}
-.empty,.empty-state,.empty-recommendations,.empty-section,.empty-table{font-size:13px;line-height:1.5}
-table,th,td{font-size:13px}
-
 </style>
 </head>
 
@@ -433,7 +395,7 @@ table,th,td{font-size:13px}
 <div class="layout">
     <aside class="sidebar">
         <div class="brand">
-            <div class="brand-main syne-only">NEXAS <span>HR</span></div>
+            <div class="brand-main">NEXAS <span>HR</span></div>
             <div class="brand-sub">HR Platform</div>
         </div>
 
@@ -460,7 +422,7 @@ table,th,td{font-size:13px}
             <div class="hero-grid">
                 <div class="hero-left">
                     <div class="eyebrow">Dashboard recrutare AI</div>
-                    <h1 class="hero-title syne-only">NEXAS <span>HR</span></h1>
+                    <h1 class="hero-title">NEXAS <span>HR</span></h1>
                     <div class="hero-sub">
                         Incarci CV-uri din Gmail sau manual. Alegi postul. Agentul iti arata candidatii potriviti.
                     </div>
@@ -565,7 +527,7 @@ table,th,td{font-size:13px}
         <section class="workbench">
             <div class="section-head">
                 <div>
-                    <div class="section-title syne-only">Adauga CV-uri in platforma</div>
+                    <div class="section-title">Adauga CV-uri in platforma</div>
                     <div class="section-sub">Gmail si upload manual, intr-un singur flux.</div>
                 </div>
             </div>

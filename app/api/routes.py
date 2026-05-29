@@ -80,12 +80,23 @@ def ensure_candidate_extra_columns():
         return
 
     with engine.begin() as conn:
-        # Folosim IF NOT EXISTS — sigur pe PostgreSQL, nu crapa daca exista deja
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS batch_id VARCHAR"))
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS visible_in_dashboard INTEGER DEFAULT 1"))
         conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS companies TEXT"))
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_id INTEGER"))
+        # ── Campuri noi agent AI decizie ──
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS decision_reason TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS missing_requirements TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS must_verify_by_phone TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS recommended_next_action VARCHAR"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS priority VARCHAR"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS manager_summary TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS phone_call_script TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS interview_questions TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS better_role_match VARCHAR"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS reject_reason_internal TEXT"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS created_at TIMESTAMP"))
 
 
 ensure_candidate_extra_columns()
@@ -749,26 +760,55 @@ async def dashboard(request: Request):
     jobs = group_candidates_by_job(candidates)
     message = request.query_params.get("message")
 
+    # ── Agentul recomanda azi ──────────────────────────────────────────────────
+    call_now   = sorted([c for c in candidates if (c.recommended_next_action or "") == "CALL_NOW"],
+                        key=lambda x: x.score or 0, reverse=True)
+    call_later = sorted([c for c in candidates if (c.recommended_next_action or "") == "CALL_LATER"],
+                        key=lambda x: x.score or 0, reverse=True)
+    keep_other = [c for c in candidates if (c.recommended_next_action or "") == "KEEP_FOR_OTHER_ROLE"]
+    auto_reject= [c for c in candidates if (c.recommended_next_action or "") == "REJECT"]
+    top3       = (call_now + call_later)[:3]
+
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
-        context={"request": request, "candidates": candidates, "jobs": jobs, "total": total, "message": message}
+        context={
+            "request": request,
+            "candidates": candidates,
+            "jobs": jobs,
+            "total": total,
+            "message": message,
+            "call_now": call_now,
+            "call_later": call_later,
+            "keep_other": keep_other,
+            "auto_reject": auto_reject,
+            "top3": top3,
+        }
     )
 
 
 @router.get("/candidati", response_class=HTMLResponse)
-async def candidates_page(request: Request, q: str = "", status: str = "", job: str = "", skill: str = "", min_score: int = 0):
+async def candidates_page(request: Request, q: str = "", status: str = "", job: str = "", skill: str = "", min_score: int = 0, page: int = 1):
     candidates, total = load_candidates()
-    candidate_rows = build_unique_candidate_rows(candidates, q=q, status=status, job=job, skill=skill, min_score=min_score)
+    all_rows = build_unique_candidate_rows(candidates, q=q, status=status, job=job, skill=skill, min_score=min_score)
 
     all_jobs = sorted(list({candidate.job_title for candidate in candidates if candidate.job_title}))
     all_statuses = sorted(list({candidate.status for candidate in candidates if candidate.status}))
 
+    # Paginare
+    PAGE_SIZE = 50
+    total_pages = max(1, (len(all_rows) + PAGE_SIZE - 1) // PAGE_SIZE)
+    page = max(1, min(page, total_pages))
+    candidate_rows = all_rows[(page - 1) * PAGE_SIZE : page * PAGE_SIZE]
+
+    # Toate randurile unice (fara filtru) — pentru unique_total
+    all_unique = build_unique_candidate_rows(candidates)
+
     stats = {
         "total": len(candidates),
-        "unique_total": len(build_unique_candidate_rows(candidates)),
-        "filtered": len(candidate_rows),
-        "analyses_filtered": sum(len(row["matches"]) for row in candidate_rows),
+        "unique_total": len(all_unique),
+        "filtered": len(all_rows),
+        "analyses_filtered": sum(len(row["matches"]) for row in all_rows),
         "interviu": len([c for c in candidates if c.status == "INTERVIU"]),
         "selectat": len([c for c in candidates if c.status == "SELECTAT"]),
         "angajat": len([c for c in candidates if c.status == "ANGAJAT"]),
@@ -792,7 +832,9 @@ async def candidates_page(request: Request, q: str = "", status: str = "", job: 
             "status": status,
             "job": job,
             "skill": skill,
-            "min_score": min_score
+            "min_score": min_score,
+            "page": page,
+            "total_pages": total_pages,
         }
     )
 
@@ -1173,7 +1215,9 @@ async def clear_database():
 
 
 @router.post("/sterge-definitiv")
-async def delete_all_database():
+async def delete_all_database(confirm_delete: str = Form("")):
+    if confirm_delete != "STERGE":
+        return RedirectResponse(url="/?message=Stergere anulata. Token de confirmare invalid.", status_code=303)
     db = SessionLocal()
     db.query(CandidateEvent).delete()
     db.query(Candidate).delete()
@@ -1602,6 +1646,17 @@ def _process_cv_background(
             candidate.weaknesses = as_text(normalized.get("weaknesses", ""))
             candidate.summary = as_text(normalized.get("summary", ""))
             candidate.status = status
+            # ── Campuri noi ──
+            candidate.decision_reason         = as_text(normalized.get("decision_reason", ""))
+            candidate.missing_requirements    = as_text(normalized.get("missing_requirements", ""))
+            candidate.must_verify_by_phone    = as_text(normalized.get("must_verify_by_phone", ""))
+            candidate.recommended_next_action = as_text(normalized.get("recommended_next_action", ""))
+            candidate.priority                = as_text(normalized.get("priority", ""))
+            candidate.manager_summary         = as_text(normalized.get("manager_summary", ""))
+            candidate.phone_call_script       = as_text(normalized.get("phone_call_script", ""))
+            candidate.interview_questions     = as_text(normalized.get("interview_questions", ""))
+            candidate.better_role_match       = as_text(normalized.get("better_role_match", ""))
+            candidate.reject_reason_internal  = as_text(normalized.get("reject_reason_internal", ""))
             db.commit()
         db.close()
     except Exception as e:

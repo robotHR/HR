@@ -567,6 +567,129 @@ table,th,td{font-size:13px}
                 <div class="summary-box">{{ clean_summary(candidate.summary) }}</div>
             </div>
 
+            <!-- ─── DECIZIA AGENTULUI ─────────────── -->
+            {% if candidate.decision_reason or candidate.priority or candidate.recommended_next_action %}
+            <div class="panel full" style="border-color:{% if candidate.priority=='HIGH' %}var(--tline){% elif candidate.priority=='MEDIUM' %}var(--yline){% else %}var(--line){% endif %}">
+                <div class="panel-title" style="color:{% if candidate.priority=='HIGH' %}var(--t2){% elif candidate.priority=='MEDIUM' %}#fcd38a{% else %}var(--b2){% endif %}">
+                    Decizia agentului AI
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+                    <!-- Prioritate + actiune -->
+                    <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+                        {% if candidate.priority %}
+                        <div>
+                            <div style="font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:4px">Prioritate</div>
+                            {% if candidate.priority == 'HIGH' %}
+                                <span class="tag tag-green" style="font-size:12px;padding:5px 14px">● Suna azi</span>
+                            {% elif candidate.priority == 'MEDIUM' %}
+                                <span class="tag tag-yellow" style="font-size:12px;padding:5px 14px">● Suna curand</span>
+                            {% else %}
+                                <span class="tag tag-muted" style="font-size:12px;padding:5px 14px">● Prioritate mica</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% if candidate.recommended_next_action %}
+                        <div>
+                            <div style="font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:4px">Actiune recomandata</div>
+                            {% if candidate.recommended_next_action == 'CALL_NOW' %}
+                                <span class="tag tag-green">Suna acum</span>
+                            {% elif candidate.recommended_next_action == 'CALL_LATER' %}
+                                <span class="tag tag-yellow">Suna curand</span>
+                            {% elif candidate.recommended_next_action == 'KEEP_FOR_OTHER_ROLE' %}
+                                <span class="tag tag-blue">Pastreaza pentru alt rol</span>
+                            {% else %}
+                                <span class="tag tag-red">Respinge</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Motiv decizie -->
+                    {% if candidate.decision_reason %}
+                    <div style="flex:1;min-width:200px">
+                        <div style="font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:6px">De ce a primit acest scor</div>
+                        <div style="font-size:13px;color:var(--soft);line-height:1.6;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:12px">{{ candidate.decision_reason }}</div>
+                    </div>
+                    {% endif %}
+                    <!-- Rol mai potrivit -->
+                    {% if candidate.better_role_match %}
+                    <div style="min-width:160px">
+                        <div style="font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:4px">Rol mai potrivit</div>
+                        <div style="font-size:13px;font-weight:800;color:var(--b2);background:var(--bsoft);border:1px solid var(--bline);border-radius:10px;padding:10px 14px">{{ candidate.better_role_match }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if candidate.manager_summary %}
+                <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+                    <div style="font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:6px">Rezumat pentru manager</div>
+                    <div style="font-size:13px;color:var(--soft);line-height:1.6;font-style:italic">{{ candidate.manager_summary }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ─── CE LIPSESTE + VERIFICARE TELEFON ── -->
+            {% if candidate.missing_requirements or candidate.must_verify_by_phone %}
+            <div class="two-col">
+                {% if candidate.missing_requirements %}
+                <div class="panel">
+                    <div class="panel-title" style="color:#fcd38a">Ce lipseste din CV</div>
+                    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+                        {% for item in candidate.missing_requirements.split(',') %}
+                        {% if item.strip() %}
+                        <li style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--soft);line-height:1.5">
+                            <span style="color:#fcd38a;font-weight:900;flex-shrink:0;margin-top:2px">!</span>
+                            {{ item.strip() }}
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% if candidate.must_verify_by_phone %}
+                <div class="panel">
+                    <div class="panel-title" style="color:var(--t2)">Ce verifici la telefon</div>
+                    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px">
+                        {% for item in candidate.must_verify_by_phone.split(',') %}
+                        {% if item.strip() %}
+                        <li style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--soft);line-height:1.5">
+                            <span style="color:var(--t2);font-weight:900;flex-shrink:0;margin-top:2px">?</span>
+                            {{ item.strip() }}
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- ─── SCRIPT TELEFON ─────────────────── -->
+            {% if candidate.phone_call_script %}
+            <div class="panel full">
+                <div class="panel-title" style="color:var(--b2)">Script apel telefonic</div>
+                <div style="background:rgba(93,169,255,.06);border:1px solid var(--bline);border-radius:12px;padding:16px">
+                    <pre style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--soft);line-height:1.7;white-space:pre-wrap;word-break:break-word">{{ candidate.phone_call_script }}</pre>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ─── INTREBARI INTERVIU ─────────────── -->
+            {% if candidate.interview_questions %}
+            <div class="panel full">
+                <div class="panel-title" style="color:var(--t2)">Intrebari recomandate pentru interviu</div>
+                <ol style="list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:iq">
+                    {% for item in candidate.interview_questions.split(',') %}
+                    {% if item.strip() %}
+                    <li style="display:flex;align-items:flex-start;gap:10px;counter-increment:iq">
+                        <span style="background:var(--tsoft);border:1px solid var(--tline);color:var(--t2);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;margin-top:1px">{{ loop.index }}</span>
+                        <span style="font-size:13px;color:var(--soft);line-height:1.6">{{ item.strip() }}</span>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ol>
+            </div>
+            {% endif %}
+
             <!-- ─── EDIT + NOTA ───────────────── -->
             <div class="panel full hidden" id="editPanel">
                 <div class="panel-title">Editare manuala candidat</div>

@@ -288,6 +288,31 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   padding:1px 6px;border-radius:999px;white-space:nowrap;flex-shrink:0;
 }
 
+/* ── PRIORITY BADGE ── */
+.priority-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:999px;
+  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;
+  margin-top:4px;
+}
+.priority-high{background:rgba(34,199,184,.18);border:1px solid var(--tline);color:var(--t2)}
+.priority-medium{background:rgba(245,158,11,.15);border:1px solid var(--yline);color:#fcd38a}
+.priority-low{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+
+/* ── PAGINATION ── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;padding-bottom:8px}
+.page-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;height:36px;padding:0 12px;border-radius:10px;
+  font-size:13px;font-weight:800;text-decoration:none;
+  background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--soft);
+  transition:.15s;
+}
+.page-btn:hover{color:#fff;border-color:var(--bline);background:var(--bsoft)}
+.page-btn.active{background:rgba(93,169,255,.18);border-color:var(--bline);color:var(--b2)}
+.page-btn.disabled{opacity:.35;pointer-events:none}
+.page-info{font-size:12px;color:var(--muted);font-weight:700}
+
 /* ── AI SCORE BADGE — sub best-role ── */
 .ai-badge{
   display:inline-flex;align-items:center;
@@ -547,6 +572,13 @@ table,th,td{font-size:13px}
                                     <div class="small">{{ candidate.companies or "Nespecificat" }}</div>
                                     <div class="cand-status">
                                         <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
+                                        {% if candidate.priority == 'HIGH' %}
+                                            <span class="priority-badge priority-high">● Suna azi</span>
+                                        {% elif candidate.priority == 'MEDIUM' %}
+                                            <span class="priority-badge priority-medium">● Prioritate medie</span>
+                                        {% elif candidate.priority == 'LOW' %}
+                                            <span class="priority-badge priority-low">● Prioritate mica</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -603,6 +635,24 @@ table,th,td{font-size:13px}
                     </article>
                 {% endfor %}
             </section>
+        {% endif %}
+
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}
+                <a class="page-btn" href="?q={{ q }}&status={{ status }}&job={{ job }}&skill={{ skill }}&min_score={{ min_score }}&page={{ page - 1 }}">← Prev</a>
+            {% else %}
+                <span class="page-btn disabled">← Prev</span>
+            {% endif %}
+
+            <span class="page-info">Pagina {{ page }} din {{ total_pages }}</span>
+
+            {% if page < total_pages %}
+                <a class="page-btn" href="?q={{ q }}&status={{ status }}&job={{ job }}&skill={{ skill }}&min_score={{ min_score }}&page={{ page + 1 }}">Next →</a>
+            {% else %}
+                <span class="page-btn disabled">Next →</span>
+            {% endif %}
+        </div>
         {% endif %}
     </main>
 </div>

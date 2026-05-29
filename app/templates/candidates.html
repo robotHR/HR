@@ -306,42 +306,41 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 
 
 /* =========================================================
-   NEXAS HR FONT SYSTEM - uniformizare fonturi
-   DM Sans = font principal pe toate paginile
-   Syne = doar pe titlurile marcate cu .syne-only
+   NEXAS HR FONT SYSTEM SAFE
+   DM Sans = font principal
+   Syne = doar pe elementele marcate cu .syne-only
    ========================================================= */
 :root{
   --font-main:'DM Sans',sans-serif;
   --font-accent:'Syne',sans-serif;
 }
-html,body,
-body *,
-button,input,select,textarea{
+body,button,input,select,textarea,.nav a,.page-sub,.hero-sub,.section-sub,.subtitle,
+.card,.panel,.stat-label,.kpi-lbl,.field label,label,.btn,button[class^="btn"],button[class*=" btn"],
+.tag,.status-badge,.tag-chip,.chip,.row-badge,table,th,td{
   font-family:var(--font-main) !important;
 }
-.syne-only,
-.syne-only *{
+.syne-only,.syne-only *{
   font-family:var(--font-accent) !important;
 }
-body{font-size:14px !important;line-height:1.45}
-.nav a{font-size:13px !important;font-weight:700 !important}
-.brand-main,.logo-text{font-size:20px !important;font-weight:800 !important;letter-spacing:-.03em !important}
-.brand-sub,.logo-sub{font-size:10px !important;letter-spacing:.20em !important}
-.eyebrow{font-size:10px !important;font-weight:900 !important;letter-spacing:.16em !important}
-h1,.page-title,.hero-title{font-size:26px !important;font-weight:800 !important;letter-spacing:-.04em !important;line-height:1.1 !important}
-.page-sub,.hero-sub,.section-sub,.subtitle{font-size:13px !important;line-height:1.55 !important}
-.section-title{font-size:16px !important;font-weight:800 !important;letter-spacing:-.02em !important}
-.card-title,.panel-title{font-size:11px !important;font-weight:900 !important;letter-spacing:.13em !important}
-.stat-label,.kpi-lbl,
-.field label,label{font-size:10px !important;font-weight:900 !important;letter-spacing:.10em !important}
-.stat-value,.kpi-val,.stat-num{font-size:28px !important;font-weight:800 !important;letter-spacing:-.04em !important}
-.stat-help,.kpi-note,.helper-text,.loading-note{font-size:11px !important;line-height:1.5 !important}
-.btn,button[class^="btn"],button[class*=" btn"]{font-size:13px !important;font-weight:800 !important}
-input,select,textarea{font-size:14px !important;font-weight:600 !important}
-.tag,.status-badge,.tag-chip,.chip,.row-badge{font-size:10px !important;font-weight:900 !important;letter-spacing:.06em !important}
-.score-num-badge,.score-cell{font-size:13px !important;font-weight:800 !important}
-.empty,.empty-state,.empty-recommendations,.empty-section,.empty-table{font-size:13px !important;line-height:1.5 !important}
-table,th,td{font-size:13px !important}
+body{font-size:14px;line-height:1.45}
+.nav a{font-size:13px;font-weight:700}
+.brand-main,.logo-text{font-size:20px;font-weight:800;letter-spacing:-.03em}
+.brand-sub,.logo-sub{font-size:10px;letter-spacing:.20em}
+.eyebrow{font-size:10px;font-weight:900;letter-spacing:.16em}
+h1,.page-title,.hero-title{font-size:26px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.page-sub,.hero-sub,.section-sub,.subtitle{font-size:13px;line-height:1.55}
+.section-title{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.card-title,.panel-title{font-size:11px;font-weight:900;letter-spacing:.13em}
+.stat-label,.kpi-lbl,.field label,label{font-size:10px;font-weight:900;letter-spacing:.10em}
+.stat-value,.kpi-val,.stat-num{font-size:28px;font-weight:800;letter-spacing:-.04em}
+.stat-help,.kpi-note,.helper-text,.loading-note{font-size:11px;line-height:1.5}
+.btn,button[class^="btn"],button[class*=" btn"]{font-size:13px;font-weight:800}
+input,select,textarea{font-size:14px;font-weight:600}
+.tag,.status-badge,.tag-chip,.chip,.row-badge{font-size:10px;font-weight:900;letter-spacing:.06em}
+.score-num-badge,.score-cell{font-size:13px;font-weight:800}
+.empty,.empty-state,.empty-recommendations,.empty-section,.empty-table{font-size:13px;line-height:1.5}
+table,th,td{font-size:13px}
+
 </style>
 </head>
 <body>

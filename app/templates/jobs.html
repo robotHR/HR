@@ -359,6 +359,151 @@ input,select,textarea{font-size:14px;font-weight:600}
 .empty,.empty-state,.empty-recommendations,.empty-section,.empty-table{font-size:13px;line-height:1.5}
 table,th,td{font-size:13px}
 
+
+/* ─── FIX SIDEBAR JOBS CA DASHBOARD ─── */
+.sidebar{
+  width:220px !important;
+  flex-shrink:0 !important;
+  background:linear-gradient(180deg,#111827 0%,#141b2d 100%) !important;
+  border-right:1px solid var(--line) !important;
+  position:fixed !important;
+  top:0 !important;
+  bottom:0 !important;
+  left:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  padding:0 !important;
+  z-index:20 !important;
+}
+
+.brand{
+  padding:24px 20px 20px !important;
+  border-bottom:1px solid var(--line) !important;
+}
+
+.brand-main{
+  font-family:'Syne',sans-serif !important;
+  font-size:20px !important;
+  font-weight:800 !important;
+  color:#fff !important;
+  letter-spacing:-.3px !important;
+  line-height:1.1 !important;
+}
+
+.brand-main span{
+  color:var(--b2) !important;
+}
+
+.brand-sub{
+  font-size:10px !important;
+  color:var(--muted) !important;
+  letter-spacing:2px !important;
+  text-transform:uppercase !important;
+  margin-top:4px !important;
+  font-weight:500 !important;
+}
+
+.nav{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:2px !important;
+  padding:14px 12px !important;
+  flex:1 !important;
+}
+
+.nav a{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+  font-size:13px !important;
+  font-weight:500 !important;
+  color:var(--muted) !important;
+  text-decoration:none !important;
+  border-radius:var(--radius-md) !important;
+  transition:.15s !important;
+  position:relative !important;
+  border:0 !important;
+  min-height:auto !important;
+}
+
+.nav a:hover{
+  color:#fff !important;
+  background:rgba(255,255,255,.05) !important;
+}
+
+.nav a.active{
+  color:#fff !important;
+  background:rgba(93,169,255,.15) !important;
+}
+
+.nav a.active::before{
+  content:'' !important;
+  position:absolute !important;
+  left:0 !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  width:3px !important;
+  height:60% !important;
+  background:var(--b2) !important;
+  border-radius:0 3px 3px 0 !important;
+}
+
+.nav a.logout-link{
+  color:#fca5a5 !important;
+  margin-top:auto !important;
+}
+
+.nav a.logout-link:hover{
+  background:rgba(248,113,113,.08) !important;
+  color:#f87171 !important;
+}
+
+.main{
+  margin-left:220px !important;
+  width:calc(100% - 220px) !important;
+}
+
+html[data-theme="light"] .sidebar{
+  background:#ffffff !important;
+  border-right:1px solid rgba(15,23,42,.10) !important;
+}
+
+html[data-theme="light"] .brand{
+  border-bottom:1px solid rgba(15,23,42,.10) !important;
+}
+
+html[data-theme="light"] .brand-main{
+  color:#07111f !important;
+}
+
+html[data-theme="light"] .brand-sub{
+  color:#8b95a5 !important;
+}
+
+html[data-theme="light"] .nav a{
+  color:#6b7280 !important;
+}
+
+html[data-theme="light"] .nav a:hover{
+  color:#07111f !important;
+  background:rgba(37,99,235,.06) !important;
+}
+
+html[data-theme="light"] .nav a.active{
+  color:#2563eb !important;
+  background:rgba(37,99,235,.10) !important;
+}
+
+html[data-theme="light"] .nav a.logout-link{
+  color:#ef4444 !important;
+}
+
+html[data-theme="light"] .nav a.logout-link:hover{
+  color:#dc2626 !important;
+  background:rgba(239,68,68,.08) !important;
+}
+
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
     <script src="/static/js/theme.js"></script>
@@ -366,18 +511,18 @@ table,th,td{font-size:13px}
 <body>
 
     <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-text">NEXAS<span class="accent"> HR</span></div>
-      <div class="logo-sub">HR Platform</div>
+    <div class="brand">
+        <div class="brand-main">NEXAS <span>HR</span></div>
+        <div class="brand-sub">HR Platform</div>
     </div>
-        
+
     <nav class="nav">
         <a href="/">Panou principal</a>
         <a href="/candidati">Candidati</a>
         <a href="/analytics">Statistici</a>
         <a class="active" href="/posturi">Posturi vacante</a>
         <a href="/calendar">Calendar</a>
-        <a class="logout-link" href="/logout">Deconectare</a>
+        <a class="logout-link" href="/logout">↪ Deconectare</a>
     </nav>
 </aside>
 

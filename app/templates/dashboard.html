@@ -802,6 +802,151 @@
 .top-cand-hdr{font-size:11px;font-weight:900;color:#7cc4ff;text-transform:uppercase;letter-spacing:.13em;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.09)}
 .top-cand-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px}
 .top-cand-score-lbl{font-size:10px;color:rgba(255,255,255,.4)}
+
+/* ─── LIGHT THEME TEXT FIX DASHBOARD ───
+   Cand tema este alba, fortam textele pale/albe sa devina negre.
+   Pastreaza accentele albastre si badge-urile colorate. */
+html[data-theme="light"]{
+    --bg:#f4f8ff;
+    --surface:#ffffff;
+    --surface-2:#ffffff;
+    --card:#ffffff;
+    --line:rgba(15,23,42,.10);
+    --line-2:rgba(15,23,42,.14);
+    --text:#07111f;
+    --muted:#667085;
+    --soft:#1f2937;
+}
+
+html[data-theme="light"] body{
+    color:#07111f !important;
+}
+
+html[data-theme="light"] .main,
+html[data-theme="light"] .workbench,
+html[data-theme="light"] .hero,
+html[data-theme="light"] .hero-panel,
+html[data-theme="light"] .source-card,
+html[data-theme="light"] .match-box,
+html[data-theme="light"] .mini-row,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .kpi-stat,
+html[data-theme="light"] .top-cand-box,
+html[data-theme="light"] .top-cand-row{
+    color:#07111f !important;
+}
+
+html[data-theme="light"] .hero-title,
+html[data-theme="light"] .section-title,
+html[data-theme="light"] .mini-title,
+html[data-theme="light"] .source-card h3,
+html[data-theme="light"] .match-title,
+html[data-theme="light"] .job-title,
+html[data-theme="light"] .row-name,
+html[data-theme="light"] .row-pos,
+html[data-theme="light"] .empty-recommendations strong,
+html[data-theme="light"] .top-cand-row .t-name,
+html[data-theme="light"] .stat-value{
+    color:#07111f !important;
+}
+
+html[data-theme="light"] .hero-sub,
+html[data-theme="light"] .section-sub,
+html[data-theme="light"] .source-card p,
+html[data-theme="light"] .helper-text,
+html[data-theme="light"] .mini-row small,
+html[data-theme="light"] .job-description,
+html[data-theme="light"] .row-sub,
+html[data-theme="light"] .row-summary,
+html[data-theme="light"] .risk-mini,
+html[data-theme="light"] .empty,
+html[data-theme="light"] .empty-recommendations,
+html[data-theme="light"] .empty-recommendations span,
+html[data-theme="light"] .kpi-sub,
+html[data-theme="light"] .top-cand-row .t-sub,
+html[data-theme="light"] .top-cand-score-lbl{
+    color:#667085 !important;
+}
+
+html[data-theme="light"] .kpi-lbl,
+html[data-theme="light"] .stat-label,
+html[data-theme="light"] .ai-mini-label,
+html[data-theme="light"] .cand-table th{
+    color:#334155 !important;
+}
+
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="file"],
+html[data-theme="light"] select,
+html[data-theme="light"] textarea{
+    color:#07111f !important;
+    background:#f8fafc !important;
+    border-color:rgba(15,23,42,.16) !important;
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder{
+    color:#8a94a6 !important;
+}
+
+html[data-theme="light"] input[type="text"]:focus,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] textarea:focus{
+    color:#07111f !important;
+    background:#ffffff !important;
+    border-color:rgba(37,99,235,.45) !important;
+}
+
+html[data-theme="light"] .dashboard-image-card{
+    background:linear-gradient(160deg,#eef6ff 0%,#e6f1ff 60%,#f8fbff 100%) !important;
+    border-color:rgba(37,99,235,.18) !important;
+}
+
+html[data-theme="light"] .ai-mini-num{
+    color:#07111f !important;
+}
+
+html[data-theme="light"] .ai-wave-header{
+    color:#2563eb !important;
+}
+
+html[data-theme="light"] .ai-wave-status{
+    color:#0f9f8f !important;
+}
+
+html[data-theme="light"] .btn-gmail,
+html[data-theme="light"] .btn-main,
+html[data-theme="light"] .btn-details{
+    color:#ffffff !important;
+}
+
+html[data-theme="light"] .btn-secondary,
+html[data-theme="light"] .btn-cv{
+    color:#2563eb !important;
+}
+
+html[data-theme="light"] .source-icon{
+    color:#07111f !important;
+    background:#eaf2ff !important;
+    border:1px solid rgba(37,99,235,.18) !important;
+}
+
+html[data-theme="light"] .mini-avatar,
+html[data-theme="light"] .row-avatar,
+html[data-theme="light"] .job-icon{
+    color:#2563eb !important;
+}
+
+html[data-theme="light"] .loading-box,
+html[data-theme="light"] .loading-step{
+    color:#07111f !important;
+}
+
+html[data-theme="light"] .loading-box p,
+html[data-theme="light"] .loading-note{
+    color:#667085 !important;
+}
+
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
     <script src="/static/js/theme.js"></script>

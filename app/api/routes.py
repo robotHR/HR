@@ -18,6 +18,7 @@ from app.models.candidate_event_model import CandidateEvent
 from app.models.cv_analysis_model import CvAnalysis
 from app.models.job_post_model import JobPost
 from app.models.interview_model import Interview
+from app.models.scheduling_token_model import SchedulingToken
 from app.services.cv_parser import (
     process_cvs_for_job,
     extract_text_from_file,
@@ -2268,3 +2269,240 @@ Echipa HR NEXAS
         )
     except Exception as e:
         print(f"[CALENDAR] WARN email interviu esuat catre {to_email}: {e}")
+
+
+# ─── SELF-SCHEDULING: candidatul isi alege singur ora ───────────────────────
+
+import secrets
+from datetime import datetime, timedelta
+
+
+@router.post("/candidat/{candidate_id}/invita-self-schedule")
+async def invite_self_schedule(candidate_id: int, background_tasks: BackgroundTasks, request: Request):
+    """Genereaza un token unic si trimite email candidatului cu link de programare."""
+    candidate = get_candidate_by_id(candidate_id)
+    if not candidate:
+        return JSONResponse({"error": "Candidatul nu a fost gasit."}, status_code=404)
+    if not candidate.email:
+        return JSONResponse({"error": "Candidatul nu are email."}, status_code=400)
+
+    token_str = secrets.token_urlsafe(32)
+    expires = datetime.utcnow() + timedelta(days=7)
+
+    db = SessionLocal()
+    tok = SchedulingToken(
+        token=token_str,
+        candidate_id=candidate_id,
+        expires_at=expires,
+    )
+    db.add(tok)
+    db.commit()
+    db.close()
+
+    base_url = str(request.base_url).rstrip("/")
+    link = f"{base_url}/programeaza/{token_str}"
+
+    background_tasks.add_task(
+        _send_scheduling_invite_email,
+        to_email=candidate.email,
+        candidate_name=candidate.name or "Candidat",
+        job_title=candidate.job_title or "postul pentru care ati aplicat",
+        link=link,
+    )
+
+    return JSONResponse({"success": True, "message": "Invitatie trimisa cu succes."})
+
+
+@router.get("/programeaza/{token}", response_class=HTMLResponse)
+async def scheduling_page(request: Request, token: str):
+    """Pagina publica unde candidatul isi alege data si ora interviului."""
+    db = SessionLocal()
+    tok = db.query(SchedulingToken).filter(SchedulingToken.token == token).first()
+    db.close()
+
+    if not tok:
+        return HTMLResponse("<h2>Link invalid.</h2>", status_code=404)
+    if tok.expires_at < datetime.utcnow():
+        return HTMLResponse("<h2>Link-ul a expirat.</h2>", status_code=410)
+    if tok.used:
+        return templates.TemplateResponse("schedule.html", {
+            "request": request,
+            "token": token,
+            "candidate_name": "",
+            "job_title": "",
+            "already_used": True,
+        })
+
+    db = SessionLocal()
+    candidate = db.query(Candidate).filter(Candidate.id == tok.candidate_id).first()
+    db.close()
+
+    return templates.TemplateResponse("schedule.html", {
+        "request": request,
+        "token": token,
+        "candidate_name": candidate.name if candidate else "Candidat",
+        "job_title": candidate.job_title if candidate else "",
+    })
+
+
+@router.get("/api/sloturi/{token}")
+async def get_available_slots(token: str, data: str):
+    """Returneaza sloturile orare disponibile (09:00-16:00) pt data data, minus cele ocupate."""
+    db = SessionLocal()
+    tok = db.query(SchedulingToken).filter(SchedulingToken.token == token).first()
+    if not tok or tok.used or tok.expires_at < datetime.utcnow():
+        db.close()
+        return JSONResponse({"error": "Token invalid."}, status_code=403)
+
+    booked = db.query(Interview.ora).filter(Interview.data == data).all()
+    db.close()
+
+    booked_hours = {row.ora for row in booked}
+    all_slots = [f"{h:02d}:00" for h in range(9, 17)]
+    available = [s for s in all_slots if s not in booked_hours]
+
+    return JSONResponse({"slots": available})
+
+
+@router.post("/programeaza/{token}")
+async def submit_schedule(
+    token: str,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    data: str = Form(...),
+    ora: str = Form(...),
+    locatie: str = Form("Sediu Firma NEXAS"),
+):
+    """Candidatul trimite formularul — salvam interviul si notificam HR-ul."""
+    db = SessionLocal()
+    tok = db.query(SchedulingToken).filter(SchedulingToken.token == token).first()
+
+    if not tok:
+        db.close()
+        return HTMLResponse("<h2>Link invalid.</h2>", status_code=404)
+    if tok.used:
+        db.close()
+        return templates.TemplateResponse("schedule.html", {
+            "request": request,
+            "token": token,
+            "candidate_name": "",
+            "job_title": "",
+            "already_used": True,
+        })
+    if tok.expires_at < datetime.utcnow():
+        db.close()
+        return HTMLResponse("<h2>Link-ul a expirat.</h2>", status_code=410)
+
+    candidate = db.query(Candidate).filter(Candidate.id == tok.candidate_id).first()
+    if not candidate:
+        db.close()
+        return HTMLResponse("<h2>Candidatul nu a fost gasit.</h2>", status_code=404)
+
+    interview = Interview(
+        candidate_id=candidate.id,
+        candidate_name=candidate.name,
+        candidate_email=candidate.email,
+        job_title=candidate.job_title,
+        data=data,
+        ora=ora,
+        locatie=locatie,
+        durata=60,
+        status="programat",
+    )
+    db.add(interview)
+
+    tok.used = True
+    db.commit()
+    db.close()
+
+    update_candidate_status(
+        candidate.id,
+        "INTERVIU",
+        event_title="Interviu programat (self-schedule)",
+        event_description=f"Candidatul a ales: {data} la {ora}. Locatie: {locatie}.",
+    )
+
+    background_tasks.add_task(
+        _send_hr_notification_email,
+        candidate_name=candidate.name or "Candidat",
+        job_title=candidate.job_title or "—",
+        data=data,
+        ora=ora,
+        locatie=locatie,
+    )
+
+    return templates.TemplateResponse("schedule.html", {
+        "request": request,
+        "token": token,
+        "candidate_name": candidate.name or "Candidat",
+        "job_title": candidate.job_title or "",
+        "confirmed": True,
+        "data": data,
+        "ora": ora,
+        "locatie": locatie,
+    })
+
+
+def _send_scheduling_invite_email(to_email: str, candidate_name: str, job_title: str, link: str):
+    """Trimite email candidatului cu link-ul de self-scheduling."""
+    try:
+        send_email_api(
+            to_email=to_email,
+            subject=f"Programeaza-ti interviul — {job_title}",
+            body=f"""Buna ziua, {candidate_name},
+
+Va felicitam! Ati fost selectat(a) pentru un interviu pentru postul de {job_title}.
+
+Va rugam sa va programati interviul accesand link-ul de mai jos si alegand data si ora care va convine:
+
+PROGRAMEAZA INTERVIU:
+{link}
+
+Link-ul este valabil 7 zile.
+
+Cu respect,
+Echipa HR NEXAS
+""",
+        )
+    except Exception as e:
+        print(f"[SCHEDULE] WARN email invite esuat catre {to_email}: {e}")
+
+
+def _send_hr_notification_email(candidate_name: str, job_title: str, data: str, ora: str, locatie: str):
+    """Notifica HR-ul cand un candidat si-a programat interviul."""
+    try:
+        hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or os.getenv("RESEND_FROM_EMAIL") or os.getenv("FROM_EMAIL")
+        if not hr_email:
+            print("[SCHEDULE] WARN: HR_NOTIFICATION_EMAIL nesetat, notificarea HR nu a fost trimisa.")
+            return
+
+        luni = {
+            "01": "Ianuarie", "02": "Februarie", "03": "Martie",
+            "04": "Aprilie", "05": "Mai", "06": "Iunie",
+            "07": "Iulie", "08": "August", "09": "Septembrie",
+            "10": "Octombrie", "11": "Noiembrie", "12": "Decembrie"
+        }
+        try:
+            parts = data.split("-")
+            data_fmt = f"{int(parts[2])} {luni.get(parts[1], parts[1])} {parts[0]}"
+        except Exception:
+            data_fmt = data
+
+        send_email_api(
+            to_email=hr_email,
+            subject=f"[NEXAS HR] Interviu programat — {candidate_name}",
+            body=f"""Un candidat si-a programat interviul.
+
+Candidat: {candidate_name}
+Post: {job_title}
+Data: {data_fmt}
+Ora: {ora}
+Locatie: {locatie}
+
+Poti vedea detaliile in platforma NEXAS HR.
+
+Echipa NEXAS HR
+""",
+        )
+    except Exception as e:
+        print(f"[SCHEDULE] WARN email HR notif esuat: {e}")

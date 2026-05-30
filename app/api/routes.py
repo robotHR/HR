@@ -120,6 +120,7 @@ def ensure_interview_extra_columns():
     with engine.begin() as conn:
         conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT FALSE"))
         conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMP"))
+        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS action_token VARCHAR"))
 
 
 ensure_interview_extra_columns()
@@ -791,7 +792,8 @@ async def dashboard(request: Request, background_tasks: BackgroundTasks):
     message = request.query_params.get("message")
 
     # ── Remindere interviuri (background, nu blocheaza pagina) ────────────────
-    _schedule_interview_reminders(background_tasks)
+    base_url = str(request.base_url).rstrip("/")
+    _schedule_interview_reminders(background_tasks, base_url=base_url)
 
     # ── Agentul recomanda azi ──────────────────────────────────────────────────
     call_now   = sorted([c for c in candidates if (c.recommended_next_action or "") == "CALL_NOW"],
@@ -1879,22 +1881,38 @@ async def force_reanalyze(candidate_id: int, background_tasks: BackgroundTasks):
 # ─── REMINDER INTERVIURI ──────────────────────────────────────────────────────
 
 def _send_interview_reminder_email(idata: dict):
-    """Trimite email reminder cu o zi inainte de interviu si marcheaza trimis."""
+    """Trimite email reminder cu 3 ore inainte de interviu cu linkuri confirma/anuleaza."""
     from datetime import datetime as dt
     try:
-        locatie_line = f"\nLocatia / Link: {idata['locatie']}" if idata.get("locatie") else ""
+        base_url = idata.get("base_url", "")
+        action_token = idata.get("action_token", "")
+        locatie_line = f"\nLocatie: {idata['locatie']}" if idata.get("locatie") else ""
+
+        confirm_link = f"{base_url}/interviu/{action_token}/confirma" if action_token else ""
+        cancel_link = f"{base_url}/interviu/{action_token}/anuleaza" if action_token else ""
+
+        confirm_section = ""
+        if confirm_link:
+            confirm_section = f"""
+------------------------------------------------------------
+Confirma participarea:
+{confirm_link}
+
+Anuleaza interviul:
+{cancel_link}
+------------------------------------------------------------
+"""
+
         send_email_api(
             to_email=idata["candidate_email"],
-            subject=f"Reminder interviu maine — {idata['job_title'] or 'postul aplicat'}",
+            subject=f"Reminder: interviu in 3 ore — {idata['job_title'] or 'postul aplicat'}",
             body=f"""Buna ziua, {idata['candidate_name'] or 'Candidat'},
 
-Va reamintim ca maine, {idata['data']} la ora {idata['ora']}, aveti programat un interviu pentru postul de {idata['job_title'] or 'postul aplicat'}.{locatie_line}
-
-Va rugam sa confirmati participarea sau sa ne contactati daca aveti indisponibilitate.
-
+Va reamintim ca astazi, la ora {idata['ora']}, aveti programat un interviu pentru postul de {idata['job_title'] or 'postul aplicat'}.{locatie_line}
+{confirm_section}
 Cu respect,
 Echipa HR NEXAS
-"""
+""",
         )
     except Exception as e:
         print(f"[REMINDER] WARN email esuat interviu {idata['id']}: {e}")
@@ -1911,32 +1929,51 @@ Echipa HR NEXAS
         print(f"[REMINDER] WARN update DB esuat: {e}")
 
 
-def _schedule_interview_reminders(background_tasks: BackgroundTasks):
-    """Verifica interviuri de maine si adauga reminder in background daca nu s-a trimis deja."""
+def _schedule_interview_reminders(background_tasks: BackgroundTasks, base_url: str = ""):
+    """Verifica interviuri in urmatoarele 3 ore si trimite reminder daca nu s-a trimis deja."""
     from datetime import datetime, timedelta
-    tomorrow = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+    now = datetime.utcnow()
+    today = now.strftime("%Y-%m-%d")
+    window_start = now + timedelta(hours=3)
+    window_end = now + timedelta(hours=4)
+
     try:
         db = SessionLocal()
-        upcoming = db.query(Interview).filter(
-            Interview.data == tomorrow,
+        candidates_today = db.query(Interview).filter(
+            Interview.data == today,
             Interview.reminder_sent.isnot(True),
-            Interview.status == "programat",
+            Interview.status.in_(["programat", "confirmat"]),
             Interview.candidate_email.isnot(None),
         ).all()
-        interviews_data = [{
-            "id": i.id,
-            "candidate_email": i.candidate_email,
-            "candidate_name": i.candidate_name,
-            "job_title": i.job_title,
-            "data": i.data,
-            "ora": i.ora,
-            "locatie": i.locatie,
-        } for i in upcoming]
+
+        interviews_data = []
+        for i in candidates_today:
+            try:
+                interview_dt = datetime.strptime(f"{i.data} {i.ora}", "%Y-%m-%d %H:%M")
+                if window_start <= interview_dt <= window_end:
+                    # Genereaza action_token daca nu exista
+                    if not i.action_token:
+                        i.action_token = secrets.token_urlsafe(24)
+                        db.commit()
+                    interviews_data.append({
+                        "id": i.id,
+                        "candidate_email": i.candidate_email,
+                        "candidate_name": i.candidate_name,
+                        "job_title": i.job_title,
+                        "data": i.data,
+                        "ora": i.ora,
+                        "locatie": i.locatie,
+                        "action_token": i.action_token,
+                        "base_url": base_url,
+                    })
+            except Exception:
+                continue
         db.close()
+
         for idata in interviews_data:
             background_tasks.add_task(_send_interview_reminder_email, idata)
         if interviews_data:
-            print(f"[REMINDER] Programate {len(interviews_data)} remindere pentru {tomorrow}")
+            print(f"[REMINDER] Trimise {len(interviews_data)} remindere pentru ora {window_start.strftime('%H:%M')}")
     except Exception as e:
         print(f"[REMINDER] WARN schedule error: {e}")
 
@@ -2176,6 +2213,7 @@ async def create_interview_api(
         locatie=locatie,
         durata=durata,
         status="programat",
+        action_token=secrets.token_urlsafe(24),
     )
     db.add(interview)
     db.commit()
@@ -2417,6 +2455,7 @@ async def submit_schedule(
         locatie=locatie,
         durata=60,
         status="programat",
+        action_token=secrets.token_urlsafe(24),
     )
     db.add(interview)
 
@@ -2515,3 +2554,100 @@ Echipa NEXAS HR
         )
     except Exception as e:
         print(f"[SCHEDULE] WARN email HR notif esuat: {e}")
+
+
+# ─── CONFIRMARE / ANULARE INTERVIU (linkuri din email) ───────────────────────
+
+def _interview_action_page(title: str, message: str, color: str = "#22c7b8") -> str:
+    return f"""<!DOCTYPE html>
+<html lang="ro"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title} | NEXAS HR</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,#121827,#171f33 55%,#1d263d);padding:24px}}
+.card{{background:#1a2238;border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:40px 36px;
+max-width:440px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.3)}}
+.icon{{font-size:52px;margin-bottom:18px}}
+h2{{font-size:22px;font-weight:800;color:#fff;margin-bottom:10px}}
+p{{font-size:14px;color:rgba(255,255,255,.65);line-height:1.6}}
+.badge{{display:inline-block;margin-top:18px;padding:8px 20px;border-radius:99px;
+font-size:12px;font-weight:700;background:rgba(255,255,255,.07);color:{color}}}
+</style></head>
+<body><div class="card">
+<div class="icon">{'✅' if color == '#22c7b8' else '❌'}</div>
+<h2>{title}</h2>
+<p>{message}</p>
+<div class="badge">NEXAS HR</div>
+</div></body></html>"""
+
+
+@router.get("/interviu/{action_token}/confirma", response_class=HTMLResponse)
+async def confirma_interviu(action_token: str):
+    """Candidatul confirma participarea la interviu din link-ul email."""
+    db = SessionLocal()
+    interview = db.query(Interview).filter(Interview.action_token == action_token).first()
+    if not interview:
+        db.close()
+        return HTMLResponse(_interview_action_page("Link invalid", "Acest link nu este valid.", "#ff6b70"), status_code=404)
+
+    if interview.status == "anulat":
+        db.close()
+        return HTMLResponse(_interview_action_page(
+            "Interviu anulat",
+            "Interviul a fost deja anulat. Contacteaza-ne pentru reprogramare.",
+            "#ff6b70"
+        ))
+
+    interview.status = "confirmat"
+    db.commit()
+    ora = interview.ora
+    data = interview.data
+    job = interview.job_title or "postul aplicat"
+    db.close()
+
+    return HTMLResponse(_interview_action_page(
+        "Participare confirmata!",
+        f"Multumim! Te asteptam pe {data} la ora {ora} pentru interviul de {job}.",
+        "#22c7b8"
+    ))
+
+
+@router.get("/interviu/{action_token}/anuleaza", response_class=HTMLResponse)
+async def anuleaza_interviu(action_token: str):
+    """Candidatul anuleaza interviul din link-ul email."""
+    db = SessionLocal()
+    interview = db.query(Interview).filter(Interview.action_token == action_token).first()
+    if not interview:
+        db.close()
+        return HTMLResponse(_interview_action_page("Link invalid", "Acest link nu este valid.", "#ff6b70"), status_code=404)
+
+    if interview.status in ("anulat", "finalizat"):
+        db.close()
+        return HTMLResponse(_interview_action_page(
+            "Interviu deja procesat",
+            "Interviul a fost deja anulat sau finalizat.",
+            "#ff6b70"
+        ))
+
+    cand_id = interview.candidate_id
+    interview.status = "anulat"
+    db.commit()
+    db.close()
+
+    try:
+        update_candidate_status(
+            cand_id,
+            "APLICAT",
+            event_title="Interviu anulat de candidat",
+            event_description="Candidatul a anulat interviul din link-ul de reminder.",
+        )
+    except Exception:
+        pass
+
+    return HTMLResponse(_interview_action_page(
+        "Interviu anulat",
+        "Interviul a fost anulat. Echipa HR va fi notificata si te vom contacta pentru reprogramare.",
+        "#f59e0b"
+    ))

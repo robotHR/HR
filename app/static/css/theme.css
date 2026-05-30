@@ -325,6 +325,9 @@ input, select, textarea {
 }
 [data-theme="light"] .score-bar-track { background: rgba(0,0,0,.10); }
 
+/* ── Dashboard — ai-mini-label ── */
+[data-theme="light"] .ai-mini-label { color: rgba(15,23,42,.48); }
+
 /* ── Analytics — bar track & quality boxes ── */
 [data-theme="light"] .bar-track { background: rgba(0,0,0,.09); border-color: rgba(0,0,0,.06); }
 [data-theme="light"] .quality-box {
@@ -357,6 +360,12 @@ input, select, textarea {
   background: rgba(0,0,0,.03);
   border-color: rgba(0,0,0,.08);
 }
+[data-theme="light"] .mcal-iv-t  { color: #0f172a; }
+[data-theme="light"] .mcal-iv-d  { color: rgba(15,23,42,.52); }
+[data-theme="light"] .mcal-dn    { color: rgba(15,23,42,.48); }
+[data-theme="light"] .mcal-dd    { color: #0f172a; }
+[data-theme="light"] .mcal-day.sel .mcal-dn,
+[data-theme="light"] .mcal-day.sel .mcal-dd { color: #ffffff; }
 
 /* ═══════════════════════════════════════════════════════════
    DARK MODE — public pages (careers / career_detail / login)

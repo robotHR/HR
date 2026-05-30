@@ -463,8 +463,18 @@ table,th,td{font-size:13px}
                             {% endif %}
                         </div>
                     </div>
-                    <div class="hero-score {% if candidate.status in ['ADMIS','ANGAJAT'] %}score-green{% elif candidate.status in ['DE ANALIZAT','SELECTAT','INTERVIU'] %}score-yellow{% elif candidate.status in ['RESPINS','REFUZAT','EXCLUS'] %}score-red{% else %}score-default{% endif %}">
-                        {{ candidate.score }}
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+                        <div class="hero-score {% if candidate.status in ['ADMIS','ANGAJAT'] %}score-green{% elif candidate.status in ['DE ANALIZAT','SELECTAT','INTERVIU'] %}score-yellow{% elif candidate.status in ['RESPINS','REFUZAT','EXCLUS'] %}score-red{% else %}score-default{% endif %}">
+                            {{ candidate.score }}
+                        </div>
+                        {% if avg_score %}
+                        <div style="text-align:right">
+                            <div style="font-size:9px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:3px">Interviu</div>
+                            <span style="display:inline-flex;align-items:center;gap:5px;background:{% if avg_score >= 4 %}var(--tsoft){% elif avg_score >= 3 %}var(--ysoft){% else %}var(--rsoft){% endif %};border:1px solid {% if avg_score >= 4 %}var(--tline){% elif avg_score >= 3 %}var(--yline){% else %}var(--rline){% endif %};border-radius:999px;padding:3px 10px;font-size:11px;font-weight:900;color:{% if avg_score >= 4 %}var(--t2){% elif avg_score >= 3 %}#fcd38a{% else %}#ffb4b7{% endif %}">
+                                ★ {{ avg_score }}/5
+                            </span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -479,6 +489,10 @@ table,th,td{font-size:13px}
                             Marcheaza potential
                         </button>
                     </form>
+                    <button class="btn btn-edit-sm" type="button" onclick="toggleLinkEvaluare()" id="btn-link-eval">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        Link evaluare
+                    </button>
                     <button class="btn btn-email" type="button" onclick="invitaInterviu({{ candidate.id }})" id="btn-invita">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                         Invita la interviu
@@ -736,6 +750,102 @@ table,th,td{font-size:13px}
                 </div>
             </div>
 
+            <!-- ─── PANEL GENERARE LINK EVALUARE ─── -->
+            <div id="linkEvalPanel" style="display:none">
+            <div class="panel full" style="border-color:var(--bline)">
+                <div class="panel-title" style="color:var(--b2)">Trimite link evaluare către evaluator extern</div>
+                <p style="font-size:13px;color:var(--soft);margin-bottom:14px;line-height:1.6">
+                    Generează un link unic pe care îl trimiți șefului de departament / evaluatorului. Acesta completează formularul fără să aibă cont în platformă. Evaluarea apare automat la profilul candidatului.
+                </p>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Numele evaluatorului (opțional)</label>
+                        <input type="text" id="eval-name" placeholder="Ex: Ion Marinescu — Șef depozit">
+                    </div>
+                    <div class="field">
+                        <label>Email evaluator (opțional)</label>
+                        <input type="email" id="eval-email" placeholder="Ex: ion.marinescu@firma.ro">
+                    </div>
+                    {% if interviews %}
+                    <div class="field">
+                        <label>Legat de interviul (opțional)</label>
+                        <select id="eval-interview-id">
+                            <option value="">— fără interviu specific —</option>
+                            {% for iv in interviews %}
+                            <option value="{{ iv.id }}">{{ iv.data }} · {{ iv.ora }} {% if iv.locatie %}· {{ iv.locatie }}{% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% else %}
+                    <input type="hidden" id="eval-interview-id" value="">
+                    {% endif %}
+                    <div class="field full">
+                        <button class="btn btn-primary" type="button" id="btn-gen-link" onclick="genereazaLink()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            Generează link
+                        </button>
+                    </div>
+                </div>
+                <div id="link-result" style="display:none;margin-top:4px">
+                    <div style="font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Link generat — trimite-l evaluatorului</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input type="text" id="link-output" readonly style="background:rgba(93,169,255,.06);border-color:var(--bline);font-size:12px;font-weight:700;cursor:text">
+                        <button class="btn btn-secondary" type="button" id="btn-copy" onclick="copiazaLink()" style="flex-shrink:0;white-space:nowrap">Copiază</button>
+                    </div>
+                    <div id="link-expiry" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+                </div>
+            </div>
+            </div>
+
+            <!-- ─── INTERVIURI & SCORECARD ────── -->
+            {% if interviews %}
+            <div class="panel full">
+                <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between">
+                    <span>Interviuri programate</span>
+                    <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:none;letter-spacing:0">{{ interviews|length }} total</span>
+                </div>
+                <div style="display:grid;gap:10px">
+                    {% for iv in interviews %}
+                    {% set sc = scorecard_map.get(iv.id) %}
+                    <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:13px;flex-wrap:wrap">
+                        <!-- Date/time -->
+                        <div style="display:flex;flex-direction:column;gap:2px;min-width:90px">
+                            <span style="font-size:12px;font-weight:800;color:#fff">{{ iv.data }}</span>
+                            <span style="font-size:11px;color:var(--muted)">{{ iv.ora }}{% if iv.durata %} · {{ iv.durata }} min{% endif %}</span>
+                        </div>
+                        <!-- Location -->
+                        {% if iv.locatie %}
+                        <span style="font-size:12px;color:var(--soft);flex:1;min-width:80px">{{ iv.locatie }}</span>
+                        {% else %}
+                        <span style="flex:1"></span>
+                        {% endif %}
+                        <!-- Status badge -->
+                        <span style="padding:3px 9px;border-radius:999px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;{% if iv.status == 'confirmat' %}background:var(--tsoft);border:1px solid var(--tline);color:var(--t2){% elif iv.status == 'anulat' %}background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7{% elif iv.status == 'finalizat' %}background:var(--bsoft);border:1px solid var(--bline);color:var(--b2){% else %}background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft){% endif %}">
+                            {{ iv.status }}
+                        </span>
+                        <!-- Scorecard badge or button -->
+                        {% if sc %}
+                        {% set sc_avg = ((sc.technical_skills_score or 0) + (sc.attention_to_detail_score or 0) + (sc.communication_score or 0) + (sc.team_fit_score or 0)) / 4 %}
+                        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                            <span style="padding:3px 10px;border-radius:999px;font-size:10px;font-weight:900;background:{% if sc_avg >= 4 %}var(--tsoft){% elif sc_avg >= 3 %}var(--ysoft){% else %}var(--rsoft){% endif %};border:1px solid {% if sc_avg >= 4 %}var(--tline){% elif sc_avg >= 3 %}var(--yline){% else %}var(--rline){% endif %};color:{% if sc_avg >= 4 %}var(--t2){% elif sc_avg >= 3 %}#fcd38a{% else %}#ffb4b7{% endif %}">
+                                ★ {{ "%.1f"|format(sc_avg) }} · {{ sc.overall_recommendation }}
+                            </span>
+                            <a href="/candidat/{{ candidate.id }}/scorecard/{{ iv.id }}" style="padding:5px 12px;border-radius:9px;font-size:11px;font-weight:800;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--soft);text-decoration:none;transition:.14s" onmouseover="this.style.borderColor='var(--bline)'" onmouseout="this.style.borderColor='var(--line2)'">
+                                Editeaza
+                            </a>
+                        </div>
+                        {% else %}
+                        <a href="/candidat/{{ candidate.id }}/scorecard/{{ iv.id }}" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;font-size:12px;font-weight:800;background:var(--bsoft);border:1px solid var(--bline);color:var(--b2);text-decoration:none;transition:.14s;flex-shrink:0" onmouseover="this.style.background='rgba(93,169,255,.22)'" onmouseout="this.style.background='var(--bsoft)'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            Fill Scorecard
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- ─── ISTORIC ────────────────────── -->
             <div class="panel full">
                 <div class="panel-title">Istoric actiuni</div>
@@ -771,6 +881,54 @@ function toggleEdit(){
     if(!panel.classList.contains("hidden")){
         panel.scrollIntoView({behavior:"smooth", block:"start"});
     }
+}
+
+/* ── Link evaluare ── */
+function toggleLinkEvaluare() {
+    var panel = document.getElementById('linkEvalPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    if (panel.style.display === 'block') panel.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function genereazaLink() {
+    var btn = document.getElementById('btn-gen-link');
+    var name = document.getElementById('eval-name').value;
+    var email = document.getElementById('eval-email').value;
+    var intId = document.getElementById('eval-interview-id').value;
+    btn.disabled = true;
+    btn.textContent = 'Se generează...';
+    fetch('/candidat/{{ candidate.id }}/genereaza-link-evaluare', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: 'evaluator_name=' + encodeURIComponent(name)
+            + '&evaluator_email=' + encodeURIComponent(email)
+            + '&interview_id=' + encodeURIComponent(intId || 0)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+        if (d.success) {
+            document.getElementById('link-result').style.display = 'block';
+            document.getElementById('link-output').value = d.link;
+            document.getElementById('link-expiry').textContent = 'Link valabil până pe ' + d.expires;
+        } else {
+            alert('Eroare: ' + (d.error || 'Necunoscută'));
+            btn.disabled = false;
+            btn.textContent = 'Generează link';
+        }
+    })
+    .catch(function(){ btn.disabled = false; btn.textContent = 'Generează link'; alert('Eroare de rețea.'); });
+}
+
+function copiazaLink() {
+    var inp = document.getElementById('link-output');
+    inp.select();
+    navigator.clipboard.writeText(inp.value).then(function(){
+        var btn = document.getElementById('btn-copy');
+        btn.textContent = '✓ Copiat!';
+        btn.style.background = 'rgba(34,199,184,.18)';
+        btn.style.color = '#5ee6da';
+        setTimeout(function(){ btn.textContent = 'Copiază'; btn.style.background=''; btn.style.color=''; }, 2000);
+    });
 }
 
 function invitaInterviu(candidateId) {

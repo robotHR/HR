@@ -19,7 +19,9 @@ class Interview(Base):
     locatie = Column(String, nullable=True)
     durata = Column(Integer, default=60)         # minute
 
-    status = Column(String, default="programat") # programat / finalizat / anulat
+    status = Column(String, default="programat") # programat / confirmat / anulat / finalizat
+
+    action_token = Column(String, unique=True, nullable=True, index=True)
 
     reminder_sent = Column(Boolean, default=False)
     reminder_sent_at = Column(DateTime, nullable=True)

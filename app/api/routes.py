@@ -19,6 +19,7 @@ from app.models.cv_analysis_model import CvAnalysis
 from app.models.job_post_model import JobPost
 from app.models.interview_model import Interview
 from app.models.scheduling_token_model import SchedulingToken
+from app.models.interview_scorecard_model import InterviewScorecard
 from app.services.cv_parser import (
     process_cvs_for_job,
     extract_text_from_file,
@@ -124,6 +125,62 @@ def ensure_interview_extra_columns():
 
 
 ensure_interview_extra_columns()
+
+
+def ensure_scorecard_columns():
+    if not inspect(engine).has_table("interview_scorecards"):
+        return
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE interview_scorecards ADD COLUMN IF NOT EXISTS evaluator_name VARCHAR"))
+
+
+ensure_scorecard_columns()
+
+
+# ── Scorecard helpers ────────────────────────────────────────────────────────
+
+VALID_RECOMMENDATIONS = ["Strong Hire", "Hire", "No Hire"]
+
+
+def calculate_average_score(scorecard) -> float:
+    scores = [
+        scorecard.technical_skills_score,
+        scorecard.attention_to_detail_score,
+        scorecard.communication_score,
+        scorecard.team_fit_score,
+    ]
+    valid = [s for s in scores if s is not None and 1 <= s <= 5]
+    if not valid:
+        return 0.0
+    return round(sum(valid) / len(valid), 1)
+
+
+def get_candidate_scorecard(candidate_id: int):
+    db = SessionLocal()
+    sc = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == candidate_id
+    ).order_by(InterviewScorecard.id.desc()).first()
+    db.close()
+    return sc
+
+
+def get_scorecard_by_interview(candidate_id: int, interview_id: int):
+    db = SessionLocal()
+    sc = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == candidate_id,
+        InterviewScorecard.interview_id == interview_id,
+    ).first()
+    db.close()
+    return sc
+
+
+def get_candidate_interviews(candidate_id: int):
+    db = SessionLocal()
+    interviews = db.query(Interview).filter(
+        Interview.candidate_id == candidate_id
+    ).order_by(Interview.id.desc()).all()
+    db.close()
+    return interviews
 
 
 def load_candidates():
@@ -919,11 +976,31 @@ async def candidate_detail(request: Request, candidate_id: int):
     message = request.query_params.get("message")
     error = request.query_params.get("error")
     events = get_candidate_events(candidate_id)
+    interviews = get_candidate_interviews(candidate_id)
+
+    db = SessionLocal()
+    scorecards = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == candidate_id
+    ).all()
+    db.close()
+
+    scorecard_map = {sc.interview_id: sc for sc in scorecards}
+    latest_scorecard = scorecards[-1] if scorecards else None
+    avg_score = calculate_average_score(latest_scorecard) if latest_scorecard else None
 
     return templates.TemplateResponse(
         request=request,
         name="candidate_detail.html",
-        context={"request": request, "candidate": candidate, "events": events, "message": message, "error": error}
+        context={
+            "request": request,
+            "candidate": candidate,
+            "events": events,
+            "message": message,
+            "error": error,
+            "interviews": interviews,
+            "scorecard_map": scorecard_map,
+            "avg_score": avg_score,
+        }
     )
 
 
@@ -2762,3 +2839,134 @@ async def anuleaza_interviu(action_token: str):
         "Interviul a fost anulat. Echipa HR va fi notificata si te vom contacta pentru reprogramare.",
         "#f59e0b"
     ))
+
+
+# ── Interview Scorecard ───────────────────────────────────────────────────────
+
+@router.get("/candidat/{candidate_id}/scorecard/{interview_id}", response_class=HTMLResponse)
+async def scorecard_form(request: Request, candidate_id: int, interview_id: int):
+    candidate = get_candidate_by_id(candidate_id)
+    if not candidate:
+        return RedirectResponse(url="/candidati", status_code=303)
+
+    db = SessionLocal()
+    interview = db.query(Interview).filter(Interview.id == interview_id).first()
+    existing = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == candidate_id,
+        InterviewScorecard.interview_id == interview_id,
+    ).first()
+    db.close()
+
+    if not interview or interview.candidate_id != candidate_id:
+        return RedirectResponse(url=f"/candidat/{candidate_id}", status_code=303)
+
+    avg_score = calculate_average_score(existing) if existing else None
+    message = request.query_params.get("message")
+
+    return templates.TemplateResponse(
+        request=request,
+        name="scorecard_form.html",
+        context={
+            "request": request,
+            "candidate": candidate,
+            "interview": interview,
+            "scorecard": existing,
+            "avg_score": avg_score,
+            "recommendations": VALID_RECOMMENDATIONS,
+            "message": message,
+        }
+    )
+
+
+@router.post("/candidat/{candidate_id}/scorecard/{interview_id}")
+async def scorecard_submit(
+    request: Request,
+    candidate_id: int,
+    interview_id: int,
+    evaluator_name: str = Form(""),
+    technical_skills_score: int = Form(...),
+    attention_to_detail_score: int = Form(...),
+    communication_score: int = Form(...),
+    team_fit_score: int = Form(...),
+    overall_recommendation: str = Form(...),
+    comments: str = Form(""),
+):
+    errors = []
+    for label, val in [
+        ("Technical skills", technical_skills_score),
+        ("Attention to detail", attention_to_detail_score),
+        ("Communication", communication_score),
+        ("Team fit", team_fit_score),
+    ]:
+        if not (1 <= val <= 5):
+            errors.append(f"{label} score must be between 1 and 5.")
+
+    if overall_recommendation not in VALID_RECOMMENDATIONS:
+        errors.append("Invalid recommendation value.")
+
+    if errors:
+        candidate = get_candidate_by_id(candidate_id)
+        db = SessionLocal()
+        interview = db.query(Interview).filter(Interview.id == interview_id).first()
+        existing = db.query(InterviewScorecard).filter(
+            InterviewScorecard.candidate_id == candidate_id,
+            InterviewScorecard.interview_id == interview_id,
+        ).first()
+        db.close()
+        return templates.TemplateResponse(
+            request=request,
+            name="scorecard_form.html",
+            context={
+                "request": request,
+                "candidate": candidate,
+                "interview": interview,
+                "scorecard": existing,
+                "avg_score": None,
+                "recommendations": VALID_RECOMMENDATIONS,
+                "error": " ".join(errors),
+            },
+            status_code=422,
+        )
+
+    db = SessionLocal()
+    existing = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == candidate_id,
+        InterviewScorecard.interview_id == interview_id,
+    ).first()
+
+    if existing:
+        existing.evaluator_name = evaluator_name.strip() or existing.evaluator_name
+        existing.technical_skills_score = technical_skills_score
+        existing.attention_to_detail_score = attention_to_detail_score
+        existing.communication_score = communication_score
+        existing.team_fit_score = team_fit_score
+        existing.overall_recommendation = overall_recommendation
+        existing.comments = comments.strip()
+    else:
+        sc = InterviewScorecard(
+            candidate_id=candidate_id,
+            interview_id=interview_id,
+            evaluator_name=evaluator_name.strip() or None,
+            technical_skills_score=technical_skills_score,
+            attention_to_detail_score=attention_to_detail_score,
+            communication_score=communication_score,
+            team_fit_score=team_fit_score,
+            overall_recommendation=overall_recommendation,
+            comments=comments.strip() or None,
+        )
+        db.add(sc)
+
+    db.commit()
+    db.close()
+
+    log_candidate_event(
+        candidate_id=candidate_id,
+        event_type="SCORECARD",
+        title="Scorecard completat",
+        description=f"Evaluare interviu: {overall_recommendation}" + (f" – de catre {evaluator_name.strip()}" if evaluator_name.strip() else ""),
+    )
+
+    return RedirectResponse(
+        url=f"/candidat/{candidate_id}/scorecard/{interview_id}?message=Scorecard salvat cu succes.",
+        status_code=303,
+    )

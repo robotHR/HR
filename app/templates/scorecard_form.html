@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+<script>(function(){document.documentElement.setAttribute('data-theme',localStorage.getItem('nexas-theme')||'dark');})()</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorecard interviu | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 8%,rgba(93,169,255,.14),transparent 34%),
+    radial-gradient(circle at 88% 85%,rgba(34,199,184,.08),transparent 30%),
+    linear-gradient(135deg,#121827,#171f33 50%,#1d263d);
+}
+:root{
+  --bg:#141b2d;--s1:#1a2238;--s2:#202a44;--card:#1c2540;
+  --line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.14);
+  --soft:rgba(255,255,255,.82);--muted:rgba(255,255,255,.50);
+  --blue:#5da9ff;--b2:#7cc4ff;--bsoft:rgba(93,169,255,.13);--bline:rgba(93,169,255,.26);
+  --teal:#22c7b8;--t2:#5ee6da;--tsoft:rgba(34,199,184,.13);--tline:rgba(34,199,184,.26);
+  --yellow:#f59e0b;--ysoft:rgba(245,158,11,.13);--yline:rgba(245,158,11,.26);
+  --red:#ff6b70;--rsoft:rgba(255,107,112,.13);--rline:rgba(255,107,112,.26);
+  --r:12px;--rl:18px;--rxl:22px;--radius-sm:9px;
+}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  width:220px;position:fixed;top:0;bottom:0;left:0;z-index:20;
+  background:linear-gradient(180deg,#101825,#141b2d);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+}
+.brand{padding:24px 20px 20px;border-bottom:1px solid var(--line)}
+.brand-main{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1}
+.brand-main span{color:var(--b2)}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
+.nav{display:flex;flex-direction:column;gap:2px;padding:12px 10px;flex:1}
+.nav a{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;transition:.15s;position:relative;user-select:none}
+.nav a svg{width:15px;height:15px;opacity:.65;flex-shrink:0;transition:.15s}
+.nav a:hover{color:#fff;background:rgba(255,255,255,.055)}
+.nav a:hover svg{opacity:1}
+.nav a.active{color:#fff;background:rgba(93,169,255,.15)}
+.nav a.active svg{opacity:1;color:var(--b2)}
+.nav a.logout-link{color:rgba(252,165,165,.72);margin-top:auto}
+.nav a.logout-link:hover{color:#fca5a5;background:rgba(248,113,113,.08)}
+.main{margin-left:220px;width:calc(100% - 220px);min-height:100vh;padding:26px 28px 36px}
+.topbar{height:62px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 28px;gap:14px;background:rgba(20,27,45,.92);backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.topbar-title{font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;color:#07111f}
+.back-btn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--soft);text-decoration:none;padding:8px 14px;border-radius:11px;border:1px solid var(--line2);background:rgba(255,255,255,.04);transition:.15s;margin-bottom:20px}
+.back-btn:hover{color:#fff;border-color:var(--bline)}
+.content{padding:22px 26px 32px;max-width:760px;margin:0 auto}
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);padding:22px;margin-bottom:16px}
+.panel-title{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.13em;margin-bottom:13px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.hero-row{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.cand-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#07111f;flex-shrink:0;border:2px solid var(--bline)}
+.hero-name{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.hero-sub{font-size:12px;color:var(--soft);margin-top:3px}
+.interview-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+.meta-chip{background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:800;color:var(--soft);display:inline-flex;align-items:center;gap:5px}
+.meta-chip svg{width:12px;height:12px;opacity:.65}
+/* ── Criteria ── */
+.criteria-grid{display:grid;gap:14px}
+.criterion{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.criterion-label{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+.star-row{display:flex;gap:8px;align-items:center}
+.star-row input[type=radio]{display:none}
+.star-row label{
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:10px;
+  border:1px solid var(--line2);background:rgba(255,255,255,.04);
+  font-size:18px;transition:.15s;position:relative;user-select:none;
+}
+.star-row label:hover,.star-row label:hover ~ label{border-color:var(--yline);background:var(--ysoft)}
+.star-row input[type=radio]:checked + label,
+.star-row input[type=radio]:checked ~ input + label,
+.star-row input[type=radio]:checked ~ input ~ input + label,
+.star-row input[type=radio]:checked ~ input ~ input ~ input + label,
+.star-row input[type=radio]:checked ~ input ~ input ~ input ~ input + label{
+  border-color:var(--yline);background:var(--ysoft);
+}
+.star-row .score-hint{font-size:11px;color:var(--muted);margin-left:10px;white-space:nowrap}
+/* simpler approach: highlight selected via JS */
+.star-btn{
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:10px;
+  border:1px solid var(--line2);background:rgba(255,255,255,.04);
+  font-size:18px;transition:.15s;user-select:none;flex-shrink:0;
+}
+.star-btn.active{border-color:var(--yline);background:var(--ysoft)}
+.star-btn:hover{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+.star-group{display:flex;gap:8px;align-items:center}
+.score-hint{font-size:11px;color:var(--muted);margin-left:8px}
+/* ── Recommendation ── */
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+.rec-option{position:relative}
+.rec-option input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.rec-card{
+  cursor:pointer;border-radius:14px;padding:14px 10px;text-align:center;
+  border:2px solid var(--line);background:rgba(255,255,255,.03);
+  transition:.15s;display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.rec-card:hover{border-color:var(--bline);background:var(--bsoft)}
+.rec-option input[type=radio]:checked + .rec-card{border-color:var(--b2);background:rgba(93,169,255,.12)}
+.rec-card.strong-hire input:checked,.rec-option.strong-hire input:checked + .rec-card{border-color:var(--teal);background:var(--tsoft)}
+.rec-option.hire input:checked + .rec-card{border-color:var(--blue);background:var(--bsoft)}
+.rec-option.no-hire input:checked + .rec-card{border-color:var(--red);background:var(--rsoft)}
+.rec-icon{font-size:22px}
+.rec-label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.10em}
+.rec-option.strong-hire .rec-label{color:var(--t2)}
+.rec-option.hire .rec-label{color:var(--b2)}
+.rec-option.no-hire .rec-label{color:#ffb4b7}
+/* ── Form fields ── */
+.field{margin-bottom:14px}
+.field label{font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:6px}
+input[type=text],textarea{width:100%;padding:10px 13px;border-radius:11px;border:1px solid var(--line2);background:rgba(255,255,255,.06);color:#fff;font-size:14px;font-weight:600;outline:none;transition:.18s;font-family:'DM Sans',sans-serif}
+input[type=text]:focus,textarea:focus{border-color:var(--bline);box-shadow:0 0 0 3px rgba(93,169,255,.10)}
+input[type=text]::placeholder,textarea::placeholder{color:rgba(255,255,255,.28)}
+textarea{min-height:100px;resize:vertical;line-height:1.5}
+/* ── Score summary ── */
+.avg-bar{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--rl);padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.avg-circle{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;flex-shrink:0}
+.avg-circle.high{background:linear-gradient(135deg,var(--teal),var(--blue));color:#07111f}
+.avg-circle.mid{background:linear-gradient(135deg,var(--yellow),#f59e0b88);color:#07111f}
+.avg-circle.low{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.avg-label{font-size:12px;color:var(--muted);margin-top:2px}
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:11px;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:.15s;font-family:'DM Sans',sans-serif;text-decoration:none;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--b2));color:#07111f;box-shadow:0 4px 14px rgba(93,169,255,.22)}
+.btn-primary:hover{box-shadow:0 8px 22px rgba(93,169,255,.32)}
+.btn-secondary{background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--soft)}
+.btn-secondary:hover{color:#fff;border-color:var(--bline);background:var(--bsoft)}
+.notice{padding:11px 14px;border-radius:11px;font-size:13px;font-weight:700;margin-bottom:14px}
+.ok-msg{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.err-msg{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.form-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+.hidden{display:none!important}
+/* Light theme */
+[data-theme="light"] body{background:linear-gradient(135deg,#f0f4ff,#e8f0fe 50%,#edf2ff);color:#1a2238}
+[data-theme="light"] :root{--s1:#fff;--s2:#f5f7ff;--line:rgba(0,0,0,.08);--line2:rgba(0,0,0,.12);--soft:rgba(26,34,56,.8);--muted:rgba(26,34,56,.5);--card:#fff}
+[data-theme="light"] body{color:#1a2238}
+[data-theme="light"] .sidebar{background:linear-gradient(180deg,#fff,#f5f7ff);border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .nav a{color:rgba(26,34,56,.5)}
+[data-theme="light"] .nav a:hover{color:#1a2238;background:rgba(0,0,0,.04)}
+[data-theme="light"] .hero-name,.topbar-title,[data-theme="light"] h1{color:#1a2238}
+[data-theme="light"] input[type=text],[data-theme="light"] textarea{background:rgba(0,0,0,.03);color:#1a2238;border-color:rgba(0,0,0,.12)}
+[data-theme="light"] .criterion,[data-theme="light"] .panel,[data-theme="light"] .avg-bar{background:#fff;border-color:rgba(0,0,0,.08)}
+[data-theme="light"] .meta-chip{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.08);color:rgba(26,34,56,.7)}
+[data-theme="light"] .star-btn{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.10)}
+[data-theme="light"] .rec-card{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.10)}
+[data-theme="light"] .topbar{background:rgba(255,255,255,.92)}
+/* theme toggle */
+.login-theme-btn{position:fixed;bottom:18px;right:18px;background:var(--s1);border:1px solid var(--line2);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:999;transition:.14s}
+.login-theme-btn:hover{border-color:var(--bline)}
+.login-theme-btn svg{width:16px;height:16px;color:var(--soft)}
+[data-theme="dark"] .icon-sun,[data-theme="light"] .icon-moon{display:block}
+[data-theme="dark"] .icon-moon,[data-theme="light"] .icon-sun{display:none}
+/* mobile */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0;width:100%;padding:14px 14px 80px}
+  .content{padding:14px;max-width:100%}
+  .rec-grid{grid-template-columns:1fr}
+  .bnav{display:flex}
+}
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(16,24,37,.97);border-top:1px solid var(--line);height:58px;z-index:30;align-items:stretch}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:9px;font-weight:800;color:var(--muted);text-decoration:none;text-transform:uppercase;letter-spacing:.06em}
+.bn svg{width:18px;height:18px;opacity:.6}
+.bn.on{color:var(--b2)}
+.bn.on svg{opacity:1}
+    </style>
+    <script src="/static/js/theme.js" defer></script>
+</head>
+<body>
+<div class="layout">
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-main">NEXAS<span>HR</span></div>
+            <div class="brand-sub">Recruitment platform</div>
+        </div>
+        <nav class="nav">
+            <a href="/">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Panou principal
+            </a>
+            <a href="/candidati" class="active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Candidati
+            </a>
+            <a href="/analytics">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Statistici
+            </a>
+            <a href="/posturi">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                Posturi
+            </a>
+            <a href="/calendar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Calendar
+            </a>
+            <a class="logout-link" href="/logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Deconectare
+            </a>
+        </nav>
+    </aside>
+
+    <!-- ─── MAIN ─── -->
+    <div class="main">
+        <div class="topbar">
+            <a class="back-btn" href="/candidat/{{ candidate.id }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Inapoi la candidat
+            </a>
+            <span class="topbar-title">Scorecard interviu</span>
+            <div class="topbar-right">
+                <div class="user-avatar">HR</div>
+            </div>
+        </div>
+
+        <div class="content">
+
+            {% if message %}
+            <div class="notice ok-msg">{{ message }}</div>
+            {% endif %}
+            {% if error %}
+            <div class="notice err-msg">{{ error }}</div>
+            {% endif %}
+
+            <!-- ─── Candidate + interview header ─── -->
+            <div class="panel">
+                <div class="hero-row">
+                    <div class="cand-avatar">
+                        {{ (candidate.name or "?")[0] | upper }}{{ (candidate.name or " ?").split(" ")[1][0] | upper if (candidate.name or " ?").split(" ")|length > 1 else "" }}
+                    </div>
+                    <div>
+                        <div class="hero-name">{{ candidate.name or "Candidat" }}</div>
+                        <div class="hero-sub">{{ candidate.job_title or candidate.position or "Post nespecificat" }}</div>
+                        <div class="interview-meta">
+                            <span class="meta-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                {{ interview.data }} · {{ interview.ora }}
+                            </span>
+                            {% if interview.locatie %}
+                            <span class="meta-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                {{ interview.locatie }}
+                            </span>
+                            {% endif %}
+                            <span class="meta-chip">Status: {{ interview.status }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if avg_score %}
+                <div class="avg-bar">
+                    <div class="avg-circle {% if avg_score >= 4 %}high{% elif avg_score >= 3 %}mid{% else %}low{% endif %}">
+                        {{ avg_score }}
+                    </div>
+                    <div>
+                        <div style="font-size:14px;font-weight:800;color:#fff">Scor mediu scorecard</div>
+                        <div class="avg-label">Media celor 4 criterii de evaluare</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ─── Scorecard form ─── -->
+            <form method="post" action="/candidat/{{ candidate.id }}/scorecard/{{ interview.id }}" id="scorecard-form">
+
+                <!-- Evaluator -->
+                <div class="panel">
+                    <div class="panel-title">Informatii evaluator</div>
+                    <div class="field">
+                        <label>Nume evaluator (optional)</label>
+                        <input type="text" name="evaluator_name" placeholder="Ex: Andrei Popescu"
+                               value="{{ scorecard.evaluator_name if scorecard and scorecard.evaluator_name else '' }}">
+                    </div>
+                </div>
+
+                <!-- Criteria scores -->
+                <div class="panel">
+                    <div class="panel-title">Criterii de evaluare (1 – 5)</div>
+                    <div class="criteria-grid">
+
+                        {% set criteria = [
+                          ("technical_skills_score",    "Technical Skills",       "Cunostinte tehnice, competente specifice rolului"),
+                          ("attention_to_detail_score", "Attention to Detail",    "Precizie, grija pentru detalii, calitatea muncii"),
+                          ("communication_score",       "Communication",          "Claritate, ascultare activa, structura raspunsurilor"),
+                          ("team_fit_score",            "Team Fit",               "Valori, atitudine, compatibilitate cu echipa"),
+                        ] %}
+
+                        {% for field_name, label, hint in criteria %}
+                        {% set cur_val = (scorecard|attr(field_name)) if scorecard else 0 %}
+                        {% set cur_val = cur_val if cur_val else 0 %}
+                        <div class="criterion">
+                            <div class="criterion-label">{{ label }}</div>
+                            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">{{ hint }}</div>
+                            <div class="star-group" data-field="{{ field_name }}">
+                                {% for i in range(1, 6) %}
+                                <button type="button" class="star-btn {% if cur_val >= i %}active{% endif %}" data-val="{{ i }}">
+                                    ★
+                                </button>
+                                {% endfor %}
+                                <span class="score-hint" id="hint-{{ field_name }}">
+                                    {% if cur_val > 0 %}{{ cur_val }}/5{% else %}Selecteaza{% endif %}
+                                </span>
+                            </div>
+                            <input type="hidden" name="{{ field_name }}" id="input-{{ field_name }}"
+                                   value="{{ cur_val if cur_val > 0 else '' }}">
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+                <!-- Recommendation -->
+                <div class="panel">
+                    <div class="panel-title">Recomandare finala</div>
+                    <div class="rec-grid">
+                        {% set rec_val = scorecard.overall_recommendation if scorecard else '' %}
+
+                        <div class="rec-option strong-hire">
+                            <input type="radio" name="overall_recommendation" id="rec-strong-hire"
+                                   value="Strong Hire" {% if rec_val == 'Strong Hire' %}checked{% endif %}>
+                            <label class="rec-card" for="rec-strong-hire">
+                                <span class="rec-icon">🚀</span>
+                                <span class="rec-label">Strong Hire</span>
+                            </label>
+                        </div>
+
+                        <div class="rec-option hire">
+                            <input type="radio" name="overall_recommendation" id="rec-hire"
+                                   value="Hire" {% if rec_val == 'Hire' %}checked{% endif %}>
+                            <label class="rec-card" for="rec-hire">
+                                <span class="rec-icon">✅</span>
+                                <span class="rec-label">Hire</span>
+                            </label>
+                        </div>
+
+                        <div class="rec-option no-hire">
+                            <input type="radio" name="overall_recommendation" id="rec-no-hire"
+                                   value="No Hire" {% if rec_val == 'No Hire' %}checked{% endif %}>
+                            <label class="rec-card" for="rec-no-hire">
+                                <span class="rec-icon">❌</span>
+                                <span class="rec-label">No Hire</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments -->
+                <div class="panel">
+                    <div class="panel-title">Observatii detaliate</div>
+                    <div class="field">
+                        <label>Comentarii</label>
+                        <textarea name="comments" placeholder="Descrie comportamentul candidatului, aspectele pozitive si negative observate in cadrul interviului...">{{ scorecard.comments if scorecard and scorecard.comments else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <a class="btn btn-secondary" href="/candidat/{{ candidate.id }}">Anuleaza</a>
+                    <button class="btn btn-primary" type="submit" id="submit-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        Salveaza scorecard
+                    </button>
+                </div>
+
+            </form>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /layout -->
+
+<nav class="bnav">
+  <a class="bn" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Panou</span></a>
+  <a class="bn on" href="/candidati"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Candidati</span></a>
+  <a class="bn" href="/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Statistici</span></a>
+  <a class="bn" href="/posturi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><span>Posturi</span></a>
+  <a class="bn" href="/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
+</nav>
+
+<button class="login-theme-btn" onclick="toggleNexasTheme()" title="Schimba tema">
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
+
+<script>
+// Star rating interactivity
+document.querySelectorAll('.star-group').forEach(function(group) {
+    var field = group.getAttribute('data-field');
+    var buttons = group.querySelectorAll('.star-btn');
+    var input = document.getElementById('input-' + field);
+    var hint = document.getElementById('hint-' + field);
+
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var val = parseInt(btn.getAttribute('data-val'));
+            input.value = val;
+            hint.textContent = val + '/5';
+            buttons.forEach(function(b) {
+                b.classList.toggle('active', parseInt(b.getAttribute('data-val')) <= val);
+            });
+        });
+    });
+});
+
+// Validate before submit
+document.getElementById('scorecard-form').addEventListener('submit', function(e) {
+    var fields = ['technical_skills_score','attention_to_detail_score','communication_score','team_fit_score'];
+    for (var i = 0; i < fields.length; i++) {
+        var v = document.getElementById('input-' + fields[i]).value;
+        if (!v || parseInt(v) < 1 || parseInt(v) > 5) {
+            e.preventDefault();
+            alert('Te rugam sa completezi toate criteriile de evaluare (1-5 stele).');
+            return;
+        }
+    }
+    var rec = document.querySelector('input[name="overall_recommendation"]:checked');
+    if (!rec) {
+        e.preventDefault();
+        alert('Te rugam sa selectezi o recomandare finala.');
+        return;
+    }
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').textContent = 'Se salveaza...';
+});
+</script>
+</body>
+</html>

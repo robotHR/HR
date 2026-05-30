@@ -233,7 +233,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .btn-modal-save{flex:2;padding:11px;border-radius:12px;font-size:13px;font-weight:800;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;color:#07111f;cursor:pointer;box-shadow:0 5px 16px rgba(34,199,184,.20);font-family:'DM Sans',sans-serif;transition:.15s}
 .btn-modal-save:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(34,199,184,.28)}
 /* Detail popup */
-.detail-popup{position:fixed;z-index:200;background:#182036;border:1px solid var(--line2);border-radius:17px;padding:17px;min-width:236px;max-width:288px;box-shadow:0 22px 55px rgba(0,0,0,.48);display:none}
+.detail-popup{position:fixed;z-index:200;background:#182036;border:1px solid var(--line2);border-radius:17px;padding:17px 36px 17px 17px;min-width:236px;max-width:288px;box-shadow:0 22px 55px rgba(0,0,0,.48);display:none}
 .detail-popup.visible{display:block}
 .detail-name{font-size:14px;font-weight:800;color:#fff;margin-bottom:3px}
 .detail-job{font-size:11px;color:var(--t2);font-weight:700;margin-bottom:11px}
@@ -271,6 +271,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   .main{flex:1 !important;display:flex !important;flex-direction:column !important;height:100% !important;overflow:hidden !important;margin-left:0 !important;width:100% !important;padding:0 !important}
   .topbar{flex-shrink:0 !important;padding:0 10px !important;height:54px !important}
   .topbar .week-label{min-width:0 !important;font-size:11px !important}
+  .login-theme-btn{top:11px !important;right:auto !important;left:10px !important;width:30px !important;height:30px !important}
   .cal-outer{flex:1 !important;overflow:hidden !important}
   .cal-container{min-width:0 !important;height:100% !important;display:flex !important;flex-direction:column !important}
   .cal-header,.cal-body{display:none !important}
@@ -433,6 +434,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 
 <!-- ── DETAIL POPUP ── -->
 <div class="detail-popup" id="detail-popup">
+  <button onclick="closeDetailPopup()" style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:6px;border:none;background:rgba(255,255,255,.10);color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;padding:0;flex-shrink:0" title="Inchide">✕</button>
   <div class="detail-name" id="dp-name"></div>
   <div class="detail-job" id="dp-job"></div>
   <div class="detail-row">

@@ -71,6 +71,37 @@ input, select, textarea {
   color: #0f172a;   /* anchor for inherited text */
 }
 
+/* ── Topbar (sticky header on internal pages) ── */
+[data-theme="light"] .topbar {
+  background: rgba(255,255,255,.97);
+  border-bottom-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .btn-nav {
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.12);
+  color: rgba(15,23,42,.60);
+}
+[data-theme="light"] .btn-nav:hover {
+  background: rgba(37,99,235,.06);
+  border-color: rgba(37,99,235,.22);
+  color: #2563eb;
+}
+[data-theme="light"] .btn-today {
+  background: rgba(37,99,235,.07);
+  border-color: rgba(37,99,235,.18);
+  color: #2563eb;
+}
+
+/* ── Calendar grid header & mobile strip ── */
+[data-theme="light"] .cal-header {
+  background: #f1f5f9;
+  border-bottom-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .mcal-strip {
+  background: #f1f5f9;
+  border-bottom-color: rgba(0,0,0,.08);
+}
+
 /* ── Sidebar ── */
 [data-theme="light"] .sidebar {
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
@@ -391,6 +422,11 @@ input, select, textarea {
   border-color: rgba(255,255,255,.08);
   color: #e2e8f0;
 }
+[data-theme="dark"] .job-card-title { color: #f0f6ff; }
+[data-theme="dark"] .job-card-desc  { color: rgba(226,232,240,.72); }
+[data-theme="dark"] .job-card-footer { border-top-color: rgba(255,255,255,.08); }
+[data-theme="dark"] .job-meta-item  { color: rgba(226,232,240,.55); }
+[data-theme="dark"] .chip-gray      { background: rgba(255,255,255,.08); color: #cbd5e1; }
 [data-theme="dark"] .job-card:hover { border-color: rgba(59,130,246,.35); background: #202a44; }
 [data-theme="dark"] .job-title,
 [data-theme="dark"] .job-name   { color: #f0f6ff; }

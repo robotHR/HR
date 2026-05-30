@@ -169,6 +169,7 @@ input, select, textarea {
 [data-theme="light"] .stat-card,
 [data-theme="light"] .kpi,
 [data-theme="light"] .panel,
+[data-theme="light"] .table-card,
 [data-theme="light"] .card,
 [data-theme="light"] .source-card,
 [data-theme="light"] .match-box,
@@ -323,6 +324,39 @@ input, select, textarea {
   border-color: rgba(37,99,235,.22);
 }
 [data-theme="light"] .score-bar-track { background: rgba(0,0,0,.10); }
+
+/* ── Analytics — bar track & quality boxes ── */
+[data-theme="light"] .bar-track { background: rgba(0,0,0,.09); border-color: rgba(0,0,0,.06); }
+[data-theme="light"] .quality-box {
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .table-head {
+  border-bottom-color: rgba(0,0,0,.08);
+}
+
+/* ── Calendar — popups, dropdowns, toast, agenda items ── */
+[data-theme="light"] .detail-popup,
+[data-theme="light"] .candidate-dropdown {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.10);
+  box-shadow: 0 8px 28px rgba(0,0,0,.10);
+}
+[data-theme="light"] .candidate-option {
+  color: #0f172a;
+  border-bottom-color: rgba(0,0,0,.07);
+}
+[data-theme="light"] .candidate-option:hover { background: #f1f5f9; }
+[data-theme="light"] .toast {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.12);
+  color: #0f172a;
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+}
+[data-theme="light"] .mcal-iv {
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.08);
+}
 
 /* ═══════════════════════════════════════════════════════════
    DARK MODE — public pages (careers / career_detail / login)

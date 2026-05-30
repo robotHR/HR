@@ -586,3 +586,26 @@ input, select, textarea {
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.25); }
 [data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.14); }
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.25); }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE — sidebar hidden, main full-width (all internal pages)
+   Applied from theme.css (loaded after inline <style>) to
+   guarantee these rules win on all browsers.
+   ═══════════════════════════════════════════════════════════ */
+@media(max-width:768px) {
+  .sidebar {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    pointer-events: none !important;
+  }
+  .main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+  .layout {
+    display: block !important;
+  }
+}

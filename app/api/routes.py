@@ -2401,10 +2401,16 @@ async def submit_schedule(
         db.close()
         return HTMLResponse("<h2>Candidatul nu a fost gasit.</h2>", status_code=404)
 
+    # Extragem valorile inainte de a inchide sesiunea
+    cand_id = candidate.id
+    cand_name = candidate.name or "Candidat"
+    cand_email = candidate.email
+    cand_job = candidate.job_title or "—"
+
     interview = Interview(
-        candidate_id=candidate.id,
+        candidate_id=cand_id,
         candidate_name=candidate.name,
-        candidate_email=candidate.email,
+        candidate_email=cand_email,
         job_title=candidate.job_title,
         data=data,
         ora=ora,
@@ -2419,7 +2425,7 @@ async def submit_schedule(
     db.close()
 
     update_candidate_status(
-        candidate.id,
+        cand_id,
         "INTERVIU",
         event_title="Interviu programat (self-schedule)",
         event_description=f"Candidatul a ales: {data} la {ora}. Locatie: {locatie}.",
@@ -2427,8 +2433,8 @@ async def submit_schedule(
 
     background_tasks.add_task(
         _send_hr_notification_email,
-        candidate_name=candidate.name or "Candidat",
-        job_title=candidate.job_title or "—",
+        candidate_name=cand_name,
+        job_title=cand_job,
         data=data,
         ora=ora,
         locatie=locatie,
@@ -2436,8 +2442,8 @@ async def submit_schedule(
 
     html = _public_env.get_template("schedule.html").render(
         token=token,
-        candidate_name=candidate.name or "Candidat",
-        job_title=candidate.job_title or "",
+        candidate_name=cand_name,
+        job_title=cand_job if cand_job != "—" else "",
         confirmed=True,
         data=data,
         ora=ora,

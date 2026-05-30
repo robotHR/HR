@@ -45,6 +45,15 @@ from app.services.gmail_service import (
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
+# No-cache environment for public pages — avoids Jinja2 LRU cache
+# incompatibility with newer Python/Jinja2 versions
+import jinja2 as _jinja2
+_public_env = _jinja2.Environment(
+    loader=_jinja2.FileSystemLoader("app/templates"),
+    autoescape=True,
+    cache_size=0,
+)
+
 UPLOAD_FOLDER = "app/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 TERMINAL_STATUSES = ["REFUZAT", "ANGAJAT", "EXCLUS"]
@@ -2325,24 +2334,21 @@ async def scheduling_page(request: Request, token: str):
     if tok.expires_at < datetime.utcnow():
         return HTMLResponse("<h2>Link-ul a expirat.</h2>", status_code=410)
     if tok.used:
-        return templates.TemplateResponse("schedule.html", {
-            "request": request,
-            "token": token,
-            "candidate_name": "",
-            "job_title": "",
-            "already_used": True,
-        })
+        html = _public_env.get_template("schedule.html").render(
+            token=token, candidate_name="", job_title="", already_used=True,
+        )
+        return HTMLResponse(html)
 
     db = SessionLocal()
     candidate = db.query(Candidate).filter(Candidate.id == tok.candidate_id).first()
     db.close()
 
-    return templates.TemplateResponse("schedule.html", {
-        "request": request,
-        "token": token,
-        "candidate_name": candidate.name if candidate else "Candidat",
-        "job_title": candidate.job_title if candidate else "",
-    })
+    html = _public_env.get_template("schedule.html").render(
+        token=token,
+        candidate_name=candidate.name if candidate else "Candidat",
+        job_title=candidate.job_title if candidate else "",
+    )
+    return HTMLResponse(html)
 
 
 @router.get("/api/sloturi/{token}")
@@ -2382,13 +2388,10 @@ async def submit_schedule(
         return HTMLResponse("<h2>Link invalid.</h2>", status_code=404)
     if tok.used:
         db.close()
-        return templates.TemplateResponse("schedule.html", {
-            "request": request,
-            "token": token,
-            "candidate_name": "",
-            "job_title": "",
-            "already_used": True,
-        })
+        html = _public_env.get_template("schedule.html").render(
+            token=token, candidate_name="", job_title="", already_used=True,
+        )
+        return HTMLResponse(html)
     if tok.expires_at < datetime.utcnow():
         db.close()
         return HTMLResponse("<h2>Link-ul a expirat.</h2>", status_code=410)
@@ -2431,16 +2434,16 @@ async def submit_schedule(
         locatie=locatie,
     )
 
-    return templates.TemplateResponse("schedule.html", {
-        "request": request,
-        "token": token,
-        "candidate_name": candidate.name or "Candidat",
-        "job_title": candidate.job_title or "",
-        "confirmed": True,
-        "data": data,
-        "ora": ora,
-        "locatie": locatie,
-    })
+    html = _public_env.get_template("schedule.html").render(
+        token=token,
+        candidate_name=candidate.name or "Candidat",
+        job_title=candidate.job_title or "",
+        confirmed=True,
+        data=data,
+        ora=ora,
+        locatie=locatie,
+    )
+    return HTMLResponse(html)
 
 
 def _send_scheduling_invite_email(to_email: str, candidate_name: str, job_title: str, link: str):

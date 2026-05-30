@@ -687,39 +687,38 @@ def candidate_last_event_text(candidate_id):
     return event.title or "", format_event_date(event.created_at)
 
 
-def generate_candidates_excel(candidates):
+def generate_candidates_excel(candidates: list) -> BytesIO:
+    """Export candidati in Excel cu toate campurile AI, color-coded dupa scor."""
     wb = Workbook()
     ws = wb.active
     ws.title = "Candidati"
 
     headers = [
-        "Nume",
-        "Email",
-        "Telefon",
-        "Job cautat",
-        "Pozitie detectata",
-        "Scor",
-        "Status",
-        "Experienta",
-        "Skill-uri",
-        "CV fisier",
-        "Rezumat AI",
-        "Ultima actiune",
-        "Data ultimei actiuni"
+        "Nume", "Email", "Telefon", "Job cautat", "Pozitie detectata",
+        "Scor", "Status", "Prioritate", "Experienta", "Skill-uri",
+        "Motiv Decizie", "Cerinte Lipsa", "Verificare Telefon",
+        "Script Apel", "Intrebari Interviu", "Rol Potrivit Altul",
+        "Motiv Refuz Intern", "Rezumat AI", "CV fisier",
+        "Ultima actiune", "Data ultimei actiuni",
     ]
 
     ws.append(headers)
 
     header_fill = PatternFill("solid", fgColor="1F2937")
     header_font = Font(color="FFFFFF", bold=True)
-
     for cell in ws[1]:
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = Alignment(horizontal="center", vertical="center")
 
+    fill_green  = PatternFill("solid", fgColor="C6EFCE")
+    fill_yellow = PatternFill("solid", fgColor="FFEB9C")
+    fill_orange = PatternFill("solid", fgColor="F8CBAD")
+
     for candidate in candidates:
         last_action, last_action_date = candidate_last_event_text(candidate.id)
+        score = candidate.score or 0
+        row_fill = fill_green if score >= 85 else (fill_yellow if score >= 70 else fill_orange)
 
         ws.append([
             candidate.name or "",
@@ -727,32 +726,40 @@ def generate_candidates_excel(candidates):
             candidate.phone or "",
             candidate.job_title or "",
             candidate.position or "",
-            candidate.score or 0,
+            score,
             status_display(candidate.status),
+            candidate.priority or "",
             candidate.experience or "",
             candidate.skills or "",
-            candidate.cv_file or "",
+            candidate.decision_reason or "",
+            candidate.missing_requirements or "",
+            candidate.must_verify_by_phone or "",
+            candidate.phone_call_script or "",
+            candidate.interview_questions or "",
+            candidate.better_role_match or "",
+            candidate.reject_reason_internal or "",
             candidate.summary or "",
+            candidate.cv_file or "",
             last_action,
-            last_action_date
+            last_action_date,
         ])
 
-    widths = {
-        "A": 28, "B": 34, "C": 18, "D": 28, "E": 28, "F": 10,
-        "G": 24, "H": 20, "I": 45, "J": 32, "K": 65, "L": 28, "M": 22
-    }
+        for cell in ws[ws.max_row]:
+            cell.fill = row_fill
+            cell.alignment = Alignment(vertical="top", wrap_text=True)
 
+    widths = {
+        "A": 25, "B": 32, "C": 16, "D": 25, "E": 25,
+        "F": 8,  "G": 20, "H": 12, "I": 16, "J": 40,
+        "K": 35, "L": 30, "M": 25, "N": 40, "O": 40,
+        "P": 25, "Q": 30, "R": 60, "S": 30, "T": 28, "U": 22,
+    }
     for col, width in widths.items():
         ws.column_dimensions[col].width = width
-
-    for row in ws.iter_rows(min_row=2):
-        for cell in row:
-            cell.alignment = Alignment(vertical="top", wrap_text=True)
 
     output = BytesIO()
     wb.save(output)
     output.seek(0)
-
     return output
 
 
@@ -965,6 +972,13 @@ async def open_candidate_cv(candidate_id: int):
 
     if not candidate or not candidate.cv_file:
         return JSONResponse({"error": "CV-ul nu a fost gasit pentru acest candidat."}, status_code=404)
+
+    log_candidate_event(
+        candidate_id=candidate_id,
+        event_type="CV_DESCĂRCAT",
+        title="CV descărcat",
+        description=f"CV accesat: {candidate.cv_file}",
+    )
 
     # Incearca din Cloudinary (persistent, nu depinde de Render disk)
     buffer, mime = stream_cv_from_cloudinary(candidate.cv_file)
@@ -1242,28 +1256,6 @@ async def delete_all_database(confirm_delete: str = Form("")):
 
     return RedirectResponse(url="/?message=Toata baza de date a fost stearsa definitiv.", status_code=303)
 
-
-@router.get("/api/debug")
-async def debug_db():
-    candidates, total = load_candidates()
-
-    return JSONResponse({
-        "total_candidates": total,
-        "items": [
-            {
-                "id": candidate.id,
-                "name": candidate.name,
-                "score": candidate.score,
-                "status": candidate.status,
-                "status_display": status_display(candidate.status),
-                "visible_in_dashboard": candidate.visible_in_dashboard,
-                "batch_id": candidate.batch_id,
-                "job_title": candidate.job_title,
-                "cv_file": candidate.cv_file
-            }
-            for candidate in candidates
-        ]
-    })
 
 
 # ─── POSTURI VACANTE (INTERN) ────────────────────────────────────────────────
@@ -1751,8 +1743,6 @@ Vezi candidatul: https://hr-g66k.onrender.com/candidat/{candidate_id}
             print(f"[BG] WARN email HR esuat: {e}")
 
 
-@router.post("/cariere/{job_id}/aplica")
-
 
 # ─── REANALIZA FORTATA ────────────────────────────────────────────────────────
 
@@ -1984,6 +1974,7 @@ async def activitate_page(request: Request, tip: str = "", zile: int = 30):
     )
 
 
+@router.post("/cariere/{job_id}/aplica")
 async def apply_to_job(
     background_tasks: BackgroundTasks,
     job_id: int,
@@ -2002,6 +1993,15 @@ async def apply_to_job(
     if not job_titlu:
         return HTMLResponse("<h2>Post indisponibil.</h2>", status_code=404)
 
+    # ── Validare email ───────────────────────────────────────────────────────
+    if not re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email or ""):
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Adresa de email invalida.", status_code=303)
+
+    # ── Validare telefon (optional, dar daca e completat trebuie sa fie valid) ──
+    if telefon and not re.match(r'^\+?[0-9]{10,13}$', telefon.replace(" ", "").replace("-", "")):
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Numar de telefon invalid (10-13 cifre).", status_code=303)
+
+    # ── Validare extensie fisier ─────────────────────────────────────────────
     ext = os.path.splitext(cv_file.filename or "")[1].lower()
     if ext not in {".pdf", ".docx", ".doc"}:
         return RedirectResponse(url=f"/cariere/{job_id}?error=Doar PDF, DOC, DOCX.", status_code=303)
@@ -2010,6 +2010,26 @@ async def apply_to_job(
     cv_bytes = await cv_file.read()
     if not cv_bytes:
         return RedirectResponse(url=f"/cariere/{job_id}?error=Fisierul CV este gol.", status_code=303)
+
+    # ── Validare dimensiune fisier (max 10 MB) ───────────────────────────────
+    if len(cv_bytes) > 10 * 1024 * 1024:
+        return RedirectResponse(url=f"/cariere/{job_id}?error=CV-ul este prea mare (maxim 10 MB).", status_code=303)
+
+    # ── Verificare aplicatie duplicata (aceeasi adresa email, acelasi job, in ultimele 30 de zile) ──
+    from datetime import datetime, timedelta
+    db_check = SessionLocal()
+    cutoff_date = datetime.utcnow() - timedelta(days=30)
+    duplicate = db_check.query(Candidate).filter(
+        Candidate.email == email,
+        Candidate.job_id == job_id,
+        Candidate.created_at >= cutoff_date,
+    ).first()
+    db_check.close()
+    if duplicate:
+        return RedirectResponse(
+            url=f"/cariere/{job_id}?error=Ai aplicat deja pentru acest post in ultimele 30 de zile.",
+            status_code=303,
+        )
 
     safe_name = re.sub(r"[^A-Za-z0-9._() -]+", "_", cv_file.filename or "cv")
     final_filename = f"aplicatie_{job_id}_{int(time.time())}_{safe_name}"

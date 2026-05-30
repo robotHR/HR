@@ -306,6 +306,226 @@
 }
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
+
+<style id="analytics-light-sidebar-fix">
+/* FIX: sidebar identic cu dashboard + light mode cu text vizibil */
+.sidebar{
+  width:220px !important;
+  flex-shrink:0 !important;
+  background:linear-gradient(180deg,#111827 0%,#141b2d 100%) !important;
+  border-right:1px solid rgba(255,255,255,.10) !important;
+  position:fixed !important;
+  top:0 !important;
+  bottom:0 !important;
+  left:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  padding:0 !important;
+  z-index:20 !important;
+  backdrop-filter:none !important;
+}
+.brand{
+  padding:24px 20px 20px !important;
+  border-bottom:1px solid rgba(255,255,255,.10) !important;
+  margin-bottom:0 !important;
+}
+.brand-main{
+  font-family:'Syne',sans-serif !important;
+  font-size:20px !important;
+  font-weight:800 !important;
+  color:#fff !important;
+  letter-spacing:-.3px !important;
+  line-height:1.1 !important;
+}
+.brand-main .accent,
+.brand-main span{
+  color:#7cc4ff !important;
+}
+.brand-sub{
+  font-size:10px !important;
+  color:rgba(255,255,255,.68) !important;
+  letter-spacing:2px !important;
+  text-transform:uppercase !important;
+  margin-top:4px !important;
+  font-weight:500 !important;
+}
+.nav{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:2px !important;
+  padding:14px 12px !important;
+  flex:1 !important;
+}
+.nav a{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+  min-height:auto !important;
+  font-size:13px !important;
+  font-weight:500 !important;
+  color:rgba(255,255,255,.68) !important;
+  text-decoration:none !important;
+  border-radius:10px !important;
+  border:0 !important;
+  transition:.15s !important;
+  position:relative !important;
+}
+.nav a:hover{
+  color:#fff !important;
+  background:rgba(255,255,255,.05) !important;
+}
+.nav a.active{
+  color:#fff !important;
+  background:rgba(93,169,255,.15) !important;
+}
+.nav a.active::before{
+  content:'' !important;
+  position:absolute !important;
+  left:0 !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  width:3px !important;
+  height:60% !important;
+  background:#7cc4ff !important;
+  border-radius:0 3px 3px 0 !important;
+}
+.nav a.logout-link{
+  color:#fca5a5 !important;
+  margin-top:auto !important;
+}
+.nav a.logout-link:hover{
+  background:rgba(248,113,113,.08) !important;
+  color:#f87171 !important;
+}
+.main{
+  margin-left:220px !important;
+  width:calc(100% - 220px) !important;
+}
+
+/* LIGHT MODE: texte negre si lizibile */
+html[data-theme="light"] body{
+  color:#07111f !important;
+  background:
+    radial-gradient(circle at top left, rgba(93,169,255,.16), transparent 34%),
+    radial-gradient(circle at top right, rgba(34,211,238,.08), transparent 32%),
+    linear-gradient(135deg,#f8fbff 0%,#edf5ff 48%,#f8fbff 100%) !important;
+}
+html[data-theme="light"] .sidebar{
+  background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%) !important;
+  border-right:1px solid rgba(15,23,42,.10) !important;
+}
+html[data-theme="light"] .brand{
+  border-bottom:1px solid rgba(15,23,42,.10) !important;
+}
+html[data-theme="light"] .brand-main{
+  color:#07111f !important;
+}
+html[data-theme="light"] .brand-sub{
+  color:#07111f !important;
+}
+html[data-theme="light"] .nav a{
+  color:#07111f !important;
+}
+html[data-theme="light"] .nav a:hover{
+  color:#07111f !important;
+  background:rgba(37,99,235,.08) !important;
+}
+html[data-theme="light"] .nav a.active{
+  color:#2563eb !important;
+  background:rgba(37,99,235,.10) !important;
+}
+html[data-theme="light"] .nav a.logout-link{
+  color:#f87171 !important;
+}
+
+html[data-theme="light"] .hero,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .table-card,
+html[data-theme="light"] .summary-chip,
+html[data-theme="light"] .quality-box{
+  background:#ffffff !important;
+  border-color:rgba(15,23,42,.10) !important;
+  color:#07111f !important;
+  box-shadow:0 18px 55px rgba(15,23,42,.08) !important;
+}
+html[data-theme="light"] .hero{
+  background:
+    linear-gradient(100deg,rgba(239,246,255,.98),rgba(255,255,255,.96)),
+    linear-gradient(90deg,rgba(93,169,255,.08),rgba(255,255,255,0)) !important;
+}
+html[data-theme="light"] .decision-card{
+  background:linear-gradient(145deg,rgba(219,234,254,.95),rgba(255,255,255,.92)) !important;
+  border-color:rgba(93,169,255,.24) !important;
+  color:#07111f !important;
+}
+html[data-theme="light"] .decision-card::before,
+html[data-theme="light"] .hero::before{
+  opacity:.28 !important;
+}
+
+html[data-theme="light"] h1,
+html[data-theme="light"] h1.syne-only,
+html[data-theme="light"] .subtitle,
+html[data-theme="light"] .summary-chip strong,
+html[data-theme="light"] .summary-chip span,
+html[data-theme="light"] .decision-text,
+html[data-theme="light"] .decision-note,
+html[data-theme="light"] .stat-label,
+html[data-theme="light"] .stat-value,
+html[data-theme="light"] .stat-help,
+html[data-theme="light"] .panel h2,
+html[data-theme="light"] .panel-sub,
+html[data-theme="light"] .bar-label,
+html[data-theme="light"] .bar-meta,
+html[data-theme="light"] .bar-value,
+html[data-theme="light"] .quality-box strong,
+html[data-theme="light"] .quality-box span,
+html[data-theme="light"] .table-head h2,
+html[data-theme="light"] .table-head p,
+html[data-theme="light"] th,
+html[data-theme="light"] td,
+html[data-theme="light"] .name,
+html[data-theme="light"] .small,
+html[data-theme="light"] .job,
+html[data-theme="light"] .empty,
+html[data-theme="light"] .empty-table{
+  color:#07111f !important;
+}
+
+html[data-theme="light"] .eyebrow,
+html[data-theme="light"] .decision-title,
+html[data-theme="light"] .top-pill{
+  color:#2563eb !important;
+}
+html[data-theme="light"] .top-pill{
+  background:rgba(37,99,235,.08) !important;
+  border-color:rgba(37,99,235,.20) !important;
+}
+html[data-theme="light"] .bar-track{
+  background:rgba(15,23,42,.10) !important;
+  border-color:rgba(15,23,42,.08) !important;
+}
+html[data-theme="light"] th{
+  background:rgba(37,99,235,.06) !important;
+  border-bottom-color:rgba(15,23,42,.10) !important;
+}
+html[data-theme="light"] td{
+  border-bottom-color:rgba(15,23,42,.08) !important;
+}
+html[data-theme="light"] tr:hover{
+  background:rgba(37,99,235,.05) !important;
+}
+
+@media(max-width:900px){
+  .main{
+    margin-left:0 !important;
+    width:100% !important;
+  }
+}
+</style>
+
     <script src="/static/js/theme.js"></script>
 </head>
 <body>
@@ -324,7 +544,7 @@
             <a class="active" href="/analytics">Statistici</a>
             <a class="" href="/posturi">Posturi vacante</a>
             <a href="/calendar">Calendar</a>
-            <a class="logout-link" href="/logout">Deconectare</a>
+            <a class="logout-link" href="/logout">↪ Deconectare</a>
         </nav>
     </aside>
 
@@ -356,7 +576,7 @@
                 <div class="hero-content">
                     <div>
                         <div class="eyebrow">Raport recrutare</div>
-                      <h1 class="syne-only">Analiza HR</h1>
+                      <h1 class="syne-only">ANALIZA HR</h1>
                         <p class="subtitle">Pagina iti arata cati candidati ai analizat, cati merita verificati si unde se afla in procesul de recrutare.</p>
                         <div class="ai-summary">
                             <div class="summary-chip"><strong>{{ analytics.total }}</strong><span>candidati analizati</span></div>

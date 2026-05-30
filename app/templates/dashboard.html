@@ -976,8 +976,8 @@
                     <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px">
                         <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#22c7b8,#5da9ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#07111f;font-size:14px;flex-shrink:0">{{ (c.name or '?')[0]|upper }}</div>
                         <div style="flex:1;min-width:0">
-                            <div style="font-size:14px;font-weight:800;color:#fff">{{ c.name or 'Candidat' }}</div>
-                            <div style="font-size:11px;color:rgba(255,255,255,.5)">{{ c.job_title or '' }}{% if c.phone %} · {{ c.phone }}{% endif %}</div>
+                            <div style="font-size:14px;font-weight:800" class="t-name">{{ c.name or 'Candidat' }}</div>
+                            <div style="font-size:11px" class="t-sub">{{ c.job_title or '' }}{% if c.phone %} · {{ c.phone }}{% endif %}</div>
                         </div>
                         <div style="text-align:right;flex-shrink:0">
                             <div style="font-size:20px;font-weight:800;color:{% if (c.score or 0)>=75 %}#22c7b8{% elif (c.score or 0)>=55 %}#f59e0b{% else %}#ff6b70{% endif %}">{{ c.score or 0 }}</div>

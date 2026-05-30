@@ -1202,7 +1202,65 @@ html[data-theme="light"] .loading-note{
                     <input type="hidden" name="confirm_delete" value="STERGE">
                     <button type="submit" class="btn-danger">Sterge definitiv baza</button>
                 </form>
+                <button type="button" class="btn-secondary" id="btn-reanalize" onclick="startReanalize()"
+                        title="Sterge cache-ul de analize si re-ruleaza AI cu noua logica de scoring pentru toti candidatii">
+                    ↺ Re-analizează cu logică nouă
+                </button>
             </div>
+
+            <div id="reanalize-status" style="display:none;margin-top:10px;padding:12px 16px;border-radius:12px;background:rgba(93,169,255,.08);border:1px solid rgba(93,169,255,.26);font-size:13px;font-weight:700;color:#7cc4ff">
+                <span id="reanalize-msg">Se pornește re-analizarea...</span>
+                <div id="reanalize-bar-wrap" style="display:none;margin-top:8px;height:6px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden">
+                    <div id="reanalize-bar" style="height:100%;width:0%;background:#5da9ff;border-radius:999px;transition:width .4s"></div>
+                </div>
+            </div>
+
+            <script>
+            function startReanalize() {
+                if (!confirm('Aceasta actiune sterge cache-ul de analize AI si re-ruleaza scoring-ul pentru toti candidatii cu noua logica.\n\nPoate dura cateva minute. Continui?')) return;
+                var btn = document.getElementById('btn-reanalize');
+                var statusBox = document.getElementById('reanalize-status');
+                var msg = document.getElementById('reanalize-msg');
+                btn.disabled = true;
+                btn.textContent = '⏳ Se porneste...';
+                statusBox.style.display = 'block';
+                fetch('/reanalize-completa', {method:'POST'})
+                    .then(function(r){ return r.json(); })
+                    .then(function(d){
+                        if (d.success) {
+                            msg.textContent = d.message;
+                            document.getElementById('reanalize-bar-wrap').style.display = 'block';
+                            pollProgress();
+                        } else {
+                            msg.textContent = 'Eroare: ' + d.message;
+                            btn.disabled = false;
+                            btn.textContent = '↺ Re-analizează cu logică nouă';
+                        }
+                    });
+            }
+            function pollProgress() {
+                var interval = setInterval(function() {
+                    fetch('/reanalize-status')
+                        .then(function(r){ return r.json(); })
+                        .then(function(d){
+                            var msg = document.getElementById('reanalize-msg');
+                            var bar = document.getElementById('reanalize-bar');
+                            bar.style.width = d.percent + '%';
+                            if (d.total > 0) {
+                                msg.textContent = 'Re-analizare: ' + d.done + ' / ' + d.total + ' CV-uri procesate (' + d.percent + '%)';
+                            }
+                            if (!d.running && d.total > 0) {
+                                clearInterval(interval);
+                                msg.textContent = '✓ Re-analizare completă! ' + d.done + ' CV-uri procesate cu noua logică.';
+                                bar.style.background = '#22c7b8';
+                                var btn = document.getElementById('btn-reanalize');
+                                btn.disabled = false;
+                                btn.textContent = '↺ Re-analizează cu logică nouă';
+                            }
+                        });
+                }, 3000);
+            }
+            </script>
 
               
 

@@ -1222,7 +1222,38 @@ async def analyze_job(target_job: str = Form(...)):
     after_id = get_max_candidate_id()
     final_files = get_final_cv_files()
 
-    result = process_cvs_for_job(target_job)
+    # Cauta daca exista un post in platforma cu cerinte definite
+    job_requirements = None
+    try:
+        db = SessionLocal()
+        job_posts = db.query(JobPost).filter(JobPost.activ == True).all()
+        db.close()
+        job_norm = normalize_text(target_job)
+        best_match, best_score = None, 0
+        for post in job_posts:
+            post_norm = normalize_text(post.titlu or "")
+            if post_norm == job_norm:
+                score = 100
+            elif post_norm in job_norm or job_norm in post_norm:
+                score = 70
+            else:
+                pw = set(post_norm.split())
+                jw = set(job_norm.split())
+                score = int(len(pw & jw) / max(len(pw), 1) * 45) if pw else 0
+            if score > best_score:
+                best_match, best_score = post, score
+        if best_match and best_score >= 30:
+            reqs = " ".join(filter(None, [
+                best_match.cerinte or "",
+                best_match.responsabilitati or "",
+            ])).strip()
+            if reqs:
+                job_requirements = reqs
+                print(f"[ANALIZA] Post gasit in platforma: '{best_match.titlu}' — cerinte folosite pentru scoring.")
+    except Exception as e:
+        print(f"[ANALIZA] Nu s-au putut incarca cerintele din platforma: {e}")
+
+    result = process_cvs_for_job(target_job, job_requirements=job_requirements)
 
     mark_new_candidates_batch(
         after_id=after_id,
@@ -1369,6 +1400,103 @@ async def delete_all_database(confirm_delete: str = Form("")):
 
     return RedirectResponse(url="/?message=Toata baza de date a fost stearsa definitiv.", status_code=303)
 
+
+# ─── RE-ANALIZĂ CU LOGICĂ NOUĂ ──────────────────────────────────────────────
+
+_reanalize_progress = {"total": 0, "done": 0, "running": False}
+
+
+def _run_reanalizare_completa():
+    global _reanalize_progress
+    try:
+        # 1. Sterge cache-ul
+        db = SessionLocal()
+        db.query(CvAnalysis).delete()
+        db.commit()
+
+        # 2. Colecteaza perechi unice (cv_file, job_title)
+        candidates = db.query(Candidate).filter(
+            Candidate.cv_file != None,
+            Candidate.job_title != None,
+        ).all()
+        db.close()
+
+        pairs = {}
+        for c in candidates:
+            key = (c.cv_file.strip(), c.job_title.strip())
+            if key[0] and key[1]:
+                pairs[key] = True
+
+        unique_pairs = list(pairs.keys())
+        _reanalize_progress["total"] = len(unique_pairs)
+        _reanalize_progress["done"] = 0
+        _reanalize_progress["running"] = True
+
+        print(f"[RE-ANALIZARE] Start: {len(unique_pairs)} perechi unice CV + job")
+
+        for cv_file, job_title in unique_pairs:
+            try:
+                path = os.path.join(UPLOAD_FOLDER, cv_file)
+                if not os.path.exists(path):
+                    _reanalize_progress["done"] += 1
+                    continue
+
+                from app.services.cv_parser import extract_text_from_file, analyze_cv_with_ai, parse_ai_response, normalize_data, save_analysis_to_cache, match_job_profile, build_fallback_profile
+                text = extract_text_from_file(path)
+                if not text:
+                    _reanalize_progress["done"] += 1
+                    continue
+
+                ai_response = analyze_cv_with_ai(text, job_title)
+                data = parse_ai_response(ai_response)
+                if data:
+                    profile = match_job_profile(job_title) or build_fallback_profile(job_title)
+                    normalized = normalize_data(data, cv_file, job_title, text, profile)
+                    save_analysis_to_cache(cv_file, job_title, normalized)
+                    print(f"[RE-ANALIZARE] ✓ {cv_file} → {job_title}")
+            except Exception as e:
+                print(f"[RE-ANALIZARE] ✗ {cv_file}: {e}")
+            finally:
+                _reanalize_progress["done"] += 1
+
+    except Exception as e:
+        print(f"[RE-ANALIZARE] Eroare generala: {e}")
+    finally:
+        _reanalize_progress["running"] = False
+        print(f"[RE-ANALIZARE] Finalizat: {_reanalize_progress['done']}/{_reanalize_progress['total']}")
+
+
+@router.post("/reanalize-completa")
+async def reanalize_completa(background_tasks: BackgroundTasks):
+    global _reanalize_progress
+    if _reanalize_progress.get("running"):
+        return JSONResponse({"success": False, "message": "Re-analizarea este deja in curs."})
+
+    background_tasks.add_task(_run_reanalizare_completa)
+
+    db = SessionLocal()
+    total_cv = db.query(Candidate).filter(
+        Candidate.cv_file != None,
+        Candidate.job_title != None,
+    ).count()
+    db.close()
+
+    return JSONResponse({
+        "success": True,
+        "message": f"Re-analizare pornita pentru ~{total_cv} candidati. Procesul ruleaza in fundal.",
+        "total": total_cv,
+    })
+
+
+@router.get("/reanalize-status")
+async def reanalize_status():
+    p = _reanalize_progress
+    return JSONResponse({
+        "running": p.get("running", False),
+        "total": p.get("total", 0),
+        "done": p.get("done", 0),
+        "percent": int(p["done"] / p["total"] * 100) if p.get("total") else 0,
+    })
 
 
 # ─── POSTURI VACANTE (INTERN) ────────────────────────────────────────────────

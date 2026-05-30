@@ -201,7 +201,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 /* ── CAL GRID ── */
 .cal-outer{flex:1;overflow-y:auto}
 .cal-container{min-width:640px}
-.cal-header{display:grid;grid-template-columns:58px repeat(7,1fr);border-bottom:1px solid var(--line);background:rgba(13,20,36,.98);position:sticky;top:0;z-index:9}
+.cal-header{display:grid;grid-template-columns:58px repeat(5,1fr);border-bottom:1px solid var(--line);background:rgba(13,20,36,.98);position:sticky;top:0;z-index:9}
 .cal-header-empty{border-right:1px solid var(--line)}
 .cal-day-header{padding:12px 7px 10px;text-align:center;border-right:1px solid var(--line)}
 .cal-day-header:last-child{border-right:none}
@@ -209,7 +209,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .cal-day-num{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--soft);margin-top:3px;line-height:1}
 .cal-day-header.is-today .cal-day-name{color:var(--t2)}
 .cal-day-header.is-today .cal-day-num{color:#07111f;background:linear-gradient(135deg,var(--teal),var(--blue));width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:3px auto 0;font-size:15px}
-.cal-body{display:grid;grid-template-columns:58px repeat(7,1fr)}
+.cal-body{display:grid;grid-template-columns:58px repeat(5,1fr)}
 .cal-hours{border-right:1px solid var(--line)}
 .cal-hour-label{height:64px;display:flex;align-items:flex-start;justify-content:flex-end;padding:7px 9px 0 0;font-size:10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--line)}
 .cal-day-col{position:relative;border-right:1px solid var(--line);cursor:pointer}
@@ -233,10 +233,23 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .btn-modal-save{flex:2;padding:11px;border-radius:12px;font-size:13px;font-weight:800;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;color:#07111f;cursor:pointer;box-shadow:0 5px 16px rgba(34,199,184,.20);font-family:'DM Sans',sans-serif;transition:.15s}
 .btn-modal-save:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(34,199,184,.28)}
 /* Detail popup */
-.detail-popup{position:fixed;z-index:200;background:#182036;border:1px solid var(--line2);border-radius:17px;padding:17px 36px 17px 17px;min-width:236px;max-width:288px;box-shadow:0 22px 55px rgba(0,0,0,.48);display:none}
+.detail-popup{position:fixed;z-index:200;background:#182036;border:1px solid var(--line2);border-radius:17px;padding:0;min-width:236px;max-width:288px;box-shadow:0 22px 55px rgba(0,0,0,.48);display:none}
 .detail-popup.visible{display:block}
-.detail-name{font-size:14px;font-weight:800;color:#fff;margin-bottom:3px}
+.detail-popup-inner{padding:14px 14px 14px 17px}
+.detail-popup-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px}
+.detail-close-btn{width:24px;height:24px;border-radius:6px;border:none;background:rgba(255,255,255,.10);color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;padding:0;flex-shrink:0;transition:.15s}
+.detail-close-btn:hover{background:rgba(255,255,255,.20);color:#fff}
+.detail-name{font-size:14px;font-weight:800;color:#fff;flex:1;padding-right:8px}
 .detail-job{font-size:11px;color:var(--t2);font-weight:700;margin-bottom:11px}
+/* Edit ora inline */
+.edit-ora-wrap{display:none;margin-top:8px;padding-top:9px;border-top:1px solid var(--line)}
+.edit-ora-wrap.open{display:block}
+.edit-ora-row{display:flex;gap:6px;align-items:center}
+.edit-ora-row input{padding:7px 10px;font-size:13px;border-radius:8px}
+.btn-edit-save{padding:7px 12px;border-radius:8px;font-size:12px;font-weight:800;background:var(--bsoft);border:1px solid var(--bline);color:var(--b2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;white-space:nowrap}
+.btn-edit-save:hover{background:rgba(93,169,255,.22);color:#fff}
+.btn-cancel-iv{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.btn-cancel-iv:hover{background:rgba(255,107,112,.22)}
 .detail-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--soft);font-weight:600;margin-bottom:6px}
 .detail-row svg{width:12px;height:12px;color:var(--b2);flex-shrink:0}
 .detail-actions{display:flex;gap:6px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
@@ -363,11 +376,11 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
       </div>
       <div class="week-nav">
         <button class="btn-nav" id="btn-prev" onclick="changeWeek(-1)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>
         </button>
         <span class="week-label" id="week-label">—</span>
         <button class="btn-nav" id="btn-next" onclick="changeWeek(1)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>
         </button>
         <button class="btn-today" onclick="goToday()">Azi</button>
         <button class="btn-add-interview" onclick="openModal()">
@@ -434,27 +447,41 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 
 <!-- ── DETAIL POPUP ── -->
 <div class="detail-popup" id="detail-popup">
-  <button onclick="closeDetailPopup()" style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:6px;border:none;background:rgba(255,255,255,.10);color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;padding:0;flex-shrink:0" title="Inchide">✕</button>
-  <div class="detail-name" id="dp-name"></div>
-  <div class="detail-job" id="dp-job"></div>
-  <div class="detail-row">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span id="dp-data"></span>
-  </div>
-  <div class="detail-row">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <span id="dp-ora"></span>
-  </div>
-  <div class="detail-row" id="dp-locatie-row">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-    <span id="dp-locatie"></span>
-  </div>
-  <div class="detail-actions">
-    <a class="btn-detail-cand" id="dp-link" href="#">Vezi candidat</a>
-    <button class="btn-detail-delete" id="dp-delete" onclick="deleteInterview()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      Șterge
-    </button>
+  <div class="detail-popup-inner">
+    <div class="detail-popup-header">
+      <div class="detail-name" id="dp-name"></div>
+      <button class="detail-close-btn" onclick="closeDetailPopup()" title="Inchide">✕</button>
+    </div>
+    <div class="detail-job" id="dp-job"></div>
+    <div class="detail-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="dp-data"></span>
+    </div>
+    <div class="detail-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14" stroke="currentColor" fill="none"/></svg>
+      <span id="dp-ora"></span>
+    </div>
+    <div class="detail-row" id="dp-locatie-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span id="dp-locatie"></span>
+    </div>
+    <!-- Edit ora inline -->
+    <div class="edit-ora-wrap" id="edit-ora-wrap">
+      <div class="edit-ora-row">
+        <input type="time" id="edit-ora-input" step="300" min="09:00" max="17:00">
+        <button class="btn-edit-save" onclick="saveEditOra()">Salvează</button>
+      </div>
+    </div>
+    <div class="detail-actions">
+      <a class="btn-detail-cand" id="dp-link" href="#">Vezi candidat</a>
+      <button class="btn btn-ghost" style="padding:7px 11px;font-size:12px" onclick="openEditOra()" title="Editeaza ora">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+      <button class="btn btn-cancel-iv" style="padding:7px 11px;font-size:12px" onclick="cancelInterview()">
+        Anulează întâlnirea
+      </button>
+    </div>
   </div>
 </div>
 
@@ -466,7 +493,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 const HOUR_START  = 8;   // 08:00
 const HOUR_END    = 20;  // 20:00
 const HOUR_PX     = 64;  // px per ora
-const DAYS_RO     = ['Lun','Mar','Mie','Joi','Vin','Sâm','Dum'];
+const DAYS_RO     = ['Lun','Mar','Mie','Joi','Vin'];
 const MONTHS_RO   = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
 const MONTHS_SHORT= ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -531,7 +558,7 @@ function renderCalendar() {
   emptyCell.className = 'cal-hour-label cal-header-empty';
   header.appendChild(emptyCell);
 
-  for (let i=0; i<7; i++) {
+  for (let i=0; i<5; i++) {
     const day = addDays(currentWeekStart, i);
     const cell = document.createElement('div');
     cell.className = 'cal-day-header' + (isToday(day) ? ' is-today' : '');
@@ -555,8 +582,8 @@ function renderCalendar() {
   }
   body.appendChild(hoursCol);
 
-  // day columns
-  for (let i=0; i<7; i++) {
+  // day columns (Mon-Fri only)
+  for (let i=0; i<5; i++) {
     const day = addDays(currentWeekStart, i);
     const dayStr = dateToStr(day);
     const col = document.createElement('div');
@@ -691,9 +718,8 @@ function renderInterviewCard(iv, pos) {
 
 // ── WEEK LABEL ──
 function updateWeekLabel() {
-  const end = addDays(currentWeekStart, 6);
   const s = currentWeekStart;
-  const e = end;
+  const e = addDays(currentWeekStart, 4); // Friday
   let label;
   if (s.getMonth() === e.getMonth()) {
     label = `${s.getDate()} – ${e.getDate()} ${MONTHS_SHORT[s.getMonth()]} ${s.getFullYear()}`;
@@ -702,7 +728,7 @@ function updateWeekLabel() {
   }
   document.getElementById('week-label').textContent = label;
   document.getElementById('topbar-sub').textContent =
-    `Săptămâna ${s.getDate()} – ${e.getDate()} ${MONTHS_SHORT[s.getMonth()]} ${s.getFullYear()}`;
+    `Săptămâna ${s.getDate()} – ${e.getDate()} ${MONTHS_SHORT[e.getMonth()]} ${s.getFullYear()}`;
 }
 
 // ── FETCH INTERVIEWS ──
@@ -883,6 +909,7 @@ function showDetailPopup(iv, e) {
 }
 function closeDetailPopup() {
   document.getElementById('detail-popup').classList.remove('visible');
+  document.getElementById('edit-ora-wrap').classList.remove('open');
   selectedInterview = null;
 }
 document.addEventListener('click', (e) => {
@@ -890,21 +917,63 @@ document.addEventListener('click', (e) => {
     closeDetailPopup();
 });
 
-// ── DELETE INTERVIEW ──
-async function deleteInterview() {
+// ── CANCEL INTERVIEW ──
+async function cancelInterview() {
   if (!selectedInterview) return;
-  if (!confirm(`Ștergi interviul cu ${selectedInterview.candidate_name}?`)) return;
+  if (!confirm(`Anulezi interviul cu ${selectedInterview.candidate_name}? Candidatul va fi notificat prin email.`)) return;
   try {
-    const res  = await fetch(`/calendar/api/interview/${selectedInterview.id}/sterge`, { method: 'POST' });
+    const res  = await fetch(`/calendar/api/interview/${selectedInterview.id}/anuleaza`, { method: 'POST' });
     const json = await res.json();
     if (json.success) {
       interviews = interviews.filter(iv => iv.id !== selectedInterview.id);
       renderCalendar();
       closeDetailPopup();
-      showToast('Interviul a fost șters.');
+      showToast('Interviul a fost anulat. Email trimis candidatului.');
+    } else {
+      showToast(json.error || 'Eroare la anulare.', true);
     }
   } catch(e) {
-    showToast('Eroare la ștergere.', true);
+    showToast('Eroare de conexiune.', true);
+  }
+}
+
+// ── EDIT ORA ──
+function openEditOra() {
+  if (!selectedInterview) return;
+  const wrap = document.getElementById('edit-ora-wrap');
+  const input = document.getElementById('edit-ora-input');
+  if (wrap.classList.contains('open')) {
+    wrap.classList.remove('open');
+    return;
+  }
+  input.value = selectedInterview.ora || '09:00';
+  wrap.classList.add('open');
+  input.focus();
+}
+
+async function saveEditOra() {
+  if (!selectedInterview) return;
+  const ora = document.getElementById('edit-ora-input').value;
+  if (!ora) { showToast('Introdu o ora valida.', true); return; }
+
+  const form = new FormData();
+  form.append('ora', ora);
+  try {
+    const res  = await fetch(`/calendar/api/interview/${selectedInterview.id}/edit-ora`, { method: 'POST', body: form });
+    const json = await res.json();
+    if (json.success) {
+      const idx = interviews.findIndex(iv => iv.id === selectedInterview.id);
+      if (idx !== -1) interviews[idx] = json.interview;
+      selectedInterview = json.interview;
+      document.getElementById('dp-ora').textContent = `${json.interview.ora} (${json.interview.durata || 60} min)`;
+      document.getElementById('edit-ora-wrap').classList.remove('open');
+      renderCalendar();
+      showToast('Ora a fost actualizata.');
+    } else {
+      showToast(json.error || 'Eroare la salvare.', true);
+    }
+  } catch(e) {
+    showToast('Eroare de conexiune.', true);
   }
 }
 
@@ -934,7 +1003,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 ;(function(){
 if(window.innerWidth>768)return;
-var DA=['Lun','Mar','Mie','Joi','Vin','Sam','Dum'];
+var DA=['Lun','Mar','Mie','Joi','Vin'];
 function ds(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
 function isTod(d){var n=new Date();return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}
 function addD(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r}
@@ -953,7 +1022,7 @@ function renderStrip(){
   var strip=wrap.querySelector('.mcal-strip');
   if(!strip){strip=document.createElement('div');strip.className='mcal-strip';wrap.insertBefore(strip,wrap.firstChild);}
   strip.innerHTML='';
-  for(var i=0;i<7;i++){
+  for(var i=0;i<5;i++){
     var day=addD(wkStart,i);var dayStr=ds(day);
     var hasIv=ivData.some(function(iv){return iv.data===dayStr;});
     var btn=document.createElement('div');

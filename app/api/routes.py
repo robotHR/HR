@@ -2270,6 +2270,79 @@ async def delete_interview_api(interview_id: int):
     return JSONResponse({"success": True})
 
 
+@router.post("/calendar/api/interview/{interview_id}/anuleaza")
+async def cancel_interview_api(interview_id: int, background_tasks: BackgroundTasks):
+    """Anuleaza un interviu si trimite email candidatului."""
+    db = SessionLocal()
+    interview = db.query(Interview).filter(Interview.id == interview_id).first()
+    if not interview:
+        db.close()
+        return JSONResponse({"error": "Interviul nu a fost gasit."}, status_code=404)
+
+    cand_email = interview.candidate_email
+    cand_name = interview.candidate_name or "Candidat"
+    job_title = interview.job_title or "postul aplicat"
+    data = interview.data
+    ora = interview.ora
+    cand_id = interview.candidate_id
+
+    interview.status = "anulat"
+    db.commit()
+    db.close()
+
+    update_candidate_status(
+        cand_id,
+        "APLICAT",
+        event_title="Interviu anulat",
+        event_description=f"Interviul din {data} la {ora} a fost anulat de HR.",
+    )
+
+    if cand_email:
+        background_tasks.add_task(
+            _send_interview_cancelled_email,
+            to_email=cand_email,
+            candidate_name=cand_name,
+            job_title=job_title,
+            data=data,
+            ora=ora,
+        )
+
+    return JSONResponse({"success": True})
+
+
+@router.post("/calendar/api/interview/{interview_id}/edit-ora")
+async def edit_interview_ora(
+    interview_id: int,
+    ora: str = Form(...),
+    data: str = Form(""),
+):
+    """Editeaza ora (si optional data) unui interviu."""
+    db = SessionLocal()
+    interview = db.query(Interview).filter(Interview.id == interview_id).first()
+    if not interview:
+        db.close()
+        return JSONResponse({"error": "Interviul nu a fost gasit."}, status_code=404)
+
+    interview.ora = ora
+    if data:
+        interview.data = data
+    db.commit()
+
+    result = {
+        "id": interview.id,
+        "candidate_id": interview.candidate_id,
+        "candidate_name": interview.candidate_name or "—",
+        "job_title": interview.job_title or "—",
+        "data": interview.data,
+        "ora": interview.ora,
+        "locatie": interview.locatie,
+        "durata": interview.durata or 60,
+        "status": interview.status,
+    }
+    db.close()
+    return JSONResponse({"success": True, "interview": result})
+
+
 def _send_interview_scheduled_email(
     to_email: str,
     candidate_name: str,
@@ -2538,7 +2611,7 @@ def _send_hr_notification_email(candidate_name: str, job_title: str, data: str, 
 
         send_email_api(
             to_email=hr_email,
-            subject=f"[NEXAS HR] Interviu programat — {candidate_name}",
+            subject=f"{candidate_name.upper()} - PROGRAMAT LA INTERVIU {data_fmt} {ora}",
             body=f"""Un candidat si-a programat interviul.
 
 Candidat: {candidate_name}
@@ -2554,6 +2627,44 @@ Echipa NEXAS HR
         )
     except Exception as e:
         print(f"[SCHEDULE] WARN email HR notif esuat: {e}")
+
+
+def _send_interview_cancelled_email(
+    to_email: str,
+    candidate_name: str,
+    job_title: str,
+    data: str,
+    ora: str,
+):
+    """Notifica candidatul ca interviul sau a fost anulat de HR."""
+    try:
+        luni = {
+            "01": "Ianuarie", "02": "Februarie", "03": "Martie",
+            "04": "Aprilie", "05": "Mai", "06": "Iunie",
+            "07": "Iulie", "08": "August", "09": "Septembrie",
+            "10": "Octombrie", "11": "Noiembrie", "12": "Decembrie"
+        }
+        try:
+            parts = data.split("-")
+            data_fmt = f"{int(parts[2])} {luni.get(parts[1], parts[1])} {parts[0]}"
+        except Exception:
+            data_fmt = data
+
+        send_email_api(
+            to_email=to_email,
+            subject=f"Interviu anulat — {job_title}",
+            body=f"""Buna ziua, {candidate_name},
+
+Va informam ca interviul programat pentru postul de {job_title} in data de {data_fmt} la ora {ora} a fost anulat.
+
+Va rugam sa ne contactati pentru a stabili o noua data, daca sunteti in continuare interesat(a) de aceasta pozitie.
+
+Cu respect,
+Echipa HR NEXAS
+""",
+        )
+    except Exception as e:
+        print(f"[SCHEDULE] WARN email anulare esuat catre {to_email}: {e}")
 
 
 # ─── CONFIRMARE / ANULARE INTERVIU (linkuri din email) ───────────────────────

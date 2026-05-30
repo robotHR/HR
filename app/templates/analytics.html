@@ -111,6 +111,16 @@
         .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--blue-2);font-weight:900;margin-bottom:12px}
         h1{font-size:34px;line-height:1.05;letter-spacing:-.6px;margin-bottom:12px;color:#fff}
         h1.syne-only{font-family:'Syne',sans-serif !important}
+        .page-title{
+            font-family:'DM Sans',sans-serif !important;
+            font-size:34px;
+            font-weight:800;
+            color:var(--text);
+            letter-spacing:-.6px;
+            line-height:1.08;
+            margin-bottom:12px;
+            text-transform:uppercase;
+        }
         .subtitle{max-width:780px;color:var(--muted);font-size:15px;line-height:1.6}
         .ai-summary{
             margin-top:22px;
@@ -304,6 +314,16 @@
     width:22px;height:2px;background:#7cc4ff;border-radius:0 0 2px 2px;
   }
 }
+
+
+/* FIX FINAL: titlu Statistici ca la Candidati, negru pe tema alba */
+html[data-theme="light"] .page-title{
+    font-family:'DM Sans',sans-serif !important;
+    color:#07111f !important;
+    -webkit-text-fill-color:#07111f !important;
+    text-shadow:none !important;
+}
+
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
 
@@ -576,7 +596,7 @@ html[data-theme="light"] tr:hover{
                 <div class="hero-content">
                     <div>
                         <div class="eyebrow">Raport recrutare</div>
-                      <h1 class="syne-only">ANALIZA HR</h1>
+                      <h1 class="page-title">ANALIZA HR</h1>
                         <p class="subtitle">Pagina iti arata cati candidati ai analizat, cati merita verificati si unde se afla in procesul de recrutare.</p>
                         <div class="ai-summary">
                             <div class="summary-chip"><strong>{{ analytics.total }}</strong><span>candidati analizati</span></div>

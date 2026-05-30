@@ -923,6 +923,15 @@ async def candidates_page(request: Request, q: str = "", status: str = "", job: 
         "de_analizat": len([c for c in candidates if c.status == "DE ANALIZAT"]),
     }
 
+    # Scorecard map: candidate_id -> scorecard (cel mai recent)
+    db = SessionLocal()
+    all_scorecards = db.query(InterviewScorecard).all()
+    db.close()
+    sc_by_candidate = {}
+    for sc in all_scorecards:
+        if sc.candidate_id not in sc_by_candidate:
+            sc_by_candidate[sc.candidate_id] = sc
+
     return templates.TemplateResponse(
         request=request,
         name="candidates.html",
@@ -941,6 +950,7 @@ async def candidates_page(request: Request, q: str = "", status: str = "", job: 
             "min_score": min_score,
             "page": page,
             "total_pages": total_pages,
+            "sc_by_candidate": sc_by_candidate,
         }
     )
 

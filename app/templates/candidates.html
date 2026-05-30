@@ -672,6 +672,35 @@ html[data-theme="light"] input::placeholder,
 html[data-theme="light"] textarea::placeholder{
   color:#6b7280 !important;
 }
+
+/* ── Scorecard badge în lista candidați ── */
+.sc-badge{
+  display:inline-flex;align-items:center;
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:900;letter-spacing:.04em;
+  white-space:nowrap;margin-top:4px;
+}
+.sc-green{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.sc-mid{background:var(--ysoft);border:1px solid var(--yline);color:#d97706}
+.sc-low{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+
+/* ── Fix portocaliu/galben pe tema alba ── */
+html[data-theme="light"] .tag-yellow,
+html[data-theme="light"] .priority-medium,
+html[data-theme="light"] .ai-badge.potential,
+html[data-theme="light"] .match-chip.chip-potential,
+html[data-theme="light"] .score-cell.mid,
+html[data-theme="light"] .score-circle.score-yellow{
+  background:rgba(217,119,6,.12) !important;
+  border-color:rgba(217,119,6,.35) !important;
+  color:#92400e !important;
+}
+html[data-theme="light"] .sc-mid{
+  background:rgba(217,119,6,.12) !important;
+  border-color:rgba(217,119,6,.35) !important;
+  color:#92400e !important;
+}
+html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
 </style>
 
 </head>
@@ -806,6 +835,13 @@ html[data-theme="light"] textarea::placeholder{
                             <div class="actions-inline">
                                 <a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a>
                                 <a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a>
+                                {% set sc = sc_by_candidate.get(candidate.id) %}
+                                {% if sc %}
+                                {% set sc_avg = ((sc.technical_skills_score or 0) + (sc.attention_to_detail_score or 0) + (sc.communication_score or 0) + (sc.team_fit_score or 0)) / 4 %}
+                                <span class="sc-badge {% if sc_avg >= 4 %}sc-green{% elif sc_avg >= 3 %}sc-mid{% else %}sc-low{% endif %}">
+                                    ★ {{ "%.1f"|format(sc_avg) }} · {{ sc.overall_recommendation }}
+                                </span>
+                                {% endif %}
                             </div>
 
                         </div>

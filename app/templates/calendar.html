@@ -233,7 +233,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .btn-modal-save{flex:2;padding:11px;border-radius:12px;font-size:13px;font-weight:800;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;color:#07111f;cursor:pointer;box-shadow:0 5px 16px rgba(34,199,184,.20);font-family:'DM Sans',sans-serif;transition:.15s}
 .btn-modal-save:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(34,199,184,.28)}
 /* Detail popup */
-.detail-popup{position:fixed;z-index:200;background:#182036;border:1px solid var(--line2);border-radius:17px;padding:17px 36px 17px 17px;min-width:236px;max-width:288px;box-shadow:0 22px 55px rgba(0,0,0,.48);display:none}
+.detail-popup{position:fixed;z-index:200;background:#182036;border:1px solid var(--line2);border-radius:17px;padding:17px;min-width:236px;max-width:288px;box-shadow:0 22px 55px rgba(0,0,0,.48);display:none}
 .detail-popup.visible{display:block}
 .detail-name{font-size:14px;font-weight:800;color:#fff;margin-bottom:3px}
 .detail-job{font-size:11px;color:var(--t2);font-weight:700;margin-bottom:11px}
@@ -271,7 +271,6 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   .main{flex:1 !important;display:flex !important;flex-direction:column !important;height:100% !important;overflow:hidden !important;margin-left:0 !important;width:100% !important;padding:0 !important}
   .topbar{flex-shrink:0 !important;padding:0 10px !important;height:54px !important}
   .topbar .week-label{min-width:0 !important;font-size:11px !important}
-  .login-theme-btn{top:11px !important;right:auto !important;left:10px !important;width:30px !important;height:30px !important}
   .cal-outer{flex:1 !important;overflow:hidden !important}
   .cal-container{min-width:0 !important;height:100% !important;display:flex !important;flex-direction:column !important}
   .cal-header,.cal-body{display:none !important}
@@ -372,7 +371,7 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
         <button class="btn-today" onclick="goToday()">Azi</button>
         <button class="btn-add-interview" onclick="openModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Programează interviu
+          Trimite invitatie
         </button>
       </div>
     </div>
@@ -387,33 +386,25 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   </main>
 </div>
 
-<!-- ── MODAL PROGRAMARE ── -->
+<!-- ── MODAL INVITATIE INTERVIU ── -->
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">Programează interviu</div>
-    <div class="modal-sub" id="modal-sub">Completează detaliile și salvează. Email-ul va fi trimis automat.</div>
+    <div class="modal-title">Trimite invitatie la interviu</div>
+    <div class="modal-sub" id="modal-sub">Candidatul primeste email cu link unic si isi alege singur data si ora.</div>
     <div class="form-grid">
       <div class="field full candidate-search-wrap" id="candidate-field-wrap">
         <label>Candidat</label>
-        <input type="text" id="candidate-search" placeholder="Caută candidat după nume..." autocomplete="off" oninput="onCandidateSearch(this.value)">
+        <input type="text" id="candidate-search" placeholder="Cauta candidat dupa nume..." autocomplete="off" oninput="onCandidateSearch(this.value)">
         <div class="candidate-dropdown" id="candidate-dropdown" style="display:none"></div>
         <input type="hidden" id="selected-candidate-id">
       </div>
-      <div class="field">
-        <label>Data</label>
-        <input type="date" id="input-data">
-      </div>
-      <div class="field">
-        <label>Ora</label>
-        <input type="time" id="input-ora" step="900">
-      </div>
       <div class="field full">
-        <label>Locație / Link Meet</label>
+        <label>Locatie / Link Meet optional</label>
         <input type="text" id="input-locatie" placeholder="ex: Str. Mihai Eminescu 10 sau meet.google.com/...">
       </div>
       <div class="field">
-        <label>Durată (minute)</label>
+        <label>Durata interviu</label>
         <select id="input-durata">
           <option value="30">30 min</option>
           <option value="45">45 min</option>
@@ -422,19 +413,24 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
           <option value="120">120 min</option>
         </select>
       </div>
+      <div class="field">
+        <label>Valabilitate link</label>
+        <select id="input-expira">
+          <option value="3">3 zile</option>
+          <option value="7" selected>7 zile</option>
+          <option value="14">14 zile</option>
+        </select>
+      </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-modal-cancel" onclick="closeModal()">Anulează</button>
-      <button class="btn-modal-save" id="btn-save" onclick="saveInterview()">
-        Salvează &amp; trimite email
-      </button>
+      <button class="btn-modal-cancel" onclick="closeModal()">Anuleaza</button>
+      <button class="btn-modal-save" id="btn-save" onclick="sendInterviewInvite()">Trimite email cu link</button>
     </div>
   </div>
 </div>
 
 <!-- ── DETAIL POPUP ── -->
 <div class="detail-popup" id="detail-popup">
-  <button onclick="closeDetailPopup()" style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:6px;border:none;background:rgba(255,255,255,.10);color:var(--soft);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;padding:0;flex-shrink:0" title="Inchide">✕</button>
   <div class="detail-name" id="dp-name"></div>
   <div class="detail-job" id="dp-job"></div>
   <div class="detail-row">
@@ -571,7 +567,7 @@ function renderCalendar() {
       slot.addEventListener('click', (e) => {
         if (e.target.closest('.interview-card')) return;
         closeDetailPopup();
-        openModal(dayStr, `${String(h).padStart(2,'0')}:00`);
+        showToast('Trimite invitatia candidatului. El isi alege singur data si ora din link.');
       });
       col.appendChild(slot);
     }
@@ -729,39 +725,30 @@ function goToday() {
   fetchInterviews();
 }
 
-// ── MODAL ──
-function openModal(date, time) {
+// ── MODAL INVITATIE ──
+function openModal() {
   const overlay = document.getElementById('modal-overlay');
 
-  // Reset
   document.getElementById('input-locatie').value = '';
   document.getElementById('input-durata').value  = '60';
+  document.getElementById('input-expira').value  = '7';
   document.getElementById('btn-save').disabled   = false;
-  document.getElementById('btn-save').textContent = 'Salvează & trimite email';
+  document.getElementById('btn-save').textContent = 'Trimite email cu link';
 
-  // Data si ora din slot
-  if (date) document.getElementById('input-data').value = date;
-  else {
-    const today = dateToStr(new Date());
-    document.getElementById('input-data').value = today;
-  }
-  if (time) document.getElementById('input-ora').value = time;
-  else document.getElementById('input-ora').value = '09:00';
-
-  // Candidat preselectat
   if (preselectedCandidate) {
-    document.getElementById('candidate-search').value    = preselectedCandidate.name;
+    document.getElementById('candidate-search').value = preselectedCandidate.name;
     document.getElementById('selected-candidate-id').value = preselectedCandidate.id;
     document.getElementById('candidate-search').readOnly = true;
     document.getElementById('modal-sub').textContent =
-      `Interviu pentru ${preselectedCandidate.name} — ${preselectedCandidate.job_title || ''}`;
+      `Invitatie pentru ${preselectedCandidate.name} — ${preselectedCandidate.job_title || ''}`;
   } else {
-    document.getElementById('candidate-search').value    = '';
+    document.getElementById('candidate-search').value = '';
     document.getElementById('selected-candidate-id').value = '';
     document.getElementById('candidate-search').readOnly = false;
     document.getElementById('modal-sub').textContent =
-      'Completează detaliile și salvează. Email-ul va fi trimis automat.';
+      'Candidatul primeste email cu link unic si isi alege singur data si ora.';
   }
+
   document.getElementById('candidate-dropdown').style.display = 'none';
   overlay.classList.add('visible');
 }
@@ -810,47 +797,41 @@ document.addEventListener('click', (e) => {
     document.getElementById('candidate-dropdown').style.display = 'none';
 });
 
-// ── SAVE INTERVIEW ──
-async function saveInterview() {
+// ── SEND INTERVIEW INVITE ──
+async function sendInterviewInvite() {
   const candidateId = document.getElementById('selected-candidate-id').value;
-  const data        = document.getElementById('input-data').value;
-  const ora         = document.getElementById('input-ora').value;
   const locatie     = document.getElementById('input-locatie').value;
   const durata      = document.getElementById('input-durata').value;
+  const expiraZile  = document.getElementById('input-expira').value;
 
-  if (!candidateId) { showToast('Selectează un candidat.', true); return; }
-  if (!data)         { showToast('Alege o dată.', true); return; }
-  if (!ora)          { showToast('Alege o oră.', true); return; }
+  if (!candidateId) { showToast('Selecteaza un candidat.', true); return; }
 
   const btn = document.getElementById('btn-save');
-  btn.disabled    = true;
-  btn.textContent = 'Se salvează...';
+  btn.disabled = true;
+  btn.textContent = 'Se trimite emailul...';
 
   const form = new FormData();
   form.append('candidate_id', candidateId);
-  form.append('data', data);
-  form.append('ora', ora);
   form.append('locatie', locatie);
   form.append('durata', durata);
+  form.append('expira_zile', expiraZile);
 
   try {
-    const res  = await fetch('/calendar/api/interview', { method: 'POST', body: form });
+    const res = await fetch('/calendar/api/interview-invite', { method: 'POST', body: form });
     const json = await res.json();
     if (json.success) {
-      interviews.push(json.interview);
-      renderCalendar();
       closeModal();
-      showToast('Interviu programat! Email-ul va fi trimis candidatului.');
+      showToast('Invitatia a fost trimisa. Candidatul isi va programa singur interviul.');
       preselectedCandidate = null;
     } else {
-      showToast(json.error || 'Eroare la salvare.', true);
+      showToast(json.error || 'Eroare la trimiterea invitatiei.', true);
       btn.disabled = false;
-      btn.textContent = 'Salvează & trimite email';
+      btn.textContent = 'Trimite email cu link';
     }
   } catch(e) {
     showToast('Eroare de conexiune.', true);
     btn.disabled = false;
-    btn.textContent = 'Salvează & trimite email';
+    btn.textContent = 'Trimite email cu link';
   }
 }
 

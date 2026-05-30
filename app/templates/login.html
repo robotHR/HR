@@ -295,6 +295,159 @@
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
     <script src="/static/js/theme.js"></script>
+
+<style id="login-light-theme-fix">
+/* Fix tema alba pentru login */
+html[data-theme="light"]{
+    --bg:#f7fbff;
+    --bg-2:#eef6ff;
+    --border:rgba(15,23,42,.14);
+    --border-focus:rgba(37,99,235,.45);
+    --text:#0f172a;
+    --muted:rgba(15,23,42,.58);
+    --input-bg:#f3f7fc;
+}
+
+html[data-theme="light"] body.login-body{
+    background:#ffffff;
+    color:#0f172a;
+}
+
+html[data-theme="light"] .left{
+    background:
+        linear-gradient(160deg,rgba(232,243,255,.96) 0%,rgba(222,238,255,.96) 52%,rgba(241,247,255,.98) 100%);
+}
+
+html[data-theme="light"] .left::before{
+    background-image:
+        linear-gradient(rgba(37,99,235,.09) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(37,99,235,.09) 1px,transparent 1px);
+}
+
+html[data-theme="light"] .brand-text .name{
+    color:#0f172a;
+}
+
+html[data-theme="light"] .brand-text .name span{
+    color:#2563eb;
+}
+
+html[data-theme="light"] .brand-text .sub{
+    color:rgba(15,23,42,.42);
+}
+
+html[data-theme="light"] .left-tag{
+    color:#2563eb;
+}
+
+html[data-theme="light"] .left-tag::before{
+    background:#2563eb;
+}
+
+html[data-theme="light"] .left-title .ghost{
+    color:transparent;
+    -webkit-text-stroke:1.5px rgba(15,23,42,.20);
+}
+
+html[data-theme="light"] .left-title .solid{
+    background:none;
+    -webkit-background-clip:initial;
+    -webkit-text-fill-color:#0f172a;
+    background-clip:initial;
+    color:#0f172a;
+}
+
+html[data-theme="light"] .left-desc{
+    color:rgba(15,23,42,.70);
+}
+
+html[data-theme="light"] .feat-pill{
+    background:rgba(255,255,255,.68);
+    border:1px solid rgba(37,99,235,.18);
+    color:rgba(15,23,42,.68);
+}
+
+html[data-theme="light"] .feat-pill:hover{
+    background:rgba(37,99,235,.08);
+    border-color:rgba(37,99,235,.25);
+    color:#0f172a;
+}
+
+html[data-theme="light"] .right{
+    background:#ffffff;
+    border-left:1px solid rgba(15,23,42,.08);
+}
+
+html[data-theme="light"] .login-title{
+    color:#0f172a;
+}
+
+html[data-theme="light"] .login-sub,
+html[data-theme="light"] .note,
+html[data-theme="light"] .note a{
+    color:rgba(15,23,42,.52);
+}
+
+html[data-theme="light"] .note a:hover{
+    color:#2563eb;
+}
+
+html[data-theme="light"] .field label{
+    color:#111827;
+}
+
+html[data-theme="light"] .field-icon{
+    opacity:.55;
+}
+
+html[data-theme="light"] .field input{
+    background:#f3f7fc;
+    border:1.5px solid rgba(15,23,42,.16);
+    color:#0f172a;
+}
+
+html[data-theme="light"] .field input::placeholder{
+    color:rgba(15,23,42,.42);
+}
+
+html[data-theme="light"] .field input:focus{
+    border-color:rgba(37,99,235,.55);
+    background:#ffffff;
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+
+html[data-theme="light"] .field input:hover:not(:focus){
+    border-color:rgba(15,23,42,.26);
+}
+
+html[data-theme="light"] .pw-toggle{
+    color:#0f172a;
+    opacity:.35;
+}
+
+html[data-theme="light"] .pw-toggle:hover{
+    opacity:.7;
+}
+
+html[data-theme="light"] .login-theme-btn{
+    color:#0f172a;
+    background:#f8fafc;
+    border:1px solid rgba(15,23,42,.14);
+    box-shadow:0 8px 22px rgba(15,23,42,.08);
+}
+
+html[data-theme="light"] .error-box{
+    background:rgba(254,226,226,.9);
+    border:1px solid rgba(220,38,38,.20);
+    color:#991b1b;
+}
+
+html[data-theme="light"] input:-webkit-autofill{
+    -webkit-box-shadow:0 0 0 100px #f3f7fc inset !important;
+    -webkit-text-fill-color:#0f172a !important;
+}
+</style>
+
 </head>
 <body class="login-body">
 

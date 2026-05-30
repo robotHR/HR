@@ -14,6 +14,7 @@
 body, .sidebar, .main, .layout,
 .stat-card, .kpi, .panel, .card, .source-card, .filters,
 .candidate-row, .cand-row, .hero-panel, .match-box,
+.kpi-stat, .top-cand-box, .top-cand-row, .mini-row,
 .modal-overlay, .modal, .bnav, .header,
 input, select, textarea {
   transition: background-color .22s ease, border-color .22s ease, color .14s ease;
@@ -274,6 +275,41 @@ input, select, textarea {
 }
 [data-theme="light"] .bn       { color: rgba(15,23,42,.48); }
 [data-theme="light"] .bn.on    { color: #2563eb; }
+
+/* ── Dashboard — KPI stat cards ── */
+[data-theme="light"] .kpi-stat {
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+}
+[data-theme="light"] .kpi-sub { color: rgba(15,23,42,.52); }
+
+/* ── Dashboard — Top candidati box ── */
+[data-theme="light"] .top-cand-box {
+  background: #ffffff;
+  border-color: rgba(0,0,0,.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+[data-theme="light"] .top-cand-hdr {
+  color: #2563eb;
+  border-bottom-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .top-cand-row {
+  background: #f8fafc;
+  border-color: rgba(0,0,0,.07);
+}
+[data-theme="light"] .top-cand-score-lbl { color: rgba(15,23,42,.48); }
+
+/* ── Dashboard — Mini lists ── */
+[data-theme="light"] .mini-title { color: #0f172a; }
+[data-theme="light"] .mini-row {
+  background: rgba(0,0,0,.03);
+  border-color: rgba(0,0,0,.08);
+}
+[data-theme="light"] .mini-row:hover {
+  background: rgba(37,99,235,.05);
+  border-color: rgba(37,99,235,.22);
+}
+[data-theme="light"] .score-bar-track { background: rgba(0,0,0,.10); }
 
 /* ═══════════════════════════════════════════════════════════
    DARK MODE — public pages (careers / career_detail / login)

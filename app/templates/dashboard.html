@@ -794,6 +794,14 @@
     width:22px;height:2px;background:#7cc4ff;border-radius:0 0 2px 2px;
   }
 }
+/* ─── Clase pentru sectiunile cu inline bg ─────────── */
+.kpi-stat{background:#1a2238;border-radius:16px;padding:14px 16px}
+.kpi-lbl{font-size:10px;font-weight:900;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.10em;margin-bottom:5px}
+.kpi-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+.top-cand-box{background:#1a2238;border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px;margin-bottom:16px}
+.top-cand-hdr{font-size:11px;font-weight:900;color:#7cc4ff;text-transform:uppercase;letter-spacing:.13em;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.09)}
+.top-cand-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px}
+.top-cand-score-lbl{font-size:10px;color:rgba(255,255,255,.4)}
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
     <script src="/static/js/theme.js"></script>
@@ -945,35 +953,35 @@
 
             <!-- KPI-uri rapide -->
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
-                <div style="background:#1a2238;border:1px solid rgba(34,199,184,.26);border-radius:16px;padding:14px 16px">
-                    <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.10em;margin-bottom:5px">Suna azi</div>
+                <div class="kpi-stat" style="border:1px solid rgba(34,199,184,.26)">
+                    <div class="kpi-lbl">Suna azi</div>
                     <div style="font-size:28px;font-weight:800;color:#5ee6da">{{ call_now|length }}</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">candidati HIGH priority</div>
+                    <div class="kpi-sub">candidati HIGH priority</div>
                 </div>
-                <div style="background:#1a2238;border:1px solid rgba(245,158,11,.26);border-radius:16px;padding:14px 16px">
-                    <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.10em;margin-bottom:5px">Suna curand</div>
+                <div class="kpi-stat" style="border:1px solid rgba(245,158,11,.26)">
+                    <div class="kpi-lbl">Suna curand</div>
                     <div style="font-size:28px;font-weight:800;color:#fcd38a">{{ call_later|length }}</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">candidati MEDIUM priority</div>
+                    <div class="kpi-sub">candidati MEDIUM priority</div>
                 </div>
-                <div style="background:#1a2238;border:1px solid rgba(93,169,255,.26);border-radius:16px;padding:14px 16px">
-                    <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.10em;margin-bottom:5px">Alt rol potrivit</div>
+                <div class="kpi-stat" style="border:1px solid rgba(93,169,255,.26)">
+                    <div class="kpi-lbl">Alt rol potrivit</div>
                     <div style="font-size:28px;font-weight:800;color:#7cc4ff">{{ keep_other|length }}</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">de pastrat in baza</div>
+                    <div class="kpi-sub">de pastrat in baza</div>
                 </div>
-                <div style="background:#1a2238;border:1px solid rgba(255,107,112,.26);border-radius:16px;padding:14px 16px">
-                    <div style="font-size:10px;font-weight:900;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.10em;margin-bottom:5px">Respinsi auto</div>
+                <div class="kpi-stat" style="border:1px solid rgba(255,107,112,.26)">
+                    <div class="kpi-lbl">Respinsi auto</div>
                     <div style="font-size:28px;font-weight:800;color:#ffb4b7">{{ auto_reject|length }}</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">nepotriviti pentru rol</div>
+                    <div class="kpi-sub">nepotriviti pentru rol</div>
                 </div>
             </div>
 
             <!-- Top 3 de contactat -->
             {% if top3 %}
-            <div style="background:#1a2238;border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px;margin-bottom:16px">
-                <div style="font-size:11px;font-weight:900;color:#7cc4ff;text-transform:uppercase;letter-spacing:.13em;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.09)">Top candidati de contactat</div>
+            <div class="top-cand-box">
+                <div class="top-cand-hdr">Top candidati de contactat</div>
                 <div style="display:flex;flex-direction:column;gap:10px">
                 {% for c in top3 %}
-                    <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px">
+                    <div class="top-cand-row">
                         <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#22c7b8,#5da9ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#07111f;font-size:14px;flex-shrink:0">{{ (c.name or '?')[0]|upper }}</div>
                         <div style="flex:1;min-width:0">
                             <div style="font-size:14px;font-weight:800" class="t-name">{{ c.name or 'Candidat' }}</div>
@@ -981,7 +989,7 @@
                         </div>
                         <div style="text-align:right;flex-shrink:0">
                             <div style="font-size:20px;font-weight:800;color:{% if (c.score or 0)>=75 %}#22c7b8{% elif (c.score or 0)>=55 %}#f59e0b{% else %}#ff6b70{% endif %}">{{ c.score or 0 }}</div>
-                            <div style="font-size:10px;color:rgba(255,255,255,.4)">scor AI</div>
+                            <div class="top-cand-score-lbl">scor AI</div>
                         </div>
                         <a href="/candidat/{{ c.id }}" style="display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:800;background:linear-gradient(135deg,#5da9ff,#7cc4ff);color:#07111f;text-decoration:none;white-space:nowrap;flex-shrink:0">Detalii →</a>
                     </div>

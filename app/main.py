@@ -15,6 +15,7 @@ from app.models.job_post_model import JobPost
 from app.models.interview_model import Interview
 from app.models.scheduling_token_model import SchedulingToken
 from app.models.interview_scorecard_model import InterviewScorecard
+from app.models.scorecard_token_model import ScorecardToken
 
 Base.metadata.create_all(bind=engine)
 
@@ -40,6 +41,7 @@ async def protect_private_pages(request: Request, call_next):
         "/programeaza",
         "/api/sloturi",
         "/interviu",
+        "/evalueaza",
     ]
 
     is_public = any(

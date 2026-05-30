@@ -1,8 +1,10 @@
 import os
 import re
+import secrets
 import shutil
 import time
 from collections import Counter, defaultdict
+from datetime import datetime, timedelta
 from io import BytesIO
 
 from fastapi import APIRouter, Request, Form, UploadFile, File, BackgroundTasks
@@ -20,6 +22,7 @@ from app.models.job_post_model import JobPost
 from app.models.interview_model import Interview
 from app.models.scheduling_token_model import SchedulingToken
 from app.models.interview_scorecard_model import InterviewScorecard
+from app.models.scorecard_token_model import ScorecardToken
 from app.services.cv_parser import (
     process_cvs_for_job,
     extract_text_from_file,
@@ -135,6 +138,17 @@ def ensure_scorecard_columns():
 
 
 ensure_scorecard_columns()
+
+
+def ensure_scorecard_token_columns():
+    if not inspect(engine).has_table("scorecard_tokens"):
+        return
+    with engine.begin() as conn:
+        conn.execute(text("ALTER TABLE scorecard_tokens ADD COLUMN IF NOT EXISTS evaluator_email VARCHAR"))
+        conn.execute(text("ALTER TABLE scorecard_tokens ADD COLUMN IF NOT EXISTS evaluator_name VARCHAR"))
+
+
+ensure_scorecard_token_columns()
 
 
 # ── Scorecard helpers ────────────────────────────────────────────────────────
@@ -2470,9 +2484,6 @@ Echipa HR NEXAS
 
 # ─── SELF-SCHEDULING: candidatul isi alege singur ora ───────────────────────
 
-import secrets
-from datetime import datetime, timedelta
-
 
 @router.post("/candidat/{candidate_id}/invita-self-schedule")
 async def invite_self_schedule(candidate_id: int, background_tasks: BackgroundTasks, request: Request):
@@ -2970,3 +2981,207 @@ async def scorecard_submit(
         url=f"/candidat/{candidate_id}/scorecard/{interview_id}?message=Scorecard salvat cu succes.",
         status_code=303,
     )
+
+
+# ── Scorecard Token (link public pentru evaluator extern) ────────────────────
+
+@router.post("/candidat/{candidate_id}/genereaza-link-evaluare")
+async def genereaza_link_evaluare(
+    request: Request,
+    candidate_id: int,
+    interview_id: int = Form(0),
+    evaluator_name: str = Form(""),
+    evaluator_email: str = Form(""),
+):
+    candidate = get_candidate_by_id(candidate_id)
+    if not candidate:
+        return JSONResponse({"success": False, "error": "Candidatul nu există."}, status_code=404)
+
+    token = secrets.token_urlsafe(32)
+    expires = datetime.utcnow() + timedelta(days=7)
+
+    db = SessionLocal()
+    sc_token = ScorecardToken(
+        token=token,
+        candidate_id=candidate_id,
+        interview_id=interview_id if interview_id else None,
+        evaluator_name=evaluator_name.strip() or None,
+        evaluator_email=evaluator_email.strip() or None,
+        expires_at=expires,
+    )
+    db.add(sc_token)
+    db.commit()
+    db.close()
+
+    base_url = str(request.base_url).rstrip("/")
+    link = f"{base_url}/evalueaza/{token}"
+
+    log_candidate_event(
+        candidate_id=candidate_id,
+        event_type="SCORECARD_LINK",
+        title="Link evaluare generat",
+        description=f"Link trimis către: {evaluator_name.strip() or evaluator_email.strip() or 'evaluator extern'}",
+    )
+
+    return JSONResponse({"success": True, "link": link, "expires": expires.strftime("%d.%m.%Y")})
+
+
+@router.get("/evalueaza/{token}", response_class=HTMLResponse)
+async def evalueaza_get(request: Request, token: str):
+    db = SessionLocal()
+    sc_token = db.query(ScorecardToken).filter(ScorecardToken.token == token).first()
+    db.close()
+
+    if not sc_token:
+        return HTMLResponse(_scorecard_token_error("Link invalid sau expirat."))
+
+    if sc_token.expires_at < datetime.utcnow():
+        return HTMLResponse(_scorecard_token_error("Acest link a expirat. Solicită un link nou de la HR."))
+
+    candidate = get_candidate_by_id(sc_token.candidate_id)
+    if not candidate:
+        return HTMLResponse(_scorecard_token_error("Candidatul nu mai există în sistem."))
+
+    db = SessionLocal()
+    interview = None
+    if sc_token.interview_id:
+        interview = db.query(Interview).filter(Interview.id == sc_token.interview_id).first()
+    existing = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == sc_token.candidate_id,
+        InterviewScorecard.interview_id == sc_token.interview_id,
+    ).first() if sc_token.interview_id else None
+    db.close()
+
+    already_submitted = sc_token.used
+    avg_score = calculate_average_score(existing) if existing else None
+
+    return templates.TemplateResponse(
+        request=request,
+        name="evalueaza_public.html",
+        context={
+            "request": request,
+            "token": token,
+            "candidate": candidate,
+            "interview": interview,
+            "scorecard": existing,
+            "avg_score": avg_score,
+            "already_submitted": already_submitted,
+            "evaluator_name": sc_token.evaluator_name or "",
+            "recommendations": VALID_RECOMMENDATIONS,
+        }
+    )
+
+
+@router.post("/evalueaza/{token}")
+async def evalueaza_post(
+    request: Request,
+    token: str,
+    evaluator_name: str = Form(""),
+    technical_skills_score: int = Form(...),
+    attention_to_detail_score: int = Form(...),
+    communication_score: int = Form(...),
+    team_fit_score: int = Form(...),
+    overall_recommendation: str = Form(...),
+    comments: str = Form(""),
+):
+    db = SessionLocal()
+    sc_token = db.query(ScorecardToken).filter(ScorecardToken.token == token).first()
+    db.close()
+
+    if not sc_token or sc_token.expires_at < datetime.utcnow():
+        return HTMLResponse(_scorecard_token_error("Link invalid sau expirat."))
+
+    errors = []
+    for label, val in [
+        ("Technical skills", technical_skills_score),
+        ("Attention to detail", attention_to_detail_score),
+        ("Communication", communication_score),
+        ("Team fit", team_fit_score),
+    ]:
+        if not (1 <= val <= 5):
+            errors.append(f"{label} trebuie să fie între 1 și 5.")
+
+    if overall_recommendation not in VALID_RECOMMENDATIONS:
+        errors.append("Recomandare invalidă.")
+
+    if errors:
+        candidate = get_candidate_by_id(sc_token.candidate_id)
+        db = SessionLocal()
+        interview = db.query(Interview).filter(Interview.id == sc_token.interview_id).first() if sc_token.interview_id else None
+        db.close()
+        return templates.TemplateResponse(
+            request=request,
+            name="evalueaza_public.html",
+            context={
+                "request": request,
+                "token": token,
+                "candidate": candidate,
+                "interview": interview,
+                "scorecard": None,
+                "avg_score": None,
+                "already_submitted": False,
+                "evaluator_name": evaluator_name,
+                "recommendations": VALID_RECOMMENDATIONS,
+                "error": " ".join(errors),
+            },
+            status_code=422,
+        )
+
+    db = SessionLocal()
+    existing = db.query(InterviewScorecard).filter(
+        InterviewScorecard.candidate_id == sc_token.candidate_id,
+        InterviewScorecard.interview_id == sc_token.interview_id,
+    ).first() if sc_token.interview_id else None
+
+    if existing:
+        existing.evaluator_name = evaluator_name.strip() or existing.evaluator_name
+        existing.technical_skills_score = technical_skills_score
+        existing.attention_to_detail_score = attention_to_detail_score
+        existing.communication_score = communication_score
+        existing.team_fit_score = team_fit_score
+        existing.overall_recommendation = overall_recommendation
+        existing.comments = comments.strip()
+    else:
+        sc = InterviewScorecard(
+            candidate_id=sc_token.candidate_id,
+            interview_id=sc_token.interview_id,
+            evaluator_name=evaluator_name.strip() or sc_token.evaluator_name,
+            technical_skills_score=technical_skills_score,
+            attention_to_detail_score=attention_to_detail_score,
+            communication_score=communication_score,
+            team_fit_score=team_fit_score,
+            overall_recommendation=overall_recommendation,
+            comments=comments.strip() or None,
+        )
+        db.add(sc)
+
+    sc_token.used = True
+    db.commit()
+    db.close()
+
+    evaluator_display = evaluator_name.strip() or sc_token.evaluator_name or "evaluator extern"
+    log_candidate_event(
+        candidate_id=sc_token.candidate_id,
+        event_type="SCORECARD",
+        title="Evaluare completată de evaluator extern",
+        description=f"Recomandare: {overall_recommendation} — de către {evaluator_display}",
+    )
+
+    return RedirectResponse(url=f"/evalueaza/{token}?ok=1", status_code=303)
+
+
+def _scorecard_token_error(msg: str) -> str:
+    return f"""<!DOCTYPE html><html lang="ro" data-theme="dark">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eroare | NEXAS HR</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;
+background:linear-gradient(135deg,#121827,#171f33 50%,#1d263d);color:#fff;padding:20px}}
+.box{{background:#1a2238;border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:40px;max-width:440px;text-align:center}}
+.icon{{font-size:48px;margin-bottom:16px}}
+h2{{font-size:20px;font-weight:800;margin-bottom:10px}}
+p{{font-size:14px;color:rgba(255,255,255,.6);line-height:1.6}}
+</style></head>
+<body><div class="box"><div class="icon">⚠️</div><h2>Link invalid</h2><p>{msg}</p></div></body></html>"""

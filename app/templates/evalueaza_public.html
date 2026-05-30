@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluare candidat | NEXAS HR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  font-family:'DM Sans',sans-serif;font-size:14px;color:#fff;min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 8%,rgba(93,169,255,.14),transparent 34%),
+    radial-gradient(circle at 88% 85%,rgba(34,199,184,.08),transparent 30%),
+    linear-gradient(135deg,#121827,#171f33 50%,#1d263d);
+  padding:30px 16px 60px;
+}
+:root{
+  --s1:#1a2238;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.14);
+  --soft:rgba(255,255,255,.82);--muted:rgba(255,255,255,.50);
+  --blue:#5da9ff;--b2:#7cc4ff;--bsoft:rgba(93,169,255,.13);--bline:rgba(93,169,255,.26);
+  --teal:#22c7b8;--t2:#5ee6da;--tsoft:rgba(34,199,184,.13);--tline:rgba(34,199,184,.26);
+  --yellow:#f59e0b;--ysoft:rgba(245,158,11,.13);--yline:rgba(245,158,11,.26);
+  --red:#ff6b70;--rsoft:rgba(255,107,112,.13);--rline:rgba(255,107,112,.26);
+  --rxl:22px;--rl:18px;
+}
+.wrap{max-width:680px;margin:0 auto}
+/* Header */
+.brand-bar{text-align:center;margin-bottom:28px}
+.brand-logo{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.brand-logo span{color:var(--b2)}
+.brand-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+/* Hero candidat */
+.cand-hero{background:var(--s1);border:1px solid var(--line2);border-radius:var(--rxl);padding:22px;margin-bottom:16px}
+.cand-row{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.cand-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#07111f;flex-shrink:0;border:2px solid var(--bline)}
+.cand-name{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.cand-pos{font-size:12px;color:var(--soft);margin-top:3px}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:800;color:var(--soft);display:inline-flex;align-items:center;gap:5px}
+.chip svg{width:12px;height:12px;opacity:.65}
+/* Panel */
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);padding:22px;margin-bottom:14px}
+.panel-title{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.13em;margin-bottom:13px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+/* Star rating */
+.criteria-grid{display:grid;gap:12px}
+.criterion{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.criterion-label{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px}
+.criterion-hint{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4}
+.star-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.star-btn{
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:10px;border:1px solid var(--line2);
+  background:rgba(255,255,255,.04);font-size:20px;transition:.15s;user-select:none;flex-shrink:0;
+}
+.star-btn.active{border-color:var(--yline);background:var(--ysoft)}
+.star-btn:hover{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+.score-hint{font-size:12px;color:var(--muted);margin-left:6px;font-weight:700}
+.score-hint.selected{color:var(--yellow)}
+/* Recommendation cards */
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rec-option{position:relative}
+.rec-option input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.rec-card{
+  cursor:pointer;border-radius:14px;padding:16px 10px;text-align:center;
+  border:2px solid var(--line);background:rgba(255,255,255,.03);
+  transition:.15s;display:flex;flex-direction:column;align-items:center;gap:7px;
+}
+.rec-card:hover{border-color:var(--bline);background:var(--bsoft)}
+.rec-option.strong-hire input:checked + .rec-card{border-color:var(--teal);background:var(--tsoft)}
+.rec-option.hire input:checked + .rec-card{border-color:var(--blue);background:var(--bsoft)}
+.rec-option.no-hire input:checked + .rec-card{border-color:var(--red);background:var(--rsoft)}
+.rec-icon{font-size:26px}
+.rec-label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.10em}
+.rec-option.strong-hire .rec-label{color:var(--t2)}
+.rec-option.hire .rec-label{color:var(--b2)}
+.rec-option.no-hire .rec-label{color:#ffb4b7}
+.rec-desc{font-size:10px;color:var(--muted);line-height:1.4}
+/* Fields */
+.field label{font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:6px}
+input[type=text],textarea{width:100%;padding:10px 13px;border-radius:11px;border:1px solid var(--line2);background:rgba(255,255,255,.06);color:#fff;font-size:14px;font-weight:600;outline:none;transition:.18s;font-family:'DM Sans',sans-serif;-webkit-appearance:none}
+input[type=text]:focus,textarea:focus{border-color:var(--bline);box-shadow:0 0 0 3px rgba(93,169,255,.10)}
+input[type=text]::placeholder,textarea::placeholder{color:rgba(255,255,255,.30)}
+textarea{min-height:110px;resize:vertical;line-height:1.6}
+/* Buttons */
+.btn-submit{
+  width:100%;padding:14px;border-radius:13px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--blue),var(--b2));color:#07111f;
+  font-size:15px;font-weight:800;font-family:'DM Sans',sans-serif;
+  box-shadow:0 4px 18px rgba(93,169,255,.28);transition:.15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-submit:hover{box-shadow:0 8px 28px rgba(93,169,255,.38);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+/* Notices */
+.notice{padding:13px 16px;border-radius:12px;font-size:13px;font-weight:700;margin-bottom:16px}
+.ok-msg{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.err-msg{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+/* Success state */
+.success-box{background:var(--s1);border:1px solid var(--tline);border-radius:var(--rxl);padding:40px 28px;text-align:center}
+.success-icon{font-size:52px;margin-bottom:16px}
+.success-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:10px}
+.success-sub{font-size:14px;color:var(--soft);line-height:1.6}
+.avg-result{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--line2);border-radius:14px;padding:14px 20px;margin-top:20px}
+.avg-num{font-size:28px;font-weight:800;font-family:'DM Sans',sans-serif}
+.avg-num.high{color:var(--t2)}
+.avg-num.mid{color:var(--yellow)}
+.avg-num.low{color:#ffb4b7}
+/* Score summary at top if re-editing */
+.score-summary{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--rl);padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.avg-circle{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
+.avg-circle.high{background:linear-gradient(135deg,var(--teal),var(--blue));color:#07111f}
+.avg-circle.mid{background:linear-gradient(135deg,var(--yellow),#f59e0b88);color:#07111f}
+.avg-circle.low{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+@media(max-width:520px){
+  .rec-grid{grid-template-columns:1fr}
+  .star-btn{width:40px;height:40px;font-size:18px}
+}
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- Brand -->
+    <div class="brand-bar">
+        <div class="brand-logo">NEXAS<span>HR</span></div>
+        <div class="brand-sub">Formular evaluare candidat</div>
+    </div>
+
+    {% set ok = request.query_params.get('ok') %}
+
+    {% if ok %}
+    <!-- ─── SUCCESS ─── -->
+    <div class="success-box">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Evaluare trimisă cu succes!</div>
+        <div class="success-sub">
+            Mulțumim pentru feedback.<br>
+            Echipa HR a fost notificată și va analiza evaluarea ta.
+        </div>
+        {% if avg_score %}
+        <div class="avg-result">
+            <span class="avg-num {% if avg_score >= 4 %}high{% elif avg_score >= 3 %}mid{% else %}low{% endif %}">★ {{ avg_score }}</span>
+            <div style="text-align:left">
+                <div style="font-size:13px;font-weight:800;color:#fff">Scor mediu acordat</div>
+                <div style="font-size:11px;color:var(--muted)">Media celor 4 criterii / 5</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+
+    <!-- ─── Candidat info ─── -->
+    <div class="cand-hero">
+        <div class="cand-row">
+            <div class="cand-avatar">
+                {{ (candidate.name or "?")[0] | upper }}{{ (candidate.name or " ?").split(" ")[1][0] | upper if (candidate.name or " ?").split(" ")|length > 1 else "" }}
+            </div>
+            <div>
+                <div class="cand-name">{{ candidate.name or "Candidat" }}</div>
+                <div class="cand-pos">{{ candidate.job_title or candidate.position or "Post nespecificat" }}</div>
+            </div>
+        </div>
+        <div class="meta-row">
+            {% if interview %}
+            <span class="chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Interviu: {{ interview.data }} · {{ interview.ora }}
+            </span>
+            {% if interview.locatie %}
+            <span class="chip">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ interview.locatie }}
+            </span>
+            {% endif %}
+            {% endif %}
+            {% if candidate.experience %}
+            <span class="chip">Experiență: {{ candidate.experience }}</span>
+            {% endif %}
+        </div>
+
+        {% if avg_score %}
+        <div class="score-summary" style="margin-top:14px;margin-bottom:0">
+            <div class="avg-circle {% if avg_score >= 4 %}high{% elif avg_score >= 3 %}mid{% else %}low{% endif %}">{{ avg_score }}</div>
+            <div>
+                <div style="font-size:13px;font-weight:800;color:#fff">Evaluare deja completată</div>
+                <div style="font-size:11px;color:var(--muted)">Poți modifica răspunsurile de mai jos</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if error %}
+    <div class="notice err-msg">{{ error }}</div>
+    {% endif %}
+
+    <!-- ─── FORM ─── -->
+    <form method="post" action="/evalueaza/{{ token }}" id="eval-form">
+
+        <!-- Evaluator name -->
+        <div class="panel">
+            <div class="panel-title">Cine completează această evaluare?</div>
+            <div class="field">
+                <label>Numele tău</label>
+                <input type="text" name="evaluator_name"
+                       placeholder="Ex: Ion Marinescu — Șef depozit"
+                       value="{{ evaluator_name or '' }}">
+            </div>
+        </div>
+
+        <!-- Criterii -->
+        <div class="panel">
+            <div class="panel-title">Evaluare pe criterii — acordă o notă de la 1 la 5</div>
+            <div class="criteria-grid">
+
+                {% set criteria_list = [
+                  ("technical_skills_score",    "Competențe tehnice / practice",
+                   "Cunoștințe specifice rolului, abilitate de a executa sarcinile postului"),
+                  ("attention_to_detail_score", "Atenție și seriozitate",
+                   "Precizie, disciplină, grija față de detalii și calitatea muncii"),
+                  ("communication_score",       "Comunicare și atitudine",
+                   "Cum se exprimă, cum ascultă, respectul față de colegi și superiori"),
+                  ("team_fit_score",            "Potrivire în echipă",
+                   "Valori, comportament, compatibilitate cu cultura echipei"),
+                ] %}
+
+                {% for field_name, label, hint in criteria_list %}
+                {% set cur = (scorecard|attr(field_name)) if scorecard else 0 %}
+                {% set cur = cur if cur else 0 %}
+                <div class="criterion">
+                    <div class="criterion-label">{{ label }}</div>
+                    <div class="criterion-hint">{{ hint }}</div>
+                    <div class="star-group" data-field="{{ field_name }}">
+                        {% for i in range(1,6) %}
+                        <button type="button" class="star-btn {% if cur >= i %}active{% endif %}" data-val="{{ i }}" title="{{ i }} / 5">★</button>
+                        {% endfor %}
+                        <span class="score-hint {% if cur > 0 %}selected{% endif %}" id="hint-{{ field_name }}">
+                            {% if cur > 0 %}{{ cur }}/5{% else %}Neselectat{% endif %}
+                        </span>
+                    </div>
+                    <input type="hidden" name="{{ field_name }}" id="input-{{ field_name }}" value="{{ cur if cur > 0 else '' }}">
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <!-- Recomandare -->
+        <div class="panel">
+            <div class="panel-title">Recomandarea ta finală</div>
+            <div class="rec-grid">
+                {% set rec = scorecard.overall_recommendation if scorecard else '' %}
+
+                <div class="rec-option strong-hire">
+                    <input type="radio" name="overall_recommendation" id="r-sh" value="Strong Hire" {% if rec == 'Strong Hire' %}checked{% endif %}>
+                    <label class="rec-card" for="r-sh">
+                        <span class="rec-icon">🚀</span>
+                        <span class="rec-label">Strong Hire</span>
+                        <span class="rec-desc">Îl angajez fără ezitare</span>
+                    </label>
+                </div>
+
+                <div class="rec-option hire">
+                    <input type="radio" name="overall_recommendation" id="r-h" value="Hire" {% if rec == 'Hire' %}checked{% endif %}>
+                    <label class="rec-card" for="r-h">
+                        <span class="rec-icon">✅</span>
+                        <span class="rec-label">Hire</span>
+                        <span class="rec-desc">Îl recomand pentru angajare</span>
+                    </label>
+                </div>
+
+                <div class="rec-option no-hire">
+                    <input type="radio" name="overall_recommendation" id="r-nh" value="No Hire" {% if rec == 'No Hire' %}checked{% endif %}>
+                    <label class="rec-card" for="r-nh">
+                        <span class="rec-icon">❌</span>
+                        <span class="rec-label">No Hire</span>
+                        <span class="rec-desc">Nu îl recomand</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comentarii -->
+        <div class="panel">
+            <div class="panel-title">Observații și motivare</div>
+            <div class="field">
+                <label>Spune-ne mai multe — de ce îl recomanzi sau nu</label>
+                <textarea name="comments" placeholder="Ex: Candidatul a demonstrat că înțelege procesele de depozitare, a fost punctual și serios. Principala îngrijorare este lipsa experienței cu sistemul WMS...">{{ scorecard.comments if scorecard and scorecard.comments else '' }}</textarea>
+            </div>
+        </div>
+
+        <button class="btn-submit" type="submit" id="submit-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px"><polyline points="20 6 9 17 4 12"/></svg>
+            Trimite evaluarea
+        </button>
+
+        <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:14px">
+            Evaluarea ta va fi vizibilă exclusiv echipei HR în platforma internă.
+        </p>
+
+    </form>
+    {% endif %}
+
+</div><!-- /wrap -->
+
+<script>
+document.querySelectorAll('.star-group').forEach(function(group) {
+    var field = group.getAttribute('data-field');
+    var buttons = group.querySelectorAll('.star-btn');
+    var input = document.getElementById('input-' + field);
+    var hint = document.getElementById('hint-' + field);
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var val = parseInt(btn.getAttribute('data-val'));
+            input.value = val;
+            hint.textContent = val + '/5';
+            hint.classList.add('selected');
+            buttons.forEach(function(b) {
+                b.classList.toggle('active', parseInt(b.getAttribute('data-val')) <= val);
+            });
+        });
+    });
+});
+
+document.getElementById('eval-form') && document.getElementById('eval-form').addEventListener('submit', function(e) {
+    var fields = ['technical_skills_score','attention_to_detail_score','communication_score','team_fit_score'];
+    for (var i = 0; i < fields.length; i++) {
+        var v = document.getElementById('input-' + fields[i]).value;
+        if (!v || parseInt(v) < 1 || parseInt(v) > 5) {
+            e.preventDefault();
+            alert('Te rugăm să completezi toate criteriile de evaluare.');
+            return;
+        }
+    }
+    if (!document.querySelector('input[name="overall_recommendation"]:checked')) {
+        e.preventDefault();
+        alert('Te rugăm să selectezi o recomandare finală.');
+        return;
+    }
+    var btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = 'Se trimite...';
+});
+</script>
+</body>
+</html>

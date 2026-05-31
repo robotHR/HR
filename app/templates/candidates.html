@@ -211,10 +211,10 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .candidate-card:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,0,0,.22)}
 .candidate-card:hover::before{background:var(--blue)}
 
-/* 4-column grid: info | best-role | matches | actions */
+/* 2-column grid: info | actions */
 .card-grid{
   display:grid;
-  grid-template-columns:210px 180px 1fr auto;
+  grid-template-columns:1fr auto;
   gap:16px;
   align-items:center;
 }
@@ -398,8 +398,9 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   .stats-row{grid-template-columns:repeat(2,1fr) !important}
   .card-grid{
     display:flex !important;
-    flex-direction:column !important;
-    gap:0 !important;
+    flex-direction:row !important;
+    gap:12px !important;
+    align-items:center !important;
   }
   .candidate-card{overflow-x:hidden;padding:14px 16px !important}
   .candidate-card::before{display:none}
@@ -729,7 +730,7 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
             <div>
                 <div class="eyebrow">Baza de candidati</div>
                 <h1 class="page-title syne-only">Candidati</h1>
-                <div class="page-sub">Fiecare persoana e afisata o singura data. Coloana <strong>Potrivit pentru</strong> = ce spune AI ca e candidatul natural. Coloana <strong>Posturi analizate</strong> = joburile pentru care a fost evaluat si scorul obtinut.</div>
+                <div class="page-sub">Toti candidatii din baza de date. Cauta dupa nume, email, telefon, job, skill sau orice din CV.</div>
             </div>
             <div class="head-pill">{{ stats.filtered }} candidati unici afisati</div>
         </div>
@@ -776,82 +777,17 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
                                     <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
                                     <div class="small">{{ candidate.email or "Email lipsa" }}</div>
                                     <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
-                                    <div class="small">{{ candidate.companies or "Nespecificat" }}</div>
+                                    <div class="small">{{ candidate.companies or "" }}{% if candidate.position %} · {{ candidate.position }}{% endif %}</div>
                                     <div class="cand-status">
                                         <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
-                                        {% if candidate.priority == 'HIGH' %}
-                                            <span class="priority-badge priority-high">● Suna azi</span>
-                                        {% elif candidate.priority == 'MEDIUM' %}
-                                            <span class="priority-badge priority-medium">● Prioritate medie</span>
-                                        {% elif candidate.priority == 'LOW' %}
-                                            <span class="priority-badge priority-low">● Prioritate mica</span>
-                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- COL 2: scor pe jobul cautat (daca filtru activ) sau fit natural -->
-                            <div class="col-best">
-                                {% if job %}
-                                    <div class="mini-label">Scor pentru postul cautat</div>
-                                {% else %}
-                                    <div class="mini-label">Potrivit pentru</div>
-                                {% endif %}
-                                {% if best %}
-                                    <div class="best-role">
-                                        <div class="score-cell {% if row.best_score >= 70 %}score-green{% elif row.best_score >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ row.best_score }}</div>
-                                        <div class="role-info">
-                                            {% if job %}
-                                                <div class="role-title">{{ best.job_title or job }}</div>
-                                                {% set nat = best.position if (best.position and best.position|lower != best.job_title|lower) else "" %}
-                                                {% if nat %}<div class="role-sub">Rol natural: {{ nat }}</div>{% endif %}
-                                            {% else %}
-                                                {% set natural_role = best.position if (best.position and best.position|lower != best.job_title|lower) else best.job_title %}
-                                                <div class="role-title">{{ natural_role or "Nespecificat" }}</div>
-                                            {% endif %}
-                                            {% if row.best_score >= 70 %}
-                                                <span class="ai-badge top">Top Candidat</span>
-                                            {% elif row.best_score >= 45 %}
-                                                <span class="ai-badge potential">Potential</span>
-                                            {% else %}
-                                                <span class="ai-badge other">Nepotrivit</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                {% else %}
-                                    <div class="role-sub">Fara analiza AI</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- COL 3: toate posturile analizate cu scorurile lor -->
-                            <div class="col-matches">
-                                <div class="mini-label">Posturi analizate</div>
-                                <div class="matches">
-                                    {% for match in row.matches[:5] %}
-                                        <a href="/candidat/{{ match.id }}" class="match-chip {% if (match.score or 0) >= 70 %}chip-top{% elif (match.score or 0) >= 45 %}chip-potential{% else %}chip-low{% endif %}">
-                                            {{ match.job_title }}&nbsp;<strong>{{ match.score }}</strong>
-                                        </a>
-                                    {% endfor %}
-                                    {% if row.matches|length > 5 %}
-                                        <span class="match-more">+{{ row.matches|length - 5 }} altele</span>
-                                    {% endif %}
-                                    {% if row.matches|length == 0 %}
-                                        <span class="match-more">Nicio analiza disponibila</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- COL 4: actiuni -->
+                            <!-- COL 2: actiuni -->
                             <div class="actions-inline">
                                 <a class="btn btn-primary" href="/candidat/{{ best.id if best else candidate.id }}">Detalii</a>
                                 <a class="btn btn-cv" href="/cv/{{ best.id if best else candidate.id }}" target="_blank">CV</a>
-                                {% set sc = sc_by_candidate.get((best.id if best else candidate.id)) %}
-                                {% if sc %}
-                                {% set sc_avg = ((sc.technical_skills_score or 0) + (sc.attention_to_detail_score or 0) + (sc.communication_score or 0) + (sc.team_fit_score or 0)) / 4 %}
-                                <span class="sc-badge {% if sc_avg >= 4 %}sc-green{% elif sc_avg >= 3 %}sc-mid{% else %}sc-low{% endif %}">
-                                    ★ {{ "%.1f"|format(sc_avg) }} · {{ sc.overall_recommendation }}
-                                </span>
-                                {% endif %}
                             </div>
 
                         </div>

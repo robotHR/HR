@@ -696,6 +696,12 @@ def candidate_search_blob(candidate):
         candidate.strengths,
         candidate.weaknesses,
         candidate.level,
+        candidate.decision_reason,
+        candidate.missing_requirements,
+        candidate.must_verify_by_phone,
+        candidate.manager_summary,
+        candidate.interview_questions,
+        candidate.better_role_match,
     ]
     return " ".join([str(part) for part in parts if part]).lower()
 

@@ -38,7 +38,6 @@ from app.services.cv_parser import (
     normalize_text,
     _is_domain_incompatible,
     _get_compat_level,
-    realistic_role_match_level,
 )
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
@@ -737,17 +736,18 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
         if q_value and not any(q_value in candidate_search_blob(item) for item in sorted_items):
             continue
 
-        # Cand filtrul de job e activ, lucram STRICT cu analiza acelui job.
-        # Nu folosim scorul global al candidatului, altfel un CV bun pentru Sofer
-        # poate urca gresit cand recruiterul filtreaza Casier, Marketing etc.
+        # Cand filtrul de job e activ, folosim strict analiza facuta pentru jobul cautat.
+        # Nu folosim scorul global al aceluiasi CV pe alt post, pentru ca ar ridica gresit
+        # candidati buni pe alt rol, dar slabi pentru rolul cautat.
         if job_value:
-            def _job_hit(item):
-                item_job = (item.job_title or "").strip().lower()
-                item_pos = (item.position or "").strip().lower()
-                return item_job == job_value or job_value in item_job or job_value in item_pos
-
-            job_items = [item for item in sorted_items if _job_hit(item)]
-            job_items_sorted = sorted(job_items, key=lambda x: (x.score or 0, x.id or 0), reverse=True)
+            job_items = [item for item in sorted_items
+                         if job_value in (item.job_title or "").lower()
+                         or job_value in (item.position or "").lower()]
+            job_items_sorted = sorted(
+                job_items,
+                key=lambda x: (x.score or 0, x.id or 0),
+                reverse=True
+            )
             display_best = job_items_sorted[0] if job_items_sorted else best
             display_score = display_best.score or 0
         else:
@@ -787,9 +787,8 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             })
 
         rows.append({
-            # In lista filtrata pe job, candidatul principal trebuie sa fie analiza
-            # pentru jobul cautat. Asa butoanele Detalii/CV/scorecard nu sar
-            # accidental la analiza globala a aceluiasi om.
+            # In pagina filtrata pe job, cardul principal trebuie sa reprezinte analiza pe jobul cautat,
+            # nu cea mai buna analiza globala a candidatului pe alt post.
             "candidate": display_best if job_value else best,
             "best_match": display_best,
             "matches": matches,
@@ -799,25 +798,20 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             "phones": sorted({item.phone for item in sorted_items if item.phone}),
         })
 
-    # Daca filtrul de job e activ, sortam dupa analiza pentru acel job, nu dupa
-    # candidatul global. Asta evita cazuri de tip Casier -> apare Sofer in top.
+    # Daca filtrul de job e activ, sortam dupa analiza reala pentru jobul cautat.
+    # Ordinea devine: compatibilitate domeniu > scor pe jobul cautat > id.
     if job_value:
         def _row_sort(row, jv=job_value):
-            c = row.get("best_match") or row.get("candidate")
-            cc = getattr(c, "candidate_cluster", None) or None
-            jc = getattr(c, "job_cluster", None) or None
-            role_text = " ".join([
-                getattr(c, "position", "") or "",
-                getattr(c, "recommended_role_for_candidate", "") or "",
-                getattr(c, "summary", "") or "",
-                getattr(c, "skills", "") or "",
-            ])
-            role_level = realistic_role_match_level(role_text, jv)
-            compat = _get_compat_level(c.position or "", jv,
-                                       candidate_cluster=cc, job_cluster=jc)
-            # Ordinea realista: potrivire directa pe rol, compatibilitate domeniu,
-            # apoi scorul AI. Altfel un sofer cu scor 67 poate trece peste un ospatar.
-            return (role_level, compat, row["best_score"], getattr(c, "id", 0) or 0)
+            m = row.get("best_match") or row.get("candidate")
+            cc = getattr(m, "candidate_cluster", None) or None
+            jc = getattr(m, "job_cluster", None) or None
+            compat = _get_compat_level(
+                getattr(m, "position", "") or "",
+                jv,
+                candidate_cluster=cc,
+                job_cluster=jc,
+            )
+            return (compat, row.get("best_score", 0) or 0, getattr(m, "id", 0) or 0)
         rows = sorted(rows, key=_row_sort, reverse=True)
     else:
         rows = sorted(rows, key=lambda row: (row["best_score"], row["candidate"].id or 0), reverse=True)
@@ -1023,7 +1017,7 @@ async def candidates_page(request: Request, q: str = "", status: str = "", job: 
 async def export_candidates(q: str = "", status: str = "", job: str = "", skill: str = "", min_score: int = 0):
     candidates, total = load_candidates()
     rows = build_unique_candidate_rows(candidates, q=q, status=status, job=job, skill=skill, min_score=min_score)
-    filtered = [row.get("best_match") or row["candidate"] for row in rows]
+    filtered = [row["candidate"] for row in rows]
 
     output = generate_candidates_excel(filtered)
     filename = f"nexas_hr_candidati_{int(time.time())}.xlsx"

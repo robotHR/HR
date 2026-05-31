@@ -496,38 +496,35 @@ JOB MESERIE CALIFICATĂ (electrician, sudor, mecanic, șofer TIR, instalator):
   ├─ Fără atestat/certificare legală obligatorie → SCOR MAX 15 + REJECT
   └─ Certificare expirată sau inactivă > 3 ani → SCOR MAX 25
 
-MATRICE INCOMPATIBILITATE DOMENIU (scor MAX 28 + REJECT — fără excepții):
-  Aplică ÎNAINTE de orice calcul dacă domeniul candidatului e complet diferit de postul vizat.
+MATRICE COMPATIBILITATE DOMENIU — 3 NIVELURI (aplică ÎNAINTE de orice calcul):
 
-  Candidat din HORECA (bucătar, ospătar, barman, restaurant):
-    → NU pentru: HR/Recrutare, IT, Contabilitate/Financiar, Juridic, Inginerie, Medicină
+  NIVEL 0 — INCOMPATIBIL (scor MAX 28 + REJECT):
+    Blue Collar (HoReCa/Transport/Depozit/Retail/Pază/Agricultură) → IT, Inginerie, Medical, Financiar, Juridic, HR, Educație
+    IT/Inginerie → Medical, Blue Collar operațional (șofer, casier, depozit, HoReCa, pază)
+    Medical → Tot ce nu e Medical sau Educație (parțial)
+    Financiar/Juridic/HR → Blue Collar operațional, Construcții, Medical
+    Educație → Blue Collar operațional, Construcții
 
-  Candidat ȘOFER/TRANSPORT (șofer TIR, curier, livrator, taximetrist):
-    → NU pentru: HR/Recrutare, IT, Contabilitate/Financiar, Juridic, Inginerie, Medicină
+  NIVEL 1 — UPSKILL (scor MAX 45, recomandare CONSIDER):
+    Blue Collar → Construcții/Automotive (meserie conexă)
+    Blue Collar → Support (Call Center, Admin, Marketing) — aptitudini transferabile
+    Construcții → IT/Inginerie (dacă CV arată studii superioare tehnice)
+    Construcții → Support (supraveghere, coordonare)
+    IT/Inginerie → Construcții, Support (admin tehnic)
+    IT/Inginerie → Educație (trainer tehnic)
+    Medical → Educație (formator medical)
+    Support → Blue Collar, Construcții, IT/Inginerie (reconversie)
+    Educație → IT/Inginerie (trainer), Medical (educator medical)
 
-  Candidat DEPOZIT ENTRY (stivuitorist, manipulant, picker, packer, lucrător depozit):
-    → NU pentru: HR/Recrutare, IT, Contabilitate/Financiar, Juridic, Inginerie, Medicină
+  NIVEL 2 — COMPATIBIL (scoring normal):
+    Același cluster sau super-cluster compatibil
+    IT/Inginerie ↔ Financiar/Juridic/HR/Management
+    Business (Financiar/Juridic/HR/Sales/Management) ↔ Support (Admin/Marketing/Call Center)
+    Business ↔ Educație
+    Support ↔ Educație
 
-  Candidat RETAIL ENTRY (casier, vânzător, lucrător comercial):
-    → NU pentru: IT, Inginerie, Medicină, Juridic, Contabilitate/Financiar
-
-  Candidat IT/PROGRAMATOR (developer, devops, software engineer, IT specialist):
-    → NU pentru: Șofer/Transport, Depozit entry, HoReCa, Casier/Vânzător, Paznic
-
-  Candidat INGINER (inginer construcții/mecanic/electric, arhitect tehnic):
-    → NU pentru: Șofer TIR entry, Depozit entry, HoReCa, Casier/Vânzător, Paznic
-
-  Candidat MEDIC/ASISTENT MEDICAL/FARMACIST:
-    → NU pentru: IT, Depozit, Transport, HoReCa, Retail entry
-
-  Candidat CONTABIL/ECONOMIST/FINANCIAR:
-    → NU pentru: Șofer/Transport, Depozit entry, HoReCa, Retail entry
-
-  Candidat JURIDIC (avocat, jurist, notar, judecător):
-    → NU pentru: Șofer/Transport, Depozit entry, HoReCa, Retail entry
-
-  EXCEPȚIE: Dacă CV-ul demonstrează reconversie activă (cursuri, certificări, experiență
-  în domeniul nou de min. 6 luni) → poți ignora regula și evalua reconversia.
+  EXCEPȚIE RECONVERSIE: Dacă CV-ul demonstrează reconversie activă documentată
+  (cursuri relevante + experiență min 6 luni în domeniu nou) → ignoră regula și evaluează reconversia.
 
 CERINȚĂ HARD LIPSĂ (oricare job):
   └─ Orice cerință din lista OBLIGATORII de mai sus lipsește → SCOR MAX 35 + REJECT
@@ -763,69 +760,300 @@ def _compute_next_action(score, data):
     return "REJECT"
 
 
-# ─── DOMAIN INCOMPATIBILITY MATRIX ───────────────────────────────────────────
-# Acoperire completa: 13 domenii profesionale din piata muncii din Romania
+# ─── DOMAIN COMPATIBILITY MATRIX (100 domenii, 23 clustere, 3 niveluri) ──────
+# Niveluri: 2 = COMPATIBIL | 1 = UPSKILL (max 45) | 0 = INCOMPATIBIL (max 28)
 
-_DOMAIN_KW = [
-    ("horeca",        ["bucatar", "ospatar", "barman", "restaurant", "cofetarie", "patiserie", "horeca", "bucatarie", "chef", "cook", "sef bucatarie", "pizzar"]),
-    ("transport",     ["sofer", "tir", "curier", "livrari", "camion", "taximetrist", "taxi", "conducator auto", "livrator", "dispecer transport"]),
-    ("depozit_entry", ["stivuitorist", "manipulant", "picker", "packer", "lucrator depozit", "muncitor depozit", "operator depozit", "agent depozit", "sorter", "ambalator"]),
-    ("retail_entry",  ["casier", "vanzator", "lucrator comercial", "agent vanzari", "lucrator magazin", "reponitor", "operator vanzari"]),
-    ("paza",          ["paznic", "agent paza", "guard", "bodyguard", "supraveghetor", "agent securitate", "inspector paza"]),
-    ("constructii",   ["zidar", "faiantar", "zugrav", "tamplar", "dulgher", "instalator", "betonisc", "saper", "constructor", "montator", "lacatus", "sudor", "electrician constructii", "fierbar"]),
-    ("it_tech",       ["programator", "developer", "devops", "software", "it specialist", "web developer", "data analyst", "cloud", "cybersecurity", "network", "full stack", "backend", "frontend", "system admin", "it manager", "data engineer", "qa engineer", "scrum master", "product owner", "tech lead"]),
-    ("inginer",       ["inginer", "arhitect tehnic", "proiectant", "inginer constructii", "inginer mecanic", "inginer electric", "inginer productie", "inginer apa", "inginer energetic"]),
-    ("medical",       ["medic", "asistent medical", "asistenta medicala", "asistenta generalist", "farmacist", "infirmiera", "radiolog", "stomatolog", "kinetoterapeut", "logoped", "psiholog clinic", "dentist", "moasa", "brancardier"]),
-    ("financiar",     ["contabil", "economist", "auditor", "controller", "analist financiar", "cfo", "trezorier", "contabilitate", "specialist fiscal", "consultant fiscal"]),
-    ("juridic",       ["avocat", "jurist", "consilier juridic", "notar", "judecator", "procuror", "paralegal", "compliance", "contract manager"]),
-    ("hr_recrutare",  ["recruiter", "specialist hr", "hr manager", "hr business partner", "talent acquisition", "resurse umane", "specialist recrutare", "trainer corporativ"]),
-    ("educatie",      ["profesor", "invatator", "educator", "instructor", "formator", "trainer", "lector", "mentor"]),
+_CLUSTER_KW = [
+    # ── HORECA & Turism ────────────────────────────────────────────────────────
+    ("horeca", [
+        "bucatar", "ospatar", "barman", "restaurant", "cofetarie", "patiserie",
+        "horeca", "bucatarie", "chef", "cook", "sef bucatarie", "pizzar",
+        "camerista", "housekeeping", "receptionist hotel", "turism", "ghid turistic",
+        "catering", "events", "sommelier", "food service",
+    ]),
+    # ── Transport & Logistică ──────────────────────────────────────────────────
+    ("transport", [
+        "sofer", "tir", "curier", "livrari", "camion", "taximetrist", "taxi",
+        "conducator auto", "livrator", "dispecer transport", "transport rutier",
+        "autobuz", "microbuz", "transport persoane", "aviatie", "aeroport",
+        "marina", "port", "supply chain", "forklift", "transport international",
+        "logistica", "dispecer logistica",
+    ]),
+    # ── Depozit & Producție Entry ──────────────────────────────────────────────
+    ("depozit_productie", [
+        "stivuitorist", "manipulant", "picker", "packer", "lucrator depozit",
+        "muncitor depozit", "operator depozit", "agent depozit", "sorter",
+        "ambalator", "productie", "manufactura", "operator productie",
+        "alimentara", "procesare carne", "textile", "confectii", "mobilier",
+        "ambalare", "etichetare", "muncitor", "muncitor necalificat",
+    ]),
+    # ── Retail & Vânzări Entry ─────────────────────────────────────────────────
+    ("retail_entry", [
+        "casier", "vanzator", "lucrator comercial", "agent vanzari", "lucrator magazin",
+        "reponitor", "operator vanzari", "merchandiser", "promotor",
+        "supermarket", "hypermarket", "fashion retail", "farmacie", "droguerie",
+        "vanzari b2c", "lucrator farmacie",
+    ]),
+    # ── Pază & Securitate ─────────────────────────────────────────────────────
+    ("paza", [
+        "paznic", "agent paza", "guard", "bodyguard", "supraveghetor",
+        "agent securitate", "inspector paza", "securitate evenimente",
+        "monitorizare", "cctv", "close protection",
+    ]),
+    # ── Construcții & Instalații ───────────────────────────────────────────────
+    ("constructii", [
+        "zidar", "faiantar", "zugrav", "tamplar", "dulgher", "instalator",
+        "beton", "saper", "constructor", "montator", "lacatus", "sudor",
+        "electrician constructii", "fierar beton", "muncitor constructii",
+        "santier", "supraveghere santier", "topografie", "geodezie", "plumber",
+    ]),
+    # ── IT & Tech ─────────────────────────────────────────────────────────────
+    ("it_tech", [
+        "programator", "developer", "devops", "software", "it specialist",
+        "web developer", "data analyst", "data scientist", "cloud", "cybersecurity",
+        "network engineer", "full stack", "backend", "frontend", "system admin",
+        "it manager", "data engineer", "qa engineer", "tester", "scrum master",
+        "product owner", "tech lead", "mobile developer", "ai engineer",
+        "machine learning", "it project manager", "it support", "helpdesk",
+        "digital", "web design",
+    ]),
+    # ── Inginerie ─────────────────────────────────────────────────────────────
+    ("inginerie", [
+        "inginer", "arhitect tehnic", "proiectant", "inginer mecanic",
+        "inginer electric", "inginer electronic", "inginer civil",
+        "inginer industrial", "inginer auto", "automotive engineer",
+        "inginer energetic", "renewables", "inginer chimica", "petrochimie",
+        "inginer productie", "inginer calitate", "inginer service", "mentenanta",
+        "inginer apa", "cad specialist",
+    ]),
+    # ── Medical & Sănătate ────────────────────────────────────────────────────
+    ("medical", [
+        "medic", "asistent medical", "asistenta medicala", "asistenta generalista",
+        "farmacist", "infirmiera", "radiolog", "stomatolog", "kinetoterapeut",
+        "fizioterapeut", "logoped", "psiholog clinic", "dentist", "moasa",
+        "brancardier", "ingrijitor batrani", "home care", "laborant",
+        "tehnician dentar", "psiholog", "psihoterapeut",
+    ]),
+    # ── Financiar & Contabilitate ─────────────────────────────────────────────
+    ("financiar", [
+        "contabil", "economist", "auditor", "controller", "analist financiar",
+        "cfo", "trezorier", "contabilitate", "specialist fiscal", "consultant fiscal",
+        "banca", "credit", "asigurari", "broker", "investitii", "chief accountant",
+        "finante", "trezorerie", "analyst financiar",
+    ]),
+    # ── Juridic ───────────────────────────────────────────────────────────────
+    ("juridic", [
+        "avocat", "jurist", "consilier juridic", "notar", "judecator",
+        "procuror", "paralegal", "compliance", "contract manager",
+        "executor judecatoresc", "risk manager juridic", "legal",
+    ]),
+    # ── HR & Recrutare ────────────────────────────────────────────────────────
+    ("hr_recrutare", [
+        "recruiter", "specialist hr", "hr manager", "hr business partner",
+        "talent acquisition", "resurse umane", "specialist recrutare",
+        "hr generalist", "payroll", "admin hr", "trainer corporativ",
+        "learning development", "l&d", "hr specialist",
+    ]),
+    # ── Educație & Training ───────────────────────────────────────────────────
+    ("educatie", [
+        "profesor", "invatator", "educator", "instructor", "formator",
+        "trainer", "lector", "mentor", "coach", "educator gradinita",
+        "profesor universitar", "cadru didactic",
+    ]),
+    # ── Administrativ / Secretariat ───────────────────────────────────────────
+    ("administrativ", [
+        "secretara", "asistent administrativ", "receptionist", "operator date",
+        "coordonator administrativ", "office manager", "asistent manager",
+        "back office", "administrativ",
+    ]),
+    # ── Call Center / BPO / Customer Support ──────────────────────────────────
+    ("call_center", [
+        "call center", "customer support", "customer service", "bpo",
+        "agent suport", "operator call center", "helpdesk client",
+        "relatii clienti", "agent relatii",
+    ]),
+    # ── Marketing / Digital Marketing ─────────────────────────────────────────
+    ("marketing", [
+        "marketing", "digital marketing", "social media", "seo", "sem",
+        "content creator", "copywriter", "brand manager", "pr", "comunicare",
+        "publicitate", "media", "grafician", "ux", "ui designer",
+    ]),
+    # ── Sales B2B & Account Management ────────────────────────────────────────
+    ("sales_b2b", [
+        "account manager", "sales manager", "b2b sales", "territory manager",
+        "key account", "sales representative", "business developer",
+        "sales engineer", "vanzari b2b", "reprezentant comercial",
+    ]),
+    # ── Imobiliare ────────────────────────────────────────────────────────────
+    ("imobiliare", [
+        "imobiliare", "agent imobiliar", "broker imobiliar", "evaluator imobiliar",
+        "property manager", "real estate",
+    ]),
+    # ── Beauty & Wellness ─────────────────────────────────────────────────────
+    ("beauty_wellness", [
+        "cosmeticiana", "frizer", "coafor", "manichiura", "pedichiura",
+        "make-up", "estetician", "spa", "maseur", "masaj", "beauty",
+        "nail technician", "wellness",
+    ]),
+    # ── Agricultură ───────────────────────────────────────────────────────────
+    ("agricultura", [
+        "agricultor", "fermier", "zootehnist", "agronom", "viticultor",
+        "horticultor", "muncitor agricol", "operator utilaje agricole", "silvicultura",
+    ]),
+    # ── Automotive Service ────────────────────────────────────────────────────
+    ("automotive", [
+        "mecanic auto", "tinichigiu", "vopsitor auto", "electician auto",
+        "diagnostician auto", "tehnician auto", "service auto", "vulcanizare",
+        "inspector itp", "mecanic utilaje",
+    ]),
+    # ── Management Executive ──────────────────────────────────────────────────
+    ("management", [
+        "manager general", "director general", "ceo", "coo", "cto", "cfo exec",
+        "director executiv", "director operational", "vp", "vice president",
+        "country manager", "general manager",
+    ]),
+    # ── ONG / Public / Administratie Publica ──────────────────────────────────
+    ("ong_public", [
+        "ong", "ngo", "asociatie", "fundatie", "functionar public",
+        "administratie publica", "primarie", "prefectura", "minister",
+        "institutie publica", "sector public", "referent", "inspector public",
+    ]),
 ]
 
-# Domenii incompatibile: natural_domain → [target_domains_incompatibile]
-# Logica: daca backgroundul candidatului e complet diferit de domeniu = nu are relevanta
-_INCOMPATIBLE = {
-    # Operationali → Nu pentru roluri de cunostinte specializate
-    "horeca":        ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
-    "transport":     ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
-    "depozit_entry": ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
-    "retail_entry":  ["it_tech", "inginer", "medical", "juridic", "financiar", "educatie"],
-    "paza":          ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
-    "constructii":   ["it_tech", "medical", "juridic", "financiar", "hr_recrutare", "educatie"],
-    # Specialisti tehnici → Nu pentru roluri operationale sau domenii complet diferite
-    "it_tech":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical", "juridic"],
-    "inginer":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "medical", "juridic", "hr_recrutare"],
-    # Medical → izolat de toate domeniile non-medicale
-    "medical":       ["it_tech", "depozit_entry", "transport", "horeca", "retail_entry", "inginer", "juridic", "financiar", "hr_recrutare", "constructii", "paza"],
-    # Financiar/Juridic/HR → Nu pentru operationali si domenii tehnice complet diferite
-    "financiar":     ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical"],
-    "juridic":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical", "it_tech"],
-    "hr_recrutare":  ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical", "inginer"],
-    # Educatie → Nu pentru operational sau tehnic complet nerelevant
-    "educatie":      ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii"],
+# ── 7 Super-clustere ──────────────────────────────────────────────────────────
+_SUPER = {
+    "horeca":           "blue_collar",
+    "transport":        "blue_collar",
+    "depozit_productie":"blue_collar",
+    "retail_entry":     "blue_collar",
+    "paza":             "blue_collar",
+    "agricultura":      "blue_collar",
+    "constructii":      "constructii_tehnic",
+    "automotive":       "constructii_tehnic",
+    "it_tech":          "tech_ing",
+    "inginerie":        "tech_ing",
+    "medical":          "medical",
+    "beauty_wellness":  "medical",
+    "financiar":        "business",
+    "juridic":          "business",
+    "hr_recrutare":     "business",
+    "management":       "business",
+    "imobiliare":       "business",
+    "sales_b2b":        "business",
+    "call_center":      "support",
+    "administrativ":    "support",
+    "marketing":        "support",
+    "ong_public":       "support",
+    "educatie":         "educatie",
 }
-    "juridic":       ["transport", "depozit_entry", "horeca", "retail_entry"],
-    "hr_recrutare":  ["transport", "depozit_entry", "horeca", "retail_entry"],
+
+#             blue  cstr  tech  med   biz   supp  edu
+_SC_COMPAT = {
+    ("blue_collar",      "blue_collar"):       2,
+    ("blue_collar",      "constructii_tehnic"):1,
+    ("blue_collar",      "tech_ing"):          0,
+    ("blue_collar",      "medical"):           0,
+    ("blue_collar",      "business"):          0,
+    ("blue_collar",      "support"):           1,
+    ("blue_collar",      "educatie"):          0,
+
+    ("constructii_tehnic","blue_collar"):      1,
+    ("constructii_tehnic","constructii_tehnic"):2,
+    ("constructii_tehnic","tech_ing"):         1,
+    ("constructii_tehnic","medical"):          0,
+    ("constructii_tehnic","business"):         0,
+    ("constructii_tehnic","support"):          1,
+    ("constructii_tehnic","educatie"):         0,
+
+    ("tech_ing",         "blue_collar"):       0,
+    ("tech_ing",         "constructii_tehnic"):1,
+    ("tech_ing",         "tech_ing"):          2,
+    ("tech_ing",         "medical"):           0,
+    ("tech_ing",         "business"):          2,
+    ("tech_ing",         "support"):           1,
+    ("tech_ing",         "educatie"):          1,
+
+    ("medical",          "blue_collar"):       0,
+    ("medical",          "constructii_tehnic"):0,
+    ("medical",          "tech_ing"):          0,
+    ("medical",          "medical"):           2,
+    ("medical",          "business"):          0,
+    ("medical",          "support"):           0,
+    ("medical",          "educatie"):          1,
+
+    ("business",         "blue_collar"):       0,
+    ("business",         "constructii_tehnic"):0,
+    ("business",         "tech_ing"):          2,
+    ("business",         "medical"):           0,
+    ("business",         "business"):          2,
+    ("business",         "support"):           2,
+    ("business",         "educatie"):          2,
+
+    ("support",          "blue_collar"):       1,
+    ("support",          "constructii_tehnic"):1,
+    ("support",          "tech_ing"):          1,
+    ("support",          "medical"):           0,
+    ("support",          "business"):          2,
+    ("support",          "support"):           2,
+    ("support",          "educatie"):          2,
+
+    ("educatie",         "blue_collar"):       0,
+    ("educatie",         "constructii_tehnic"):0,
+    ("educatie",         "tech_ing"):          1,
+    ("educatie",         "medical"):           1,
+    ("educatie",         "business"):          2,
+    ("educatie",         "support"):           2,
+    ("educatie",         "educatie"):          2,
 }
 
 
-def _detect_domain(text):
-    """Detecteaza domeniul profesional dintr-un titlu de job."""
+def _detect_cluster(text):
+    """Detecteaza cluster-ul profesional dintr-un titlu de job."""
     t = normalize_text(text)
-    for domain, kws in _DOMAIN_KW:
+    for cluster, kws in _CLUSTER_KW:
         for kw in kws:
             if kw in t:
-                return domain
+                return cluster
     return None
 
 
-def _is_domain_incompatible(natural_role, target_job):
-    """Returneaza True daca rolul natural e incompatibil cu jobul tinta."""
-    nd = _detect_domain(natural_role)
-    td = _detect_domain(target_job)
-    if not nd or not td or nd == td:
-        return False
-    return td in _INCOMPATIBLE.get(nd, [])
+def _get_compat_level(natural_role, target_job, cv_text=""):
+    """
+    Returneaza nivelul de compatibilitate domeniu:
+      2 = COMPATIBIL (fara limitare)
+      1 = UPSKILL (scor max 45)
+      0 = INCOMPATIBIL (scor max 28 + REJECT)
+    """
+    nc = _detect_cluster(natural_role)
+    tc = _detect_cluster(target_job)
+
+    if not nc or not tc:
+        return 2  # domeniu necunoscut = nu penaliza
+    if nc == tc:
+        return 2  # acelasi cluster = compatibil
+
+    ns = _SUPER.get(nc)
+    ts = _SUPER.get(tc)
+    if not ns or not ts:
+        return 2
+    if ns == ts:
+        return 2  # acelasi super-cluster = compatibil
+
+    level = _SC_COMPAT.get((ns, ts), 2)
+
+    # Exceptie: Constructii → Inginerie cu studii superioare in CV
+    if nc == "constructii" and tc == "inginerie" and level == 1:
+        cv_n = normalize_text(cv_text or "")
+        edu_kw = ["licenta", "master", "facultate", "universitate", "inginer", "tehnica constructii", "politehn", "utcb", "utcn"]
+        if any(kw in cv_n for kw in edu_kw):
+            return 2  # studii detectate = compatibil deplin
+
+    return level
+
+
+def _is_domain_incompatible(natural_role, target_job, cv_text=""):
+    """Backward compat: returneaza True daca nivel 0 (incompatibil)."""
+    return _get_compat_level(natural_role, target_job, cv_text) == 0
 
 
 def apply_local_safety_rules(data, target_job, cv_text, profile):
@@ -843,25 +1071,40 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
         data["recommended_next_action"] = "REJECT"
         data["reject_reason_internal"] = "Supracalificare ridicata pentru rol operational."
 
-    # ── Regula 2: incompatibilitate domeniu (bucatar→HR, sofer→IT, IT→casier etc.) ──
+    # ── Regula 2: compatibilitate domeniu (3 niveluri) ────────────────────────
     natural_role = as_text(data.get("position", ""))
-    if natural_role and _is_domain_incompatible(natural_role, target_job):
-        nat_domain = _detect_domain(natural_role)
-        tgt_domain = _detect_domain(target_job)
-        if clean_score(data.get("score", 0)) > 28:
-            data["score"] = 28
-        data["recommendation"] = "REJECT"
-        data["priority"] = "LOW"
-        data["recommended_next_action"] = "REJECT"
-        data["overqualification_risk"] = "LOW"
-        data["level_mismatch"] = "HIGH"
-        motive = f"Incompatibilitate domeniu: candidat din domeniul '{nat_domain}' aplicat pe post '{target_job}' ({tgt_domain}). Transfer de cariera complet fara dovezi de reconversie."
-        data["reject_reason_internal"] = motive
-        clean_visible = strip_risk_text(data.get("summary", ""))
-        data["summary"] = set_summary_risk(
-            f"Domeniu incompatibil ({nat_domain} vs {tgt_domain}). {clean_visible}",
-            over_risk="low", level_risk="high"
-        )
+    if natural_role:
+        compat = _get_compat_level(natural_role, target_job, cv_text)
+        nc = _detect_cluster(natural_role)
+        tc = _detect_cluster(target_job)
+
+        if compat == 0:  # INCOMPATIBIL → max 28 + REJECT
+            if clean_score(data.get("score", 0)) > 28:
+                data["score"] = 28
+            data["recommendation"] = "REJECT"
+            data["priority"] = "LOW"
+            data["recommended_next_action"] = "REJECT"
+            data["level_mismatch"] = "HIGH"
+            data["reject_reason_internal"] = (
+                f"Incompatibilitate domeniu: '{nc}' vs post '{target_job}' ({tc}). "
+                "Transfer de cariera fara dovezi de reconversie."
+            )
+            clean_visible = strip_risk_text(data.get("summary", ""))
+            data["summary"] = set_summary_risk(
+                f"Domeniu incompatibil ({nc} vs {tc}). {clean_visible}",
+                over_risk="low", level_risk="high"
+            )
+
+        elif compat == 1:  # UPSKILL → max 45 + pastram ca CONSIDER
+            if clean_score(data.get("score", 0)) > 45:
+                data["score"] = 45
+            if data.get("recommendation") not in ("CONSIDER", "REJECT"):
+                data["recommendation"] = "CONSIDER"
+            if data.get("priority") == "HIGH":
+                data["priority"] = "MEDIUM"
+            if data.get("recommended_next_action") == "CALL_NOW":
+                data["recommended_next_action"] = "CALL_LATER"
+            data["level_mismatch"] = "MEDIUM"
     req = detect_required_license(target_job, profile)
     if req:
         r = req.lower()

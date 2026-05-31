@@ -37,6 +37,7 @@ from app.services.cv_parser import (
     as_text,
     normalize_text,
     _is_domain_incompatible,
+    _get_compat_level,
 )
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
@@ -395,8 +396,9 @@ def group_candidates_by_job(candidates):
     final_jobs = {}
     for job_name, data in sorted_jobs:
         def _sort_key(c, jn=job_name):
-            incompatibil = _is_domain_incompatible(c.position or "", jn)
-            return (0 if incompatibil else 1, c.score or 0)
+            # compat: 2=compatibil, 1=upskill, 0=incompatibil → sortam DESC
+            compat = _get_compat_level(c.position or "", jn)
+            return (compat, c.score or 0)
         final_jobs[job_name] = sorted(data["candidates"], key=_sort_key, reverse=True)
 
     return final_jobs
@@ -781,12 +783,11 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             "phones": sorted({item.phone for item in sorted_items if item.phone}),
         })
 
-    # Daca filtrul de job e activ, candidatii incompatibili de domeniu merg la coada
+    # Daca filtrul de job e activ, sortam si dupa compatibilitate (2>1>0)
     if job_value:
         def _row_sort(row, jv=job_value):
-            nat = row["candidate"].position or ""
-            incompatibil = _is_domain_incompatible(nat, jv)
-            return (0 if incompatibil else 1, row["best_score"])
+            compat = _get_compat_level(row["candidate"].position or "", jv)
+            return (compat, row["best_score"])
         rows = sorted(rows, key=_row_sort, reverse=True)
     else:
         rows = sorted(rows, key=lambda row: (row["best_score"], row["candidate"].id or 0), reverse=True)

@@ -2825,12 +2825,14 @@ async def submit_schedule(
     )
 
     background_tasks.add_task(
-        _send_hr_notification_email,
-        candidate_name=cand_name,
-        job_title=cand_job,
-        data=data,
-        ora=ora,
-        locatie=locatie,
+        _notify_hr_interview_event,
+        "programat_candidat",
+        cand_name,
+        cand_job,
+        data,
+        ora,
+        locatie,
+        cand_email or "",
     )
 
     html = _public_env.get_template("schedule.html").render(
@@ -2881,7 +2883,8 @@ def _notify_hr_interview_event(
 ):
     """Notifica HR-ul pentru orice eveniment legat de un interviu.
 
-    event_type: 'confirmat_candidat' | 'anulat_candidat' | 'programat_hr' | 'anulat_hr' | 'reprogramat_hr'
+    event_type: 'programat_candidat' | 'confirmat_candidat' | 'anulat_candidat'
+                | 'programat_hr' | 'anulat_hr' | 'reprogramat_hr'
     """
     try:
         hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or os.getenv("RESEND_FROM_EMAIL") or os.getenv("FROM_EMAIL")
@@ -2902,6 +2905,7 @@ def _notify_hr_interview_event(
             data_fmt = data
 
         subjects = {
+            "programat_candidat": f"S-A PROGRAMAT — {candidate_name.upper()} — {data_fmt} {ora}",
             "confirmat_candidat": f"CONFIRMAT — {candidate_name.upper()} — {data_fmt} {ora}",
             "anulat_candidat":    f"ANULAT DE CANDIDAT — {candidate_name.upper()} — {data_fmt} {ora}",
             "programat_hr":       f"INTERVIU PROGRAMAT — {candidate_name.upper()} — {data_fmt} {ora}",
@@ -2909,6 +2913,7 @@ def _notify_hr_interview_event(
             "reprogramat_hr":     f"INTERVIU REPROGRAMAT — {candidate_name.upper()} — {data_fmt} {ora}",
         }
         messages = {
+            "programat_candidat": f"Candidatul {candidate_name} si-a ales singur data si ora interviului (self-schedule).",
             "confirmat_candidat": f"Candidatul {candidate_name} a CONFIRMAT participarea la interviu.",
             "anulat_candidat":    f"Candidatul {candidate_name} a ANULAT interviul din link-ul de email.",
             "programat_hr":       f"Ai programat un interviu nou pentru {candidate_name}.",

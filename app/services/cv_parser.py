@@ -496,6 +496,39 @@ JOB MESERIE CALIFICATĂ (electrician, sudor, mecanic, șofer TIR, instalator):
   ├─ Fără atestat/certificare legală obligatorie → SCOR MAX 15 + REJECT
   └─ Certificare expirată sau inactivă > 3 ani → SCOR MAX 25
 
+MATRICE INCOMPATIBILITATE DOMENIU (scor MAX 28 + REJECT — fără excepții):
+  Aplică ÎNAINTE de orice calcul dacă domeniul candidatului e complet diferit de postul vizat.
+
+  Candidat din HORECA (bucătar, ospătar, barman, restaurant):
+    → NU pentru: HR/Recrutare, IT, Contabilitate/Financiar, Juridic, Inginerie, Medicină
+
+  Candidat ȘOFER/TRANSPORT (șofer TIR, curier, livrator, taximetrist):
+    → NU pentru: HR/Recrutare, IT, Contabilitate/Financiar, Juridic, Inginerie, Medicină
+
+  Candidat DEPOZIT ENTRY (stivuitorist, manipulant, picker, packer, lucrător depozit):
+    → NU pentru: HR/Recrutare, IT, Contabilitate/Financiar, Juridic, Inginerie, Medicină
+
+  Candidat RETAIL ENTRY (casier, vânzător, lucrător comercial):
+    → NU pentru: IT, Inginerie, Medicină, Juridic, Contabilitate/Financiar
+
+  Candidat IT/PROGRAMATOR (developer, devops, software engineer, IT specialist):
+    → NU pentru: Șofer/Transport, Depozit entry, HoReCa, Casier/Vânzător, Paznic
+
+  Candidat INGINER (inginer construcții/mecanic/electric, arhitect tehnic):
+    → NU pentru: Șofer TIR entry, Depozit entry, HoReCa, Casier/Vânzător, Paznic
+
+  Candidat MEDIC/ASISTENT MEDICAL/FARMACIST:
+    → NU pentru: IT, Depozit, Transport, HoReCa, Retail entry
+
+  Candidat CONTABIL/ECONOMIST/FINANCIAR:
+    → NU pentru: Șofer/Transport, Depozit entry, HoReCa, Retail entry
+
+  Candidat JURIDIC (avocat, jurist, notar, judecător):
+    → NU pentru: Șofer/Transport, Depozit entry, HoReCa, Retail entry
+
+  EXCEPȚIE: Dacă CV-ul demonstrează reconversie activă (cursuri, certificări, experiență
+  în domeniul nou de min. 6 luni) → poți ignora regula și evalua reconversia.
+
 CERINȚĂ HARD LIPSĂ (oricare job):
   └─ Orice cerință din lista OBLIGATORII de mai sus lipsește → SCOR MAX 35 + REJECT
      NU scrie "merită o șansă" când cerința fundamentală lipsește.
@@ -730,9 +763,62 @@ def _compute_next_action(score, data):
     return "REJECT"
 
 
+# ─── DOMAIN INCOMPATIBILITY MATRIX ───────────────────────────────────────────
+
+_DOMAIN_KW = [
+    ("horeca",        ["bucatar", "ospatar", "barman", "restaurant", "cofetarie", "patiserie", "horeca", "bucatarie", "chef", "cook"]),
+    ("transport",     ["sofer", "tir", "curier", "livrari", "camion", "taximetrist", "taxi", "conducator auto", "livrator"]),
+    ("depozit_entry", ["stivuitorist", "manipulant", "picker", "packer", "lucrator depozit", "muncitor depozit", "operator depozit", "agent depozit"]),
+    ("retail_entry",  ["casier", "vanzator", "lucrator comercial", "agent vanzari", "lucrator magazin"]),
+    ("paza",          ["paznic", "agent paza", "guard", "bodyguard", "supraveghetor"]),
+    ("it_tech",       ["programator", "developer", "devops", "software", "it specialist", "web developer", "data analyst", "cloud", "cybersecurity", "network", "full stack", "backend", "frontend", "system admin", "it manager", "data engineer", "qa engineer"]),
+    ("inginer",       ["inginer", "arhitect tehnic", "proiectant", "inginer constructii", "inginer mecanic", "inginer electric"]),
+    ("medical",       ["medic", "asistent medical", "farmacist", "infirmiera", "radiolog", "stomatolog", "kinetoterapeut", "asistenta medicala"]),
+    ("financiar",     ["contabil", "economist", "auditor", "controller", "analist financiar", "cfo", "trezorier", "contabilitate"]),
+    ("juridic",       ["avocat", "jurist", "consilier juridic", "notar", "judecator", "procuror", "paralegal"]),
+    ("hr_recrutare",  ["recruiter", "specialist hr", "hr manager", "hr business partner", "talent acquisition", "resurse umane", "specialist recrutare"]),
+]
+
+# Domenii incompatibile: natural_domain → [target_domains_incompatibile]
+_INCOMPATIBLE = {
+    "horeca":        ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
+    "transport":     ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
+    "depozit_entry": ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
+    "retail_entry":  ["it_tech", "inginer", "medical", "juridic", "financiar"],
+    "paza":          ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
+    "it_tech":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza"],
+    "inginer":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza"],
+    "medical":       ["it_tech", "depozit_entry", "transport", "horeca", "retail_entry"],
+    "financiar":     ["transport", "depozit_entry", "horeca", "retail_entry"],
+    "juridic":       ["transport", "depozit_entry", "horeca", "retail_entry"],
+    "hr_recrutare":  ["transport", "depozit_entry", "horeca", "retail_entry"],
+}
+
+
+def _detect_domain(text):
+    """Detecteaza domeniul profesional dintr-un titlu de job."""
+    t = normalize_text(text)
+    for domain, kws in _DOMAIN_KW:
+        for kw in kws:
+            if kw in t:
+                return domain
+    return None
+
+
+def _is_domain_incompatible(natural_role, target_job):
+    """Returneaza True daca rolul natural e incompatibil cu jobul tinta."""
+    nd = _detect_domain(natural_role)
+    td = _detect_domain(target_job)
+    if not nd or not td or nd == td:
+        return False
+    return td in _INCOMPATIBLE.get(nd, [])
+
+
 def apply_local_safety_rules(data, target_job, cv_text, profile):
     cv = normalize_text(cv_text)
     combined = normalize_text(" ".join([as_text(data.get(k,"")) for k in ["name","position","summary","strengths","skills"]]) + " " + cv[:3000])
+
+    # ── Regula 1: supracalificare academica pentru rol operational ─────────────
     operational_domains = ["Depozit Logistica","Retail Financiar","Retail","Transport Soferie","Transport Livrari","Productie","Constructii","HoReCa","Facility","Securitate"]
     high_level = ["rector","profesor universitar","director general","ceo","antreprenor","consultant strategic","decan","academic"]
     if profile.get("domain") in operational_domains and any(w in combined for w in high_level):
@@ -742,6 +828,26 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
         data["priority"] = "LOW"
         data["recommended_next_action"] = "REJECT"
         data["reject_reason_internal"] = "Supracalificare ridicata pentru rol operational."
+
+    # ── Regula 2: incompatibilitate domeniu (bucatar→HR, sofer→IT, IT→casier etc.) ──
+    natural_role = as_text(data.get("position", ""))
+    if natural_role and _is_domain_incompatible(natural_role, target_job):
+        nat_domain = _detect_domain(natural_role)
+        tgt_domain = _detect_domain(target_job)
+        if clean_score(data.get("score", 0)) > 28:
+            data["score"] = 28
+        data["recommendation"] = "REJECT"
+        data["priority"] = "LOW"
+        data["recommended_next_action"] = "REJECT"
+        data["overqualification_risk"] = "LOW"
+        data["level_mismatch"] = "HIGH"
+        motive = f"Incompatibilitate domeniu: candidat din domeniul '{nat_domain}' aplicat pe post '{target_job}' ({tgt_domain}). Transfer de cariera complet fara dovezi de reconversie."
+        data["reject_reason_internal"] = motive
+        clean_visible = strip_risk_text(data.get("summary", ""))
+        data["summary"] = set_summary_risk(
+            f"Domeniu incompatibil ({nat_domain} vs {tgt_domain}). {clean_visible}",
+            over_risk="low", level_risk="high"
+        )
     req = detect_required_license(target_job, profile)
     if req:
         r = req.lower()

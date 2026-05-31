@@ -280,6 +280,10 @@ def build_fallback_profile(target_job):
         "economist", "auditor", "consultant", "specialist", "expert", "sef",
         "responsabil hr", "hr", "jurist", "avocat", "financiar", "controller",
         "programator", "developer", "it", "arhitect", "medic", "farmacist",
+        # Roluri profesionale/administrative care cer studii superioare
+        "consilier", "inspector", "referent", "judecator", "procuror", "notar",
+        "diplomat", "ofiter", "parlamentar", "prefect", "primar",
+        "sef birou", "sef serviciu", "functionar public",
     ]
 
     is_operational = any(kw in job_lower for kw in operational_kw)
@@ -317,29 +321,35 @@ def build_fallback_profile(target_job):
         }
     elif is_senior:
         return {
-            "job_title": target_job, "domain": "Calificat/Senior", "level": "Senior",
+            "job_title": target_job, "domain": "Calificat/Senior/Profesional", "level": "Senior",
             "requires_higher_education": True,
-            "must_have": ["studii superioare relevante", "experienta minima in domeniu"],
+            "must_have": ["studii superioare relevante pentru domeniu", "experienta minima in domeniu"],
             "nice_to_have": ["certificari", "limbi straine", "experienta de conducere"],
-            "reject_if_missing": ["studii superioare", "experienta in domeniu"],
+            "reject_if_missing": ["studii superioare in domeniu relevant", "experienta in domeniu"],
             "overqualified_risk": [],
-            "red_flags": ["fara studii superioare", "fara experienta relevanta"],
+            "red_flags": ["fara studii superioare", "fara experienta relevanta in domeniu", "background complet diferit"],
             "max_score_rules": [
-                "Fara studii superioare in domeniu relevant, final_score maxim 38.",
-                "Fara experienta relevanta in domeniu, final_score maxim 42.",
-                "Experienta partiala sau tangentiala, penalizare proportionala, scor 43-58.",
+                "REGULA CRITICA: Fara studii superioare in domeniu DIRECT relevant, final_score MAXIM 35.",
+                "REGULA CRITICA: Fara NICIO experienta in domeniu sau domenii conexe, final_score MAXIM 38.",
+                "REGULA CRITICA: Daca background-ul candidatului e complet diferit de domeniu (ex: vanzator/stivuitorist pentru rol juridic/parlamentar/financiar), final_score MAXIM 32.",
+                "Experienta partiala sau tangentiala in domeniu: scor 39-55.",
+                "Candidat cu studii relevante dar fara experienta: scor 40-55.",
             ],
         }
     else:
         return {
-            "job_title": target_job, "domain": "General", "level": "Middle",
+            "job_title": target_job, "domain": "General/Profesional", "level": "Middle",
             "requires_higher_education": False,
-            "must_have": [],
-            "nice_to_have": [],
+            "must_have": ["experienta in domeniu relevant sau conexe"],
+            "nice_to_have": ["studii superioare", "certificari relevante"],
             "reject_if_missing": [],
             "overqualified_risk": [],
-            "red_flags": ["lipsa experienta relevanta", "CV generic"],
-            "max_score_rules": ["Daca experienta este complet diferita de domeniu, scor maxim 45."],
+            "red_flags": ["lipsa oricarei experiente in domeniu sau domenii conexe"],
+            "max_score_rules": [
+                "Daca candidatul nu are NICIO experienta in domeniu sau domenii conexe, final_score MAXIM 38.",
+                "Daca experienta este tangentiala (transferabilitate slaba), final_score maxim 48.",
+                "Daca experienta este partial relevanta, scor 49-65.",
+            ],
         }
 
 
@@ -430,7 +440,7 @@ def build_prompt(text, target_job, job_requirements=None):
         "CALIBRARE NIVEL JOB — REGULI STRICTE DE SCORING\n"
         "═══════════════════════════════════════════════════════════\n"
         "Primul pas: determina nivelul jobului din titlu si cerinte.\n\n"
-        "JOB OPERATIONAL/ENTRY (operator, muncitor, depozitar, casier, curier, vanzator, paznic, etc.):\n"
+        "JOB OPERATIONAL/ENTRY (operator, muncitor, depozitar, casier, curier, vanzator, paznic, stivuitorist, etc.):\n"
         "  → Candidat cu studii superioare (licenta/master/doctorat) = SUPRACALIFICAT\n"
         "    final_score MAXIM 35, overqualification_risk=high\n"
         "    Motivul: nu va ramane, va pleca in 1-2 luni. Nu e potrivit.\n"
@@ -438,18 +448,27 @@ def build_prompt(text, target_job, job_requirements=None):
         "    Poate lua scor 60-90 in functie de potrivire.\n"
         "  → Candidat fara nicio experienta dar fara studii superioare = ACCEPTABIL\n"
         "    Poate lua scor 45-60 (job accesibil, se poate instrui).\n\n"
-        "JOB CALIFICAT/SENIOR (coordonator, manager, analist, inginer, contabil, HR, financiar, IT, etc.):\n"
-        "  → Candidat fara studii superioare relevante = SUBCALIFICAT\n"
+        "JOB CALIFICAT/SENIOR (coordonator, manager, director, analist, inginer, contabil, HR,\n"
+        "   financiar, IT, arhitect, medic, farmacist, consilier, inspector, referent,\n"
+        "   judecator, procuror, notar, diplomat, functionar public, etc.):\n"
+        "  → Candidat fara studii superioare in domeniu DIRECT relevant = SUBCALIFICAT\n"
+        "    final_score MAXIM 35\n"
+        "  → Candidat fara NICIO experienta in domeniu sau conexe = SUBCALIFICAT\n"
         "    final_score MAXIM 38\n"
-        "  → Candidat fara experienta minima ceruta = SUBCALIFICAT\n"
-        "    final_score MAXIM 42\n"
-        "  → Candidat cu experienta partiala = penalizare proportionala, scor 43-58\n\n"
+        "  → Candidat cu background COMPLET DIFERIT (ex: vanzator/depozitar/sofer aplicand\n"
+        "    pentru consilier parlamentar, inspector fiscal, judecator, contabil, inginer, etc.):\n"
+        "    final_score MAXIM 32. Abilitatile de comunicare sau soft skills NU compenseaza\n"
+        "    lipsa totala de educatie si experienta in domeniu.\n"
+        "  → Candidat cu experienta partiala in domeniu: scor 39-55\n\n"
         "JOB MESERIE CALIFICATA (electrician, sudor, mecanic, instalator, etc.):\n"
         "  → Fara calificare/certificare practica = final_score MAXIM 38\n"
         "  → Cu calificare dar fara experienta recenta = scor 40-55\n\n"
-        "REGULA UNIVERSALA: Potrivirea nivel-la-nivel > cantitatea de calificari.\n"
-        "Un om cu liceu + 5 ani depozit e MAI POTRIVIT pentru 'operator depozit'\n"
-        "decat un inginer cu master. Scorul reflecta POTRIVIREA, nu valoarea absoluta.\n"
+        "REGULA CRITICA ANTI-INFLATIE SCOR:\n"
+        "Soft skills (comunicare, adaptabilitate, seriozitate) NU pot compensa lipsa\n"
+        "educatiei sau experientei de domeniu pentru roluri specializate.\n"
+        "Un vanzator NU poate lua 60 pentru 'consilier parlamentar' indiferent cat\n"
+        "de bun comunicator e — nu are pregatirea necesara.\n"
+        "Scorul reflecta POTRIVIREA REALA, nu potentialul abstract.\n"
         "═══════════════════════════════════════════════════════════\n\n"
         "REGULI OBLIGATORII:\n"
         "- Extrage companiile/institutiile unde a lucrat candidatul si pune-le in companies. Nu inventa companii. Daca nu apar clar, lasa lista goala.\n"

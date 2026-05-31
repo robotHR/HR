@@ -25,12 +25,15 @@ body{
   --teal:#22c7b8;--t2:#5ee6da;--tsoft:rgba(34,199,184,.13);--tline:rgba(34,199,184,.26);
   --yellow:#f59e0b;--ysoft:rgba(245,158,11,.13);--yline:rgba(245,158,11,.26);
   --red:#ff6b70;--rsoft:rgba(255,107,112,.13);--rline:rgba(255,107,112,.26);
+  /* Aliases for files that used different names */
   --purple:var(--blue);--purple-2:var(--b2);
   --green:var(--teal);--green-2:var(--tsoft);
   --surface:var(--s1);--surface-2:var(--s2);
   --r:12px;--rl:18px;--rxl:22px;
-  --radius-md:12px;--radius-lg:18px;--radius-xl:22px;--radius-sm:9px;
+  --radius-md:12px;--radius-lg:18px;--radius-xl:22px;
+  --radius-sm:9px;
 }
+/* ── LAYOUT ── */
 .layout{display:flex;min-height:100vh}
 .sidebar{
   width:220px;position:fixed;top:0;bottom:0;left:0;z-index:20;
@@ -38,128 +41,268 @@ body{
   border-right:1px solid var(--line);
   display:flex;flex-direction:column;
 }
-.brand{padding:24px 20px 20px;border-bottom:1px solid var(--line)}
-.brand-main{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1}
-.brand-main span{color:var(--b2)}
-.brand-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
+.brand,.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--line)}
+.brand-main,.logo-text{font-family:'DM Sans',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px;line-height:1}
+.brand-main span,.logo-text .accent{color:var(--b2)}
+.brand-sub,.logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:5px}
 .nav{display:flex;flex-direction:column;gap:2px;padding:12px 10px;flex:1}
 .nav a{
   display:flex;align-items:center;gap:9px;padding:10px 12px;
-  border-radius:10px;font-size:13px;font-weight:500;color:var(--muted);
+  border-radius:10px;font-size:13px;font-weight:700;color:var(--muted);
   text-decoration:none;transition:.15s;position:relative;user-select:none;
 }
+.nav a svg{width:15px;height:15px;opacity:.65;flex-shrink:0;transition:.15s}
 .nav a:hover{color:#fff;background:rgba(255,255,255,.055)}
+.nav a:hover svg{opacity:1}
 .nav a.active{color:#fff;background:rgba(93,169,255,.15)}
+.nav a.active svg{opacity:1;color:var(--b2)}
 .nav a.active::before{
   content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
   width:3px;height:55%;border-radius:0 3px 3px 0;background:var(--b2);
 }
 .nav a.logout-link{color:rgba(252,165,165,.72);margin-top:auto}
 .nav a.logout-link:hover{color:#fca5a5;background:rgba(248,113,113,.08)}
-.main{margin-left:220px;width:calc(100% - 220px);min-height:100vh;padding:26px 28px 36px}
-
-/* typography */
+.main{
+  margin-left:220px;width:calc(100% - 220px);min-height:100vh;
+  padding:26px 28px 36px;
+}
+/* ── TYPOGRAPHY ── */
 .eyebrow{font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.16em;margin-bottom:7px}
-.page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;margin-bottom:5px}
-.page-sub{font-size:13px;color:var(--soft);line-height:1.55}
-.head-pill{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2);padding:5px 13px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.05em;white-space:nowrap}
-
-/* buttons */
-.btn{
+h1,.page-title,.hero-title{font-family:'DM Sans',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;margin-bottom:5px}
+.page-sub,.hero-sub,.section-sub,.subtitle{font-size:13px;color:var(--soft);line-height:1.55}
+.section-title{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+/* ── STAT CARDS ── */
+.stats-row,.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stat-card,.kpi{
+  background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);
+  padding:16px 18px;position:relative;overflow:hidden;transition:.18s;
+}
+.stat-card::after,.kpi::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at top right,rgba(93,169,255,.055),transparent 55%);
+  pointer-events:none;
+}
+.stat-card:hover,.kpi:hover{border-color:var(--bline)}
+.stat-label,.kpi-lbl{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+.stat-value,.kpi-val,.stat-num{font-family:'DM Sans',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1}
+.stat-value span,.kpi-val span{font-size:12px;font-weight:700;color:var(--b2);font-family:'DM Sans',sans-serif}
+.stat-help,.kpi-note{font-size:10px;color:var(--muted);margin-top:4px}
+/* ── CARDS / PANELS ── */
+.card,.panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--rxl);padding:20px}
+.card-title,.panel-title{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.13em;margin-bottom:13px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+/* ── BUTTONS ── */
+.btn,button[class^="btn"]{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:9px 16px;border-radius:11px;font-size:13px;font-weight:800;
   border:none;cursor:pointer;transition:.15s;font-family:'DM Sans',sans-serif;
   text-decoration:none;white-space:nowrap;
 }
 .btn:hover{transform:translateY(-1px)}
-.btn-primary{background:linear-gradient(135deg,var(--blue),var(--b2));color:#07111f;box-shadow:0 4px 14px rgba(93,169,255,.22)}
-.btn-primary:hover{box-shadow:0 8px 22px rgba(93,169,255,.32)}
-.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--soft)}
-.btn-ghost:hover{color:#fff;border-color:var(--bline);background:var(--bsoft)}
-.btn-cv{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
-.btn-cv:hover{background:rgba(34,199,184,.22)}
-
-/* inputs */
-input,select{
+.btn-primary,.btn-main,.btn-gmail,.btn-save-blue,.btn-details,.btn-blue{
+  background:linear-gradient(135deg,var(--blue),var(--b2));color:#07111f;
+  box-shadow:0 4px 14px rgba(93,169,255,.22);
+}
+.btn-primary:hover,.btn-main:hover,.btn-gmail:hover,.btn-save-blue:hover,.btn-blue:hover{box-shadow:0 8px 22px rgba(93,169,255,.32)}
+.btn-secondary,.btn-ghost,.btn-edit,.btn-edit-sm,.btn-link,.btn-clear,.btn-export,.btn-nav,.btn-today{
+  background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--soft);
+}
+.btn-secondary:hover,.btn-ghost:hover,.btn-edit:hover,.btn-link:hover,.btn-clear:hover,.btn-export:hover,.btn-nav:hover,.btn-today:hover{
+  color:#fff;border-color:var(--bline);background:var(--bsoft);
+}
+.btn-danger,.btn-exclude{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.btn-danger:hover,.btn-exclude:hover{background:rgba(255,107,112,.22)}
+.btn-cv,.btn-potential,.btn-save-green,.btn-hire,.btn-email,.btn-detail-cand{
+  background:var(--tsoft);border:1px solid var(--tline);color:var(--t2);
+}
+.btn-cv:hover,.btn-potential:hover,.btn-save-green:hover,.btn-hire:hover,.btn-email:hover,.btn-detail-cand:hover{background:rgba(34,199,184,.22)}
+.btn-detail,.btn-detail-delete{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+/* ── TAGS / BADGES ── */
+.tag,.status-badge,.tag-chip,.chip,.row-badge{
+  display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+}
+.tag-green,.ok,.score-cell.good,.score-circle.score-green,.avatar-top,.count-top{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.tag-yellow,.score-cell.mid,.score-circle.score-yellow,.avatar-potential,.count-potential{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
+.tag-red,.err,.score-circle.score-red,.count-rest{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.tag-blue,.head-pill,.top-pill{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
+.tag-muted,.tag-chip{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
+/* ── AVATARS / SCORES ── */
+.avatar,.mini-avatar,.row-avatar,.cand-avatar,.user-avatar{
+  display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  font-family:'DM Sans',sans-serif;font-weight:800;color:#07111f;flex-shrink:0;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+}
+.score-num-badge,.score-cell{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:800;
+}
+.score-bar-track,.bar-track{height:6px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden}
+.score-bar-fill,.bar-fill{height:100%;border-radius:999px}
+.sbf-green,.bar-fill.green{background:var(--teal)}
+.sbf-yellow,.bar-fill.yellow{background:var(--yellow)}
+.sbf-red,.bar-fill.red{background:var(--red)}
+.score-wrap{display:flex;flex-direction:column;gap:4px;min-width:60px}
+/* ── FORMS / INPUTS ── */
+input,select,textarea{
   width:100%;padding:10px 13px;border-radius:11px;border:1px solid var(--line2);
   background:rgba(255,255,255,.06);color:#fff;font-size:14px;font-weight:600;
   outline:none;transition:.18s;font-family:'DM Sans',sans-serif;-webkit-appearance:none;
 }
-input:focus,select:focus{border-color:var(--bline);box-shadow:0 0 0 3px rgba(93,169,255,.10)}
-input::placeholder{color:rgba(255,255,255,.28)}
+input:focus,select:focus,textarea:focus{border-color:var(--bline);box-shadow:0 0 0 3px rgba(93,169,255,.10)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.28)}
 select option{background:#1a2238;color:#fff}
-
-/* page header */
-.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px}
-
-/* filters bar */
-.search-bar{
-  background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);
-  padding:14px 18px;margin-bottom:18px;
-}
-.search-row{display:flex;gap:9px;align-items:center}
-.search-row input{flex:1}
-.search-row select{width:220px;flex-shrink:0}
-.filter-actions{display:flex;gap:7px;margin-top:10px}
-
-/* counter */
-.list-count{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px}
-
-/* candidate list */
-.cand-list{display:grid;gap:8px}
-
-.cand-row{
-  background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);
-  padding:15px 20px;transition:.18s;display:flex;align-items:center;gap:18px;
-  position:relative;overflow:hidden;
-}
-.cand-row::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  border-radius:3px 0 0 3px;background:transparent;transition:.18s;
-}
-.cand-row:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 5px 22px rgba(0,0,0,.2)}
-.cand-row:hover::before{background:var(--blue)}
-
-/* avatar */
-.av{
-  width:44px;height:44px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--teal),var(--blue));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;color:#07111f;
-}
-
-/* info section */
-.cand-info{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:center}
-
-.info-left{min-width:0}
-.cand-name{font-size:14px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.cand-meta{font-size:11px;color:var(--muted);line-height:1.6}
-.cand-meta span{display:inline-block}
-.cand-meta .sep{margin:0 5px;opacity:.35}
-.cand-companies{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
-
-.info-right{min-width:0}
-.fit-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em;margin-bottom:4px}
-.fit-role{font-size:13px;font-weight:700;color:var(--b2);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fit-jobs{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.fit-job-tag{
-  font-size:10px;font-weight:700;color:var(--soft);
-  background:rgba(255,255,255,.05);border:1px solid var(--line);
-  padding:2px 8px;border-radius:6px;white-space:nowrap;
-}
-.fit-job-more{font-size:10px;color:var(--muted);padding:2px 4px}
-
-/* actions */
-.cand-actions{display:flex;gap:7px;flex-shrink:0;align-items:center}
-.cand-actions .btn{padding:8px 14px;font-size:12px}
-
-/* empty */
-.empty{
-  text-align:center;padding:48px 20px;color:var(--muted);font-size:13px;
+textarea{min-height:80px;resize:vertical;line-height:1.5}
+.field{margin-bottom:12px}
+.field label,label{font-size:10px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.12em;display:block;margin-bottom:6px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full,.form-grid [class*="full"]{grid-column:1/-1}
+.form-line{display:flex;gap:8px;align-items:center}
+.form-line input,.form-line select{flex:1}
+/* ── MISC SHARED ── */
+.message,.notice,.alert{padding:11px 14px;border-radius:11px;font-size:13px;font-weight:700;margin-bottom:12px;background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
+.err,.error-msg,.danger-box{background:var(--rsoft) !important;border-color:var(--rline) !important;color:#ffb4b7 !important}
+.ok-msg{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.empty,.empty-state,.empty-recommendations,.empty-section,.empty-table{
+  text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;
   background:rgba(255,255,255,.02);border:1px dashed var(--line);border-radius:var(--rl);
 }
+.helper-text,.loading-note{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.back-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:700;color:var(--soft);text-decoration:none;
+  padding:8px 14px;border-radius:11px;border:1px solid var(--line2);
+  background:rgba(255,255,255,.04);transition:.15s;margin-bottom:20px;
+}
+.back-btn:hover{color:#fff;border-color:var(--bline)}
+.danger-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.purple{color:var(--b2)}
 
-/* pagination */
+/* ── PAGE HEADER ── */
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px}
+.page-title{font-family:'DM Sans',sans-serif;font-size:24px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1.1;margin-bottom:5px}
+/* ── FILTERS ── */
+.filters{background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);padding:13px 16px;margin-bottom:16px}
+.filters h2{font-size:11px;font-weight:900;color:var(--b2);text-transform:uppercase;letter-spacing:.13em;margin-bottom:10px}
+.filter-grid{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.filter-grid input,.filter-grid select{flex:1;min-width:130px;width:auto}
+.filter-actions{display:flex;gap:7px;margin-top:8px}
+/* ── STATS ROW fix: 3+3 ── */
+.stats-row{grid-template-columns:repeat(3,1fr) !important}
+
+/* ── CANDIDATE LIST ── */
+.candidate-list{display:grid;gap:10px}
+
+.candidate-card{
+  background:var(--s1);
+  border:1px solid var(--line);
+  border-radius:var(--rxl);
+  padding:16px 20px;
+  transition:.18s;
+  position:relative;
+  overflow:hidden;
+}
+.candidate-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  border-radius:3px 0 0 3px;
+  background:transparent;transition:.18s;
+}
+.candidate-card:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,0,0,.22)}
+.candidate-card:hover::before{background:var(--blue)}
+
+/* 4-column grid: info | best-role | matches | actions */
+.card-grid{
+  display:grid;
+  grid-template-columns:210px 180px 1fr auto;
+  gap:16px;
+  align-items:center;
+}
+
+/* COL 1 — candidat info */
+.candidate-main{display:flex;align-items:flex-start;gap:11px}
+.avatar{width:42px;height:42px;font-size:15px;flex-shrink:0;border-radius:50%}
+.cand-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.name{font-size:14px;font-weight:800;color:#fff;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.cand-status{margin-top:5px}
+
+/* COL 2 — best role */
+.col-best{display:flex;flex-direction:column;gap:6px}
+.mini-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em}
+.best-role{display:flex;align-items:center;gap:9px}
+.role-info{display:flex;flex-direction:column;gap:2px}
+.role-title{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.role-sub{font-size:11px;color:var(--muted)}
+
+/* Score circle */
+.score-cell{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:50%;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;
+  flex-shrink:0;
+}
+.score-cell.score-green{background:var(--teal);color:#07111f}
+.score-cell.score-yellow{background:var(--yellow);color:#07111f}
+.score-cell.score-red{background:var(--red);color:#fff}
+
+/* COL 3 — matches */
+.col-matches{display:flex;flex-direction:column;gap:6px}
+.matches{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.match-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 9px;border-radius:8px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);
+  font-size:11px;color:var(--soft);
+  transition:.15s;
+}
+.match-chip:hover{border-color:var(--bline);background:var(--bsoft)}
+.match-chip.chip-potential{background:var(--ysoft);border-color:var(--yline);color:#fcd38a}
+.match-chip.chip-potential strong{color:#fcd38a}
+.match-chip strong{color:#fff;font-weight:800;font-size:11px}
+.match-chip.low{opacity:.55}
+.match-more{font-size:10px;color:var(--muted);padding:2px 0}
+
+/* COL 4 — actions */
+.actions-inline{display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:stretch;min-width:80px}
+.actions-inline .btn{justify-content:center;padding:8px 14px;font-size:12px}
+
+/* ── TAGS unified ── */
+.tag{
+  display:inline-flex;align-items:center;
+  padding:3px 9px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+}
+.tag-green{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.tag-yellow{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
+.tag-red{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+.tag-blue{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
+.tag-muted{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
+
+/* ── AI SUGGESTION — sub best-role ── */
+.ai-suggestion{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:4px;
+  font-size:11px;color:var(--b2);line-height:1.3;
+}
+.ai-sugg-label{
+  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.10em;
+  background:var(--bsoft);border:1px solid var(--bline);color:var(--b2);
+  padding:1px 6px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+}
+
+/* ── PRIORITY BADGE ── */
+.priority-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:999px;
+  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;
+  margin-top:4px;
+}
+.priority-high{background:rgba(34,199,184,.18);border:1px solid var(--tline);color:var(--t2)}
+.priority-medium{background:rgba(245,158,11,.15);border:1px solid var(--yline);color:#fcd38a}
+.priority-low{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+
+/* ── PAGINATION ── */
 .pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;padding-bottom:8px}
 .page-btn{
   display:inline-flex;align-items:center;justify-content:center;
@@ -173,35 +316,141 @@ select option{background:#1a2238;color:#fff}
 .page-btn.disabled{opacity:.35;pointer-events:none}
 .page-info{font-size:12px;color:var(--muted);font-weight:700}
 
-/* ── MOBILE ── */
+/* ── AI SCORE BADGE — sub best-role ── */
+.ai-badge{
+  display:inline-flex;align-items:center;
+  padding:2px 8px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  margin-top:5px;
+}
+.ai-badge.top{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.ai-badge.potential{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
+.ai-badge.other{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+
+/* ── MATCH CHIPS colorate după scor ── */
+.match-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 9px;border-radius:8px;
+  font-size:11px;color:var(--soft);
+  background:rgba(255,255,255,.04);border:1px solid var(--line);
+  transition:.15s;
+}
+.match-chip strong{font-weight:800;font-size:11px}
+.match-chip.chip-top{background:var(--tsoft);border-color:var(--tline);color:var(--t2)}
+.match-chip.chip-top strong{color:var(--t2)}
+.match-chip.chip-low{background:var(--rsoft);border-color:var(--rline);color:#ffb4b7}
+.match-chip.chip-low strong{color:#ffb4b7}
+
+/* ─── BOTTOM NAV hidden on desktop ─── */
 .bnav{display:none}
+
+/* ─── MOBILE RESPONSIVE ─── */
 @media(max-width:768px){
-  body{overflow-x:hidden}
-  .sidebar{display:none}
-  .layout{display:block;padding-bottom:70px}
-  .main{margin-left:0;width:100%;padding:14px 14px 80px}
-  .page-head{flex-direction:column;gap:8px}
-  .search-row{flex-direction:column}
-  .search-row select{width:100%}
-  .cand-row{flex-wrap:wrap;gap:12px;padding:14px 16px}
-  .cand-row::before{display:none}
-  .cand-info{grid-template-columns:1fr;gap:10px}
-  .info-right{border-top:1px solid var(--line);padding-top:10px}
-  .cand-actions{width:100%;border-top:1px solid var(--line);padding-top:10px}
-  .cand-actions .btn{flex:1;justify-content:center}
-  .cand-companies{max-width:100%;white-space:normal}
+  /* Let body scroll naturally - no overflow:hidden */
+  body{overflow-x:hidden !important}
+
+  /* Sidebar disappears */
+  .sidebar{display:none !important}
+
+  /* Layout unblocks scroll */
+  .layout{
+    display:block !important;
+    height:auto !important;
+    min-height:100dvh;min-height:100vh;
+    overflow:visible !important;
+    padding-bottom:70px;
+  }
+
+  /* Main takes full width, no margin */
+  .main{
+    margin-left:0 !important;
+    width:100% !important;
+    padding-left:14px !important;
+    padding-right:14px !important;
+    padding-bottom:80px !important;
+    overflow-x:hidden !important;
+    box-sizing:border-box;
+  }
+
+  /* Grids collapse to single column */
+  .stats-row,.kpis{grid-template-columns:repeat(2,1fr) !important}
+  .hero-grid,.source-grid,.hero-stats,.page-hero,.two-col,.form-grid{grid-template-columns:1fr !important}
+  .full{grid-column:auto !important}
+
+  /* candidate_detail: prevent horizontal overflow */
+  .content{overflow-x:hidden !important;padding:14px !important}
+  .info-row{grid-template-columns:110px 1fr !important;gap:8px !important;word-break:break-word}
+  .hero-top{flex-wrap:wrap !important;gap:12px !important}
+  .hero-actions{flex-wrap:wrap !important;gap:8px !important}
+  .hero-actions .btn,.hero-actions a,.hero-actions button{min-width:0 !important;flex:1 !important;font-size:12px !important;padding:8px 10px !important}
+  .panel{overflow-x:hidden !important}
+  .tag-list{flex-wrap:wrap !important}
+  .timeline{overflow-x:hidden !important}
+
+  /* filters */
+  .filter-grid{flex-direction:column !important}
+  .filter-grid input,.filter-grid select{width:100% !important;font-size:16px !important}
+
+  /* tables scroll horizontally */
+  .cand-table-wrap,.table-card{overflow-x:auto !important}
+
+  /* candidate card — layout vertical curat pe mobile */
+  .stats-row{grid-template-columns:repeat(2,1fr) !important}
+  .card-grid{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:0 !important;
+  }
+  .candidate-card{overflow-x:hidden;padding:14px 16px !important}
+  .candidate-card::before{display:none}
+  .candidate-main{align-items:flex-start !important;margin-bottom:10px}
+  .cand-info{min-width:0;flex:1}
+  .name{font-size:14px !important;white-space:normal !important;overflow:visible !important}
+  .small{max-width:100% !important;white-space:normal !important;overflow:visible !important}
+  .col-best{padding:10px 0 !important;border-top:1px solid var(--line) !important}
+  .col-matches{padding:10px 0 !important;border-top:1px solid var(--line) !important}
+  .best-role{align-items:center !important}
+  .role-title{font-size:13px !important}
+  .matches{gap:5px !important}
+  .match-chip{font-size:11px !important;padding:4px 8px !important}
+  .actions-inline{
+    flex-direction:row !important;
+    padding-top:10px !important;
+    border-top:1px solid var(--line) !important;
+    min-width:unset !important;
+    align-items:stretch !important;
+  }
+  .actions-inline .btn{flex:1 !important;justify-content:center !important;font-size:13px !important;padding:10px 14px !important}
+
+  /* job_applicants */
+  .cand-card{grid-template-columns:42px 1fr !important}
+  .cand-right{grid-column:1/-1 !important;flex-direction:row !important;justify-content:flex-end !important}
+
+  /* jobs modal */
+  .modal{width:calc(100vw - 24px) !important;left:12px !important;right:12px !important}
+
+  /* week nav */
+  .week-label{min-width:0 !important;font-size:11px !important}
+
+  /* forms */
+  input,select,textarea{font-size:16px !important;-webkit-appearance:none}
+
+  /* ─── BOTTOM NAV ─── */
   .bnav{
-    display:flex !important;position:fixed;bottom:0;left:0;right:0;z-index:1000;
-    height:62px;background:linear-gradient(180deg,#0d1520,#0a1219);
-    border-top:1px solid rgba(255,255,255,.09);padding:0 4px;
+    display:flex !important;
+    position:fixed;bottom:0;left:0;right:0;z-index:1000;
+    height:62px;
+    background:linear-gradient(180deg,#0d1520,#0a1219);
+    border-top:1px solid rgba(255,255,255,.09);
+    padding:0 4px;
     padding-bottom:env(safe-area-inset-bottom,0px);
   }
   .bn{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:3px;cursor:pointer;color:rgba(255,255,255,.46);
-    font-family:'DM Sans',sans-serif;font-size:9px;font-weight:800;
-    text-transform:uppercase;letter-spacing:.04em;text-decoration:none;
-    position:relative;-webkit-tap-highlight-color:transparent;
+    font-family:'DM Sans',sans-serif;
+    font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+    text-decoration:none;position:relative;-webkit-tap-highlight-color:transparent;
   }
   .bn svg{width:20px;height:20px}
   .bn.on{color:#7cc4ff}
@@ -209,41 +458,262 @@ select option{background:#1a2238;color:#fff}
     content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
     width:22px;height:2px;background:#7cc4ff;border-radius:0 0 2px 2px;
   }
-  input,select{font-size:16px !important;-webkit-appearance:none}
 }
 
-/* light theme */
-html[data-theme="light"] body{color:#07111f}
-html[data-theme="light"] .sidebar{background:#fff !important;border-right:1px solid rgba(7,17,31,.10) !important}
-html[data-theme="light"] .brand{border-bottom:1px solid rgba(7,17,31,.10) !important}
-html[data-theme="light"] .brand-main{color:#07111f !important}
-html[data-theme="light"] .brand-main span{color:#2563eb !important}
-html[data-theme="light"] .brand-sub,.nav a{color:#6b7280 !important}
-html[data-theme="light"] .nav a:hover{color:#07111f !important;background:rgba(37,99,235,.06) !important}
-html[data-theme="light"] .nav a.active{color:#2563eb !important;background:rgba(37,99,235,.10) !important}
-html[data-theme="light"] .nav a.logout-link{color:#ff6b70 !important}
-html[data-theme="light"] .page-title,html[data-theme="light"] h1{color:#07111f !important}
-html[data-theme="light"] .page-sub,html[data-theme="light"] .cand-meta,
-html[data-theme="light"] .cand-companies,html[data-theme="light"] .fit-label,
-html[data-theme="light"] .fit-job-more,html[data-theme="light"] .list-count{color:#4b5563 !important}
-html[data-theme="light"] .cand-name,html[data-theme="light"] .fit-role{color:#07111f !important}
-html[data-theme="light"] .cand-row,html[data-theme="light"] .search-bar{background:#fff !important;border-color:rgba(7,17,31,.10) !important}
-html[data-theme="light"] .fit-job-tag{background:rgba(7,17,31,.05) !important;border-color:rgba(7,17,31,.12) !important;color:#374151 !important}
-html[data-theme="light"] input,html[data-theme="light"] select{color:#07111f !important;background:#f3f7fb !important;border-color:rgba(7,17,31,.16) !important}
-html[data-theme="light"] input::placeholder{color:#9ca3af !important}
-html[data-theme="light"] .btn-ghost{color:#374151 !important;border-color:rgba(7,17,31,.15) !important;background:rgba(7,17,31,.04) !important}
+
+
+/* =========================================================
+   NEXAS HR FONT SYSTEM SAFE
+   DM Sans = font principal
+   Syne = doar pe elementele marcate cu .syne-only
+   ========================================================= */
+:root{
+  --font-main:'DM Sans',sans-serif;
+  --font-accent:'Syne',sans-serif;
+}
+body,button,input,select,textarea,.nav a,.page-sub,.hero-sub,.section-sub,.subtitle,
+.card,.panel,.stat-label,.kpi-lbl,.field label,label,.btn,button[class^="btn"],button[class*=" btn"],
+.tag,.status-badge,.tag-chip,.chip,.row-badge,table,th,td{
+  font-family:var(--font-main) !important;
+}
+.syne-only,.syne-only *{
+  font-family:var(--font-accent) !important;
+}
+body{font-size:14px;line-height:1.45}
+.nav a{font-size:13px;font-weight:700}
+.brand-main,.logo-text{font-size:20px;font-weight:800;letter-spacing:-.03em}
+.brand-sub,.logo-sub{font-size:10px;letter-spacing:.20em}
+.eyebrow{font-size:10px;font-weight:900;letter-spacing:.16em}
+h1,.page-title,.hero-title{font-size:26px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.page-sub,.hero-sub,.section-sub,.subtitle{font-size:13px;line-height:1.55}
+.section-title{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.card-title,.panel-title{font-size:11px;font-weight:900;letter-spacing:.13em}
+.stat-label,.kpi-lbl,.field label,label{font-size:10px;font-weight:900;letter-spacing:.10em}
+.stat-value,.kpi-val,.stat-num{font-size:28px;font-weight:800;letter-spacing:-.04em}
+.stat-help,.kpi-note,.helper-text,.loading-note{font-size:11px;line-height:1.5}
+.btn,button[class^="btn"],button[class*=" btn"]{font-size:13px;font-weight:800}
+input,select,textarea{font-size:14px;font-weight:600}
+.tag,.status-badge,.tag-chip,.chip,.row-badge{font-size:10px;font-weight:900;letter-spacing:.06em}
+.score-num-badge,.score-cell{font-size:13px;font-weight:800}
+.empty,.empty-state,.empty-recommendations,.empty-section,.empty-table{font-size:13px;line-height:1.5}
+table,th,td{font-size:13px}
+
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
     <script src="/static/js/theme.js"></script>
+
+<style id="nexas-candidates-sidebar-light-fix">
+/* Fix Candidati: sidebar identic cu Dashboard + text vizibil pe tema alba */
+.sidebar{
+  width:220px !important;
+  background:linear-gradient(180deg,#111827 0%,#141b2d 100%) !important;
+  border-right:1px solid var(--line) !important;
+  padding:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+}
+.brand{
+  padding:24px 20px 20px !important;
+  border-bottom:1px solid var(--line) !important;
+}
+.brand-main,.logo-text{
+  font-family:'Syne',sans-serif !important;
+  font-size:20px !important;
+  font-weight:800 !important;
+  color:#fff !important;
+  letter-spacing:-.3px !important;
+  line-height:1.05 !important;
+}
+.brand-main span,.logo-text .accent{
+  color:var(--purple-2) !important;
+}
+.brand-sub,.logo-sub{
+  font-size:10px !important;
+  color:var(--muted) !important;
+  letter-spacing:2px !important;
+  text-transform:uppercase !important;
+  margin-top:4px !important;
+  font-weight:500 !important;
+}
+.nav{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:2px !important;
+  padding:14px 12px !important;
+  flex:1 !important;
+}
+.nav a{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+  font-size:13px !important;
+  font-weight:500 !important;
+  color:var(--muted) !important;
+  text-decoration:none !important;
+  border-radius:var(--radius-md) !important;
+  transition:.15s !important;
+  position:relative !important;
+}
+.nav a:hover{
+  color:#fff !important;
+  background:rgba(255,255,255,.05) !important;
+}
+.nav a.active{
+  color:#fff !important;
+  background:rgba(93,169,255,.15) !important;
+}
+.nav a.active::before{
+  content:'' !important;
+  position:absolute !important;
+  left:0 !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  width:3px !important;
+  height:60% !important;
+  background:var(--purple-2) !important;
+  border-radius:0 3px 3px 0 !important;
+}
+.nav a.logout-link{
+  color:#fca5a5 !important;
+  margin-top:auto !important;
+  font-weight:500 !important;
+}
+.nav a.logout-link:hover{
+  background:rgba(248,113,113,.08) !important;
+  color:#f87171 !important;
+}
+
+html[data-theme="light"] body{
+  color:#07111f !important;
+}
+html[data-theme="light"] .sidebar{
+  background:#fff !important;
+  border-right:1px solid rgba(7,17,31,.10) !important;
+}
+html[data-theme="light"] .brand{
+  border-bottom:1px solid rgba(7,17,31,.10) !important;
+}
+html[data-theme="light"] .brand-main,
+html[data-theme="light"] .logo-text{
+  color:#07111f !important;
+}
+html[data-theme="light"] .brand-main span,
+html[data-theme="light"] .logo-text .accent{
+  color:#2563eb !important;
+}
+html[data-theme="light"] .brand-sub,
+html[data-theme="light"] .logo-sub,
+html[data-theme="light"] .nav a{
+  color:#6b7280 !important;
+}
+html[data-theme="light"] .nav a:hover{
+  color:#07111f !important;
+  background:rgba(37,99,235,.06) !important;
+}
+html[data-theme="light"] .nav a.active{
+  color:#2563eb !important;
+  background:rgba(37,99,235,.10) !important;
+}
+html[data-theme="light"] .nav a.logout-link{
+  color:#ff6b70 !important;
+}
+html[data-theme="light"] .nav a.logout-link:hover{
+  color:#ef4444 !important;
+  background:rgba(248,113,113,.08) !important;
+}
+
+/* Light mode text fix pentru continutul paginii Candidati */
+html[data-theme="light"] .main,
+html[data-theme="light"] .page-title,
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] .section-title,
+html[data-theme="light"] .stat-value,
+html[data-theme="light"] .name,
+html[data-theme="light"] .role-title,
+html[data-theme="light"] .match-chip strong,
+html[data-theme="light"] .best-role,
+html[data-theme="light"] .candidate-card,
+html[data-theme="light"] .filters,
+html[data-theme="light"] .card,
+html[data-theme="light"] .panel{
+  color:#07111f !important;
+}
+html[data-theme="light"] .page-sub,
+html[data-theme="light"] .hero-sub,
+html[data-theme="light"] .section-sub,
+html[data-theme="light"] .subtitle,
+html[data-theme="light"] .small,
+html[data-theme="light"] .role-sub,
+html[data-theme="light"] .mini-label,
+html[data-theme="light"] .stat-label,
+html[data-theme="light"] .stat-help,
+html[data-theme="light"] .helper-text,
+html[data-theme="light"] .match-more{
+  color:#4b5563 !important;
+}
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .candidate-card,
+html[data-theme="light"] .filters,
+html[data-theme="light"] .card,
+html[data-theme="light"] .panel{
+  background:#fff !important;
+  border-color:rgba(7,17,31,.10) !important;
+}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea{
+  color:#07111f !important;
+  background:#f3f7fb !important;
+  border-color:rgba(7,17,31,.16) !important;
+}
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder{
+  color:#6b7280 !important;
+}
+
+/* ── Scorecard badge în lista candidați ── */
+.sc-badge{
+  display:inline-flex;align-items:center;
+  padding:4px 10px;border-radius:999px;
+  font-size:10px;font-weight:900;letter-spacing:.04em;
+  white-space:nowrap;margin-top:4px;
+}
+.sc-green{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
+.sc-mid{background:var(--ysoft);border:1px solid var(--yline);color:#d97706}
+.sc-low{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
+
+/* ── Fix portocaliu/galben pe tema alba ── */
+html[data-theme="light"] .tag-yellow,
+html[data-theme="light"] .priority-medium,
+html[data-theme="light"] .ai-badge.potential,
+html[data-theme="light"] .match-chip.chip-potential,
+html[data-theme="light"] .score-cell.mid,
+html[data-theme="light"] .score-circle.score-yellow{
+  background:rgba(217,119,6,.12) !important;
+  border-color:rgba(217,119,6,.35) !important;
+  color:#92400e !important;
+}
+html[data-theme="light"] .sc-mid{
+  background:rgba(217,119,6,.12) !important;
+  border-color:rgba(217,119,6,.35) !important;
+  color:#92400e !important;
+}
+html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
+</style>
+
 </head>
 <body>
-
+    
 <div class="layout">
     <aside class="sidebar">
         <div class="brand">
             <div class="brand-main">NEXAS <span>HR</span></div>
             <div class="brand-sub">HR Platform</div>
         </div>
+        
         <nav class="nav">
             <a href="/">Panou principal</a>
             <a class="active" href="/candidati">Candidati</a>
@@ -255,129 +725,158 @@ html[data-theme="light"] .btn-ghost{color:#374151 !important;border-color:rgba(7
     </aside>
 
     <main class="main">
-
         <div class="page-head">
             <div>
                 <div class="eyebrow">Baza de candidati</div>
-                <h1 class="page-title">Candidati</h1>
-                <div class="page-sub">Lista unica de persoane. AI indica rolul natural detectat din CV.</div>
+                <h1 class="page-title syne-only">Candidati</h1>
+                <div class="page-sub">Fiecare persoana e afisata o singura data. Coloana <strong>Potrivit pentru</strong> = ce spune AI ca e candidatul natural. Coloana <strong>Posturi analizate</strong> = joburile pentru care a fost evaluat si scorul obtinut.</div>
             </div>
-            <div class="head-pill">{{ stats.unique_total }} candidati</div>
+            <div class="head-pill">{{ stats.filtered }} candidati unici afisati</div>
         </div>
 
-        <div class="search-bar">
-            <form method="get" action="/candidati" id="filterForm">
-                <div class="search-row">
-                    <input type="text" name="q" value="{{ q }}" placeholder="Cauta dupa nume, email, telefon, companie, skill, job sau orice cuvant din analiza AI…" autofocus>
-                    <select name="job" onchange="this.form.submit()">
-                        <option value="">Toate posturile</option>
-                        {% for item in all_jobs %}
-                            <option value="{{ item }}" {% if item == job %}selected{% endif %}>{{ item }}</option>
-                        {% endfor %}
-                    </select>
-                    <button class="btn btn-primary" type="submit">Cauta</button>
-                </div>
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-label">Analize in baza de date</div><div class="stat-value">{{ stats.total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Persoane unice</div><div class="stat-value">{{ stats.unique_total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Afisate acum</div><div class="stat-value">{{ stats.filtered }}</div></div>
+            <div class="stat-card"><div class="stat-label">Analize afisate</div><div class="stat-value">{{ stats.analyses_filtered }}</div></div>
+            <div class="stat-card"><div class="stat-label">Interviu</div><div class="stat-value">{{ stats.interviu }}</div></div>
+            <div class="stat-card"><div class="stat-label">Angajati</div><div class="stat-value">{{ stats.angajat }}</div></div>
+        </div>
+
+        <section class="filters">
+            <h2>Filtre candidati</h2>
+            <form method="get" action="/candidati" class="filter-grid" id="filterForm">
+                <input type="text" name="q" value="{{ q }}" placeholder="Cauta nume, email, telefon, companie sau text din CV">
+                <select name="status"><option value="">Toate statusurile</option>{% for item in all_statuses %}<option value="{{ item }}" {% if item == status %}selected{% endif %}>{{ status_display(item) }}</option>{% endfor %}</select>
+                <select name="job"><option value="">Toate posturile</option>{% for item in all_jobs %}<option value="{{ item }}" {% if item == job %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+                <input type="text" name="skill" value="{{ skill }}" placeholder="Skill cautat, ex: Excel, SAP, casier">
+                <input type="number" name="min_score" value="{{ min_score }}" min="0" max="100" placeholder="Scor minim">
+                <button class="btn btn-primary" type="submit">Filtreaza</button>
             </form>
             <div class="filter-actions">
-                {% if q or job %}
-                    <a class="btn btn-ghost" href="/candidati">✕ Reseteaza</a>
-                {% endif %}
-                <a class="btn btn-ghost" href="/candidati/export?q={{ q }}&job={{ job }}">↓ Export Excel</a>
+                <a class="btn btn-clear" href="/candidati">Reseteaza filtrele</a>
+                <a class="btn btn-export" href="/candidati/export?q={{ q }}&status={{ status }}&job={{ job }}&skill={{ skill }}&min_score={{ min_score }}">Export Excel</a>
             </div>
-        </div>
-
-        <div class="list-count">
-            {% if q or job %}
-                {{ stats.filtered }} rezultate
-                {% if q %} pentru „{{ q }}"{% endif %}
-                {% if job %} — post: {{ job }}{% endif %}
-            {% else %}
-                {{ stats.filtered }} candidati
-            {% endif %}
-        </div>
+        </section>
 
         {% if candidate_rows|length == 0 %}
-            <div class="empty">
-                Niciun candidat gasit{% if q or job %} pentru filtrele alese{% endif %}.<br>
-                {% if q or job %}<a href="/candidati" style="color:var(--b2);text-decoration:none;font-weight:700">Reseteaza filtrele</a>{% endif %}
-            </div>
+            <div class="empty">Nu exista candidati pentru filtrele alese.</div>
         {% else %}
-            <div class="cand-list">
+            <section class="candidate-list">
                 {% for row in candidate_rows %}
                     {% set candidate = row.candidate %}
-                    <div class="cand-row">
+                    {% set best = row.best_match %}
+                    <article class="candidate-card">
+                        <div class="card-grid">
 
-                        <!-- Avatar -->
-                        <div class="av">{{ (candidate.name or "?")[0] | upper }}</div>
-
-                        <!-- Info -->
-                        <div class="cand-info">
-                            <div class="info-left">
-                                <div class="cand-name">{{ candidate.name or "Candidat necunoscut" }}</div>
-                                <div class="cand-meta">
-                                    {% if candidate.email %}<span>{{ candidate.email }}</span>{% endif %}
-                                    {% if candidate.email and candidate.phone %}<span class="sep">·</span>{% endif %}
-                                    {% if candidate.phone %}<span>{{ candidate.phone }}</span>{% endif %}
-                                </div>
-                                {% if candidate.companies %}
-                                    <div class="cand-companies">{{ candidate.companies }}</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="info-right">
-                                <div class="fit-label">Potrivit pentru</div>
-                                <div class="fit-role">
-                                    {% set natural = candidate.position or "" %}
-                                    {% if natural and natural|lower != (candidate.job_title or "")|lower %}
-                                        {{ natural }}
-                                    {% elif candidate.job_title %}
-                                        {{ candidate.job_title }}
-                                    {% else %}
-                                        Nespecificat
-                                    {% endif %}
-                                </div>
-                                {% if row.matches|length > 0 %}
-                                    <div class="fit-jobs">
-                                        {% for match in row.matches[:4] %}
-                                            <span class="fit-job-tag">{{ match.job_title }}</span>
-                                        {% endfor %}
-                                        {% if row.matches|length > 4 %}
-                                            <span class="fit-job-more">+{{ row.matches|length - 4 }}</span>
+                            <!-- COL 1: info candidat -->
+                            <div class="candidate-main">
+                                <div class="avatar">{{ (candidate.name or "?")[0] | upper }}</div>
+                                <div class="cand-info">
+                                    <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
+                                    <div class="small">{{ candidate.email or "Email lipsa" }}</div>
+                                    <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
+                                    <div class="small">{{ candidate.companies or "Nespecificat" }}</div>
+                                    <div class="cand-status">
+                                        <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
+                                        {% if candidate.priority == 'HIGH' %}
+                                            <span class="priority-badge priority-high">● Suna azi</span>
+                                        {% elif candidate.priority == 'MEDIUM' %}
+                                            <span class="priority-badge priority-medium">● Prioritate medie</span>
+                                        {% elif candidate.priority == 'LOW' %}
+                                            <span class="priority-badge priority-low">● Prioritate mica</span>
                                         {% endif %}
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- COL 2: scor pe jobul cautat (daca filtru activ) sau fit natural -->
+                            <div class="col-best">
+                                {% if job %}
+                                    <div class="mini-label">Scor pentru postul cautat</div>
+                                {% else %}
+                                    <div class="mini-label">Potrivit pentru</div>
+                                {% endif %}
+                                {% if best %}
+                                    <div class="best-role">
+                                        <div class="score-cell {% if row.best_score >= 70 %}score-green{% elif row.best_score >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ row.best_score }}</div>
+                                        <div class="role-info">
+                                            {% if job %}
+                                                <div class="role-title">{{ best.job_title or job }}</div>
+                                                {% set nat = best.position if (best.position and best.position|lower != best.job_title|lower) else "" %}
+                                                {% if nat %}<div class="role-sub">Rol natural: {{ nat }}</div>{% endif %}
+                                            {% else %}
+                                                {% set natural_role = best.position if (best.position and best.position|lower != best.job_title|lower) else best.job_title %}
+                                                <div class="role-title">{{ natural_role or "Nespecificat" }}</div>
+                                            {% endif %}
+                                            {% if row.best_score >= 70 %}
+                                                <span class="ai-badge top">Top Candidat</span>
+                                            {% elif row.best_score >= 45 %}
+                                                <span class="ai-badge potential">Potential</span>
+                                            {% else %}
+                                                <span class="ai-badge other">Nepotrivit</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="role-sub">Fara analiza AI</div>
                                 {% endif %}
                             </div>
-                        </div>
 
-                        <!-- Actiuni -->
-                        <div class="cand-actions">
-                            <a class="btn btn-primary" href="/candidat/{{ candidate.id }}">Detalii</a>
-                            {% if candidate.cv_file %}
-                                <a class="btn btn-cv" href="/cv/{{ candidate.id }}" target="_blank">CV</a>
-                            {% endif %}
-                        </div>
+                            <!-- COL 3: toate posturile analizate cu scorurile lor -->
+                            <div class="col-matches">
+                                <div class="mini-label">Posturi analizate</div>
+                                <div class="matches">
+                                    {% for match in row.matches[:5] %}
+                                        <a href="/candidat/{{ match.id }}" class="match-chip {% if (match.score or 0) >= 70 %}chip-top{% elif (match.score or 0) >= 45 %}chip-potential{% else %}chip-low{% endif %}">
+                                            {{ match.job_title }}&nbsp;<strong>{{ match.score }}</strong>
+                                        </a>
+                                    {% endfor %}
+                                    {% if row.matches|length > 5 %}
+                                        <span class="match-more">+{{ row.matches|length - 5 }} altele</span>
+                                    {% endif %}
+                                    {% if row.matches|length == 0 %}
+                                        <span class="match-more">Nicio analiza disponibila</span>
+                                    {% endif %}
+                                </div>
+                            </div>
 
-                    </div>
+                            <!-- COL 4: actiuni -->
+                            <div class="actions-inline">
+                                <a class="btn btn-primary" href="/candidat/{{ best.id if best else candidate.id }}">Detalii</a>
+                                <a class="btn btn-cv" href="/cv/{{ best.id if best else candidate.id }}" target="_blank">CV</a>
+                                {% set sc = sc_by_candidate.get((best.id if best else candidate.id)) %}
+                                {% if sc %}
+                                {% set sc_avg = ((sc.technical_skills_score or 0) + (sc.attention_to_detail_score or 0) + (sc.communication_score or 0) + (sc.team_fit_score or 0)) / 4 %}
+                                <span class="sc-badge {% if sc_avg >= 4 %}sc-green{% elif sc_avg >= 3 %}sc-mid{% else %}sc-low{% endif %}">
+                                    ★ {{ "%.1f"|format(sc_avg) }} · {{ sc.overall_recommendation }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </article>
                 {% endfor %}
-            </div>
+            </section>
         {% endif %}
 
         {% if total_pages > 1 %}
         <div class="pagination">
             {% if page > 1 %}
-                <a class="page-btn" href="?q={{ q }}&job={{ job }}&page={{ page - 1 }}">← Prev</a>
+                <a class="page-btn" href="?q={{ q }}&status={{ status }}&job={{ job }}&skill={{ skill }}&min_score={{ min_score }}&page={{ page - 1 }}">← Prev</a>
             {% else %}
                 <span class="page-btn disabled">← Prev</span>
             {% endif %}
+
             <span class="page-info">Pagina {{ page }} din {{ total_pages }}</span>
+
             {% if page < total_pages %}
-                <a class="page-btn" href="?q={{ q }}&job={{ job }}&page={{ page + 1 }}">Next →</a>
+                <a class="page-btn" href="?q={{ q }}&status={{ status }}&job={{ job }}&skill={{ skill }}&min_score={{ min_score }}&page={{ page + 1 }}">Next →</a>
             {% else %}
                 <span class="page-btn disabled">Next →</span>
             {% endif %}
         </div>
         {% endif %}
-
     </main>
 </div>
 
@@ -393,6 +892,5 @@ html[data-theme="light"] .btn-ghost{color:#374151 !important;border-color:rgba(7
   <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
   <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
 </button>
-
 </body>
 </html>

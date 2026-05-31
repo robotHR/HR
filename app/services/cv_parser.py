@@ -1078,6 +1078,101 @@ def _is_domain_incompatible(natural_role, target_job, cv_text=""):
 VALID_CLUSTERS = {"blue_collar", "constructii_tehnic", "tech_ing", "medical", "business", "support", "educatie"}
 
 
+# ─── REALISTIC ROLE MATCHING ────────────────────────────────────────────────
+# Folosit ca gard local peste scorul AI. AI-ul poate vedea abilitati transferabile,
+# dar lista de TOP trebuie sa semene cu decizia unui recruiter real.
+_ROLE_FAMILY_KEYWORDS = [
+    ("ospatar", ["ospatar", "chelner", "chelnerita", "server", "waiter", "waitress", "servire clienti", "servirea clientilor", "servit clienti", "servire la masa"]),
+    ("barman_barista", ["barman", "barista", "bartender", "preparare bauturi", "cafea", "bar"]),
+    ("bucatar", ["bucatar", "bucatarie", "ajutor bucatar", "commis", "chef", "preparare mancare"]),
+    ("receptioner_hotel", ["receptioner hotel", "receptie hotel", "front desk", "agent rezervari", "rezervari hotel", "hotel", "pensiune", "turism"]),
+    ("casier", ["casier", "casierie", "casa de marcat", "pos", "incasari", "numerar", "operator casa"]),
+    ("retail_vanzari", ["lucrator comercial", "vanzator", "vanzatoare", "retail", "magazin", "raion", "merchandiser", "consilier vanzari"]),
+    ("depozit", ["manipulant", "depozit", "picker", "ambalator", "ambalare", "marfa", "gestionar", "incarcare", "descarcare", "stivuitor", "logistica"]),
+    ("sofer", ["sofer", "conducator auto", "curier", "livrator", "tir", "camion", "distributie", "transport", "categoria b", "categoria c", "categoria ce"]),
+    ("productie", ["operator productie", "muncitor productie", "linie productie", "asamblare", "fabrica", "control calitate", "productie"]),
+    ("call_center", ["call center", "operator call", "customer support", "suport clienti", "relatii clienti", "client service", "telemarketing"]),
+    ("marketing", ["marketing", "digital marketing", "social media", "seo", "ppc", "content", "brand", "campanii", "google ads", "meta ads"]),
+    ("programator", ["programator", "software developer", "developer", "python", "javascript", "java", "react", "backend", "frontend", "it software"]),
+    ("inginer", ["inginer", "proiectant", "cad", "autocad", "solidworks", "inginer productie", "inginer mecanic", "inginer electric"]),
+    ("contabil", ["contabil", "contabilitate", "economist", "facturare", "bilant", "saga", "winmentor", "financiar"]),
+    ("hr", ["recrutor", "recruiter", "resurse umane", "hr specialist", "hr generalist", "talent acquisition"]),
+    ("juridic", ["jurist", "avocat", "consilier juridic", "drept", "legal"]),
+    ("mecanic_auto", ["mecanic auto", "service auto", "tinichigiu", "vopsitor auto", "diagnoza auto", "electromecanic"]),
+    ("paza", ["agent paza", "paznic", "securitate", "supraveghere", "bodyguard"]),
+]
+
+_NEAR_ROLE_FAMILIES = {
+    "ospatar": {"barman_barista", "receptioner_hotel"},
+    "barman_barista": {"ospatar", "receptioner_hotel"},
+    "bucatar": {"barman_barista", "ospatar"},
+    "receptioner_hotel": {"ospatar", "barman_barista", "call_center"},
+    "casier": {"retail_vanzari"},
+    "retail_vanzari": {"casier", "call_center"},
+    "depozit": {"productie", "sofer", "retail_vanzari"},
+    "sofer": {"depozit", "curier"},
+    "productie": {"depozit", "mecanic_auto"},
+    "marketing": {"retail_vanzari", "call_center"},
+    "call_center": {"retail_vanzari", "receptioner_hotel"},
+    "mecanic_auto": {"productie", "inginer"},
+    "inginer": {"productie", "mecanic_auto"},
+    "contabil": {"hr"},
+    "hr": {"call_center", "contabil"},
+}
+
+_TRANSFERABLE_ROLE_FAMILIES = {
+    "ospatar": {"bucatar", "retail_vanzari", "call_center"},
+    "casier": {"call_center", "depozit"},
+    "depozit": {"paza", "mecanic_auto"},
+    "marketing": {"hr", "contabil"},
+    "call_center": {"casier", "marketing"},
+    "retail_vanzari": {"marketing", "depozit"},
+}
+
+
+def _detect_role_family(text):
+    t = normalize_text(text or "")
+    if not t:
+        return None
+    for family, keywords in _ROLE_FAMILY_KEYWORDS:
+        for kw in keywords:
+            if kw in t:
+                return family
+    return None
+
+
+def _role_match_level(candidate_text, target_job):
+    """
+    3 = potrivire directa, recruiterul l-ar pune in TOP
+    2 = apropiat, merita vazut dupa candidatii directi
+    1 = transferabil slab, poate ramane jos
+    0 = domeniu gresit pentru jobul cautat
+    """
+    target_family = _detect_role_family(target_job)
+    if not target_family:
+        return 1
+
+    ctext = normalize_text(candidate_text or "")
+    target_words = [w for w in re.findall(r"[a-z0-9]+", normalize_text(target_job)) if len(w) >= 4]
+    if target_words and any(w in ctext for w in target_words):
+        return 3
+
+    candidate_family = _detect_role_family(ctext)
+    if not candidate_family:
+        return 1
+    if candidate_family == target_family:
+        return 3
+    if candidate_family in _NEAR_ROLE_FAMILIES.get(target_family, set()):
+        return 2
+    if candidate_family in _TRANSFERABLE_ROLE_FAMILIES.get(target_family, set()):
+        return 1
+    return 0
+
+
+def realistic_role_match_level(candidate_text, target_job):
+    return _role_match_level(candidate_text, target_job)
+
+
 def _validate_cluster(val, fallback_text=""):
     """Valideaza si returneaza un super-cluster valid, cu fallback la keyword detection."""
     v = as_text(val).lower().strip().replace("-", "_").replace(" ", "_")
@@ -1094,6 +1189,45 @@ def _validate_cluster(val, fallback_text=""):
 def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_cluster=None, job_cluster=None):
     cv = normalize_text(cv_text)
     combined = normalize_text(" ".join([as_text(data.get(k,"")) for k in ["name","position","summary","strengths","skills"]]) + " " + cv[:3000])
+
+    # ── Regula 0: potrivire realista pe rol, inainte de scor AI ───────────────
+    role_text = " ".join([as_text(data.get("position", "")), as_text(data.get("recommended_role_for_candidate", "")), combined])
+    role_level = _role_match_level(role_text, target_job)
+    data["realistic_role_match_level"] = role_level
+
+    if role_level == 0:
+        data["score"] = min(clean_score(data.get("score", 0)), 34)
+        data["recommendation"] = "REJECT"
+        data["priority"] = "LOW"
+        data["recommended_next_action"] = "REJECT"
+        data["level_mismatch"] = "HIGH"
+        clean_visible = strip_risk_text(data.get("summary", ""))
+        data["summary"] = set_summary_risk(
+            f"Profilul profesional nu este realist pentru postul cautat. {clean_visible}",
+            over_risk="low", level_risk="high"
+        )
+    elif role_level == 1:
+        data["score"] = min(clean_score(data.get("score", 0)), 52)
+        if data.get("recommendation") == "ACCEPT":
+            data["recommendation"] = "CONSIDER"
+        if data.get("priority") == "HIGH":
+            data["priority"] = "MEDIUM"
+        if data.get("recommended_next_action") == "CALL_NOW":
+            data["recommended_next_action"] = "CALL_LATER"
+        data["level_mismatch"] = data.get("level_mismatch") or "MEDIUM"
+    elif role_level == 2:
+        data["score"] = min(clean_score(data.get("score", 0)), 68)
+        if data.get("priority") == "HIGH":
+            data["priority"] = "MEDIUM"
+    elif role_level == 3 and clean_score(data.get("score", 0)) < 70:
+        # Candidatul are rol direct. Nu il tinem sub soferi/programatori doar
+        # pentru ca AI-ul a apreciat gresit stabilitatea sau un detaliu secundar.
+        data["score"] = 70
+        if data.get("recommendation") == "REJECT":
+            data["recommendation"] = "CONSIDER"
+        if data.get("priority") == "LOW":
+            data["priority"] = "MEDIUM"
+        data["recommended_next_action"] = data.get("recommended_next_action") or "CALL_NOW"
 
     # ── Regula 1: supracalificare academica pentru rol operational ─────────────
     operational_domains = ["Operational", "Depozit Logistica", "Retail Financiar", "Retail", "Transport Soferie", "Transport Livrari", "Productie", "Constructii", "HoReCa", "Facility", "Securitate"]

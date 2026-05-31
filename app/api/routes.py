@@ -707,14 +707,11 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
     for _, items in grouped.items():
         sorted_items = sorted(items, key=lambda item: (item.score or 0, item.id or 0), reverse=True)
         best = sorted_items[0]
-        best_score = best.score or 0
-
-        if min_score and best_score < min_score:
-            continue
 
         if status_value and not any((item.status or "") == status_value for item in sorted_items):
             continue
 
+        # Filtru job: candidatul trebuie sa aiba cel putin o analiza pentru jobul cautat
         if job_value and not any(
             job_value in (item.job_title or "").lower()
             or job_value in (item.position or "").lower()
@@ -728,9 +725,33 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
         if q_value and not any(q_value in candidate_search_blob(item) for item in sorted_items):
             continue
 
+        # Cand filtrul de job e activ, scorul afisat = scorul pe jobul cautat (nu best overall)
+        if job_value:
+            job_items = [item for item in sorted_items
+                         if job_value in (item.job_title or "").lower()
+                         or job_value in (item.position or "").lower()]
+            job_items_sorted = sorted(job_items, key=lambda x: x.score or 0, reverse=True)
+            display_best = job_items_sorted[0] if job_items_sorted else best
+            display_score = display_best.score or 0
+        else:
+            display_best = best
+            display_score = best.score or 0
+
+        if min_score and display_score < min_score:
+            continue
+
+        # Construieste lista de matches, cu jobul cautat primul daca filtrul e activ
         matches = []
         seen_jobs = set()
-        for item in sorted_items:
+        all_items_ordered = sorted_items
+
+        if job_value:
+            # Punem jobul cautat primul, restul dupa scor
+            job_first = [i for i in sorted_items if job_value in (i.job_title or "").lower() or job_value in (i.position or "").lower()]
+            rest = [i for i in sorted_items if i not in job_first]
+            all_items_ordered = job_first + rest
+
+        for item in all_items_ordered:
             job_name = item.job_title or item.position or "Nespecificat"
             key = (job_name or "").strip().lower()
             if key in seen_jobs:
@@ -748,9 +769,9 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
 
         rows.append({
             "candidate": best,
-            "best_match": matches[0] if matches else None,
+            "best_match": display_best,
             "matches": matches,
-            "best_score": best_score,
+            "best_score": display_score,
             "match_count": len(matches),
             "emails": sorted({item.email for item in sorted_items if item.email}),
             "phones": sorted({item.phone for item in sorted_items if item.phone}),

@@ -1261,6 +1261,16 @@ async def select_candidate(candidate_id: int):
     return RedirectResponse(url=f"/candidat/{candidate_id}?message=Status actualizat: Potential Candidat.", status_code=303)
 
 
+@router.post("/candidat/{candidate_id}/quick-status")
+async def quick_status_update(candidate_id: int, new_status: str = Form("")):
+    """Schimba rapid statusul dintr-un dropdown inline, fara redirect."""
+    ALLOWED = ["NOU", "CONTACTAT", "INTERVIU", "SELECTAT", "RESPINS", "ANGAJAT", "EXCLUS"]
+    if new_status not in ALLOWED:
+        return {"ok": False, "error": "Status invalid"}
+    update_candidate_status(candidate_id, new_status)
+    return {"ok": True, "status": new_status}
+
+
 @router.post("/analizeaza-job")
 async def analyze_job(target_job: str = Form(...)):
     batch_id = str(int(time.time()))

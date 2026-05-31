@@ -192,115 +192,110 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .stats-row{grid-template-columns:repeat(3,1fr) !important}
 
 /* ── CANDIDATE LIST ── */
-.candidate-list{display:grid;gap:10px}
+.candidate-list{display:grid;gap:12px}
 
 .candidate-card{
   background:var(--s1);
   border:1px solid var(--line);
   border-radius:var(--rxl);
-  padding:16px 20px;
+  padding:20px 24px;
   transition:.18s;
   position:relative;
   overflow:hidden;
 }
 .candidate-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  border-radius:3px 0 0 3px;
-  background:transparent;transition:.18s;
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  border-radius:4px 0 0 4px;background:transparent;transition:.18s;
 }
-.candidate-card:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,0,0,.22)}
+.candidate-card:hover{border-color:var(--bline);transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.26)}
 .candidate-card:hover::before{background:var(--blue)}
 
-/* 2-column grid: info | actions */
+/* 3-column grid: identity | professional info | AI + actions */
 .card-grid{
   display:grid;
-  grid-template-columns:1fr auto;
-  gap:16px;
-  align-items:center;
+  grid-template-columns:270px 1fr 230px;
+  gap:20px;
+  align-items:start;
 }
 
-/* COL 1 — candidat info */
-.candidate-main{display:flex;align-items:flex-start;gap:11px}
-.avatar{width:42px;height:42px;font-size:15px;flex-shrink:0;border-radius:50%}
-.cand-info{display:flex;flex-direction:column;gap:2px;min-width:0}
-.name{font-size:14px;font-weight:800;color:#fff;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
-.cand-status{margin-top:5px}
-
-/* COL 2 — best role */
-.col-best{display:flex;flex-direction:column;gap:6px}
-.mini-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em}
-.best-role{display:flex;align-items:center;gap:9px}
-.role-info{display:flex;flex-direction:column;gap:2px}
-.role-title{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
-.role-sub{font-size:11px;color:var(--muted)}
-
-/* Score circle */
-.score-cell{
+/* ── COL 1: IDENTITY ── */
+.col-identity{display:flex;align-items:flex-start;gap:13px}
+.c-avatar{
+  width:52px;height:52px;font-size:18px;flex-shrink:0;border-radius:50%;
   display:inline-flex;align-items:center;justify-content:center;
-  width:36px;height:36px;border-radius:50%;
-  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;
-  flex-shrink:0;
+  font-weight:800;color:#07111f;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
 }
-.score-cell.score-green{background:var(--teal);color:#07111f}
-.score-cell.score-yellow{background:var(--yellow);color:#07111f}
-.score-cell.score-red{background:var(--red);color:#fff}
-
-/* COL 3 — matches */
-.col-matches{display:flex;flex-direction:column;gap:6px}
-.matches{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.match-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:4px 9px;border-radius:8px;
-  background:rgba(255,255,255,.04);border:1px solid var(--line);
-  font-size:11px;color:var(--soft);
-  transition:.15s;
-}
-.match-chip:hover{border-color:var(--bline);background:var(--bsoft)}
-.match-chip.chip-potential{background:var(--ysoft);border-color:var(--yline);color:#fcd38a}
-.match-chip.chip-potential strong{color:#fcd38a}
-.match-chip strong{color:#fff;font-weight:800;font-size:11px}
-.match-chip.low{opacity:.55}
-.match-more{font-size:10px;color:var(--muted);padding:2px 0}
-
-/* COL 4 — actions */
-.actions-inline{display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:stretch;min-width:80px}
-.actions-inline .btn{justify-content:center;padding:8px 14px;font-size:12px}
-
-/* ── TAGS unified ── */
-.tag{
-  display:inline-flex;align-items:center;
-  padding:3px 9px;border-radius:999px;
-  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
-}
+.c-info{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.c-name{font-size:15px;font-weight:800;color:#fff;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-line{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.c-line svg{width:12px;height:12px;flex-shrink:0;opacity:.6}
+.c-line span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.c-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
 .tag-green{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
 .tag-yellow{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
 .tag-red{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
 .tag-blue{background:var(--bsoft);border:1px solid var(--bline);color:var(--b2)}
 .tag-muted{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--soft)}
+.tag-family{background:rgba(93,169,255,.08);border:1px solid rgba(93,169,255,.2);color:var(--b2);
+  font-size:9px;letter-spacing:.08em}
 
-/* ── AI SUGGESTION — sub best-role ── */
-.ai-suggestion{
-  display:inline-flex;align-items:center;gap:5px;
-  margin-top:4px;
-  font-size:11px;color:var(--b2);line-height:1.3;
+/* ── COL 2: PROFESSIONAL INFO ── */
+.col-professional{display:flex;flex-direction:column;gap:10px;padding-top:2px}
+.c-section-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.12em;margin-bottom:3px}
+.c-position{font-size:14px;font-weight:700;color:#fff;line-height:1.3}
+.c-experience{font-size:12px;color:var(--soft);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.skill-chip{
+  display:inline-flex;align-items:center;
+  padding:4px 10px;border-radius:8px;
+  font-size:11px;font-weight:700;
+  background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--soft);
+  transition:.12s;
 }
-.ai-sugg-label{
-  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.10em;
-  background:var(--bsoft);border:1px solid var(--bline);color:var(--b2);
-  padding:1px 6px;border-radius:999px;white-space:nowrap;flex-shrink:0;
-}
+.skill-chip:hover{background:var(--bsoft);border-color:var(--bline);color:var(--b2)}
+.c-divider{border:none;border-top:1px solid var(--line);margin:4px 0}
 
-/* ── PRIORITY BADGE ── */
-.priority-badge{
-  display:inline-flex;align-items:center;gap:4px;
+/* ── COL 3: AI + ACTIONS ── */
+.col-actions{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.ai-rec-box{
+  background:rgba(93,169,255,.07);
+  border:1px solid rgba(93,169,255,.18);
+  border-radius:14px;
+  padding:12px 14px;
+}
+.ai-rec-label{font-size:9px;font-weight:900;color:var(--b2);text-transform:uppercase;
+  letter-spacing:.14em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.ai-rec-label svg{width:11px;height:11px;opacity:.8}
+.ai-rec-role{font-size:14px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:5px}
+.ai-rec-sub{font-size:11px;color:var(--muted)}
+.ai-rec-family{
+  display:inline-flex;align-items:center;margin-top:6px;
   padding:2px 8px;border-radius:999px;
   font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;
-  margin-top:4px;
+  background:rgba(34,199,184,.12);border:1px solid var(--tline);color:var(--t2);
 }
-.priority-high{background:rgba(34,199,184,.18);border:1px solid var(--tline);color:var(--t2)}
-.priority-medium{background:rgba(245,158,11,.15);border:1px solid var(--yline);color:#fcd38a}
-.priority-low{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.action-btns .btn{justify-content:center;padding:9px 10px;font-size:12px}
+.status-select-wrap{position:relative}
+.status-quick-select{
+  width:100%;padding:8px 10px;border-radius:10px;
+  border:1px solid var(--line2);background:rgba(255,255,255,.05);
+  color:var(--soft);font-size:12px;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  -webkit-appearance:none;appearance:none;
+}
+.status-quick-select:focus{border-color:var(--bline);outline:none}
+.status-saved-msg{
+  font-size:10px;font-weight:800;color:var(--t2);text-align:center;
+  margin-top:3px;opacity:0;transition:.3s;
+}
+.status-saved-msg.show{opacity:1}
 
 /* ── PAGINATION ── */
 .pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;padding-bottom:8px}
@@ -316,30 +311,20 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .page-btn.disabled{opacity:.35;pointer-events:none}
 .page-info{font-size:12px;color:var(--muted);font-weight:700}
 
-/* ── AI SCORE BADGE — sub best-role ── */
-.ai-badge{
-  display:inline-flex;align-items:center;
-  padding:2px 8px;border-radius:999px;
-  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
-  margin-top:5px;
-}
+/* legacy compat */
+.mini-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.10em}
+.match-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:8px;
+  font-size:11px;color:var(--soft);background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.ai-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-top:5px}
 .ai-badge.top{background:var(--tsoft);border:1px solid var(--tline);color:var(--t2)}
 .ai-badge.potential{background:var(--ysoft);border:1px solid var(--yline);color:#fcd38a}
 .ai-badge.other{background:var(--rsoft);border:1px solid var(--rline);color:#ffb4b7}
-
-/* ── MATCH CHIPS colorate după scor ── */
-.match-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:4px 9px;border-radius:8px;
-  font-size:11px;color:var(--soft);
-  background:rgba(255,255,255,.04);border:1px solid var(--line);
-  transition:.15s;
-}
-.match-chip strong{font-weight:800;font-size:11px}
-.match-chip.chip-top{background:var(--tsoft);border-color:var(--tline);color:var(--t2)}
-.match-chip.chip-top strong{color:var(--t2)}
-.match-chip.chip-low{background:var(--rsoft);border-color:var(--rline);color:#ffb4b7}
-.match-chip.chip-low strong{color:#ffb4b7}
+.priority-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;
+  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.priority-high{background:rgba(34,199,184,.18);border:1px solid var(--tline);color:var(--t2)}
+.priority-medium{background:rgba(245,158,11,.15);border:1px solid var(--yline);color:#fcd38a}
+.priority-low{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
 
 /* ─── BOTTOM NAV hidden on desktop ─── */
 .bnav{display:none}
@@ -394,34 +379,24 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   /* tables scroll horizontally */
   .cand-table-wrap,.table-card{overflow-x:auto !important}
 
-  /* candidate card — layout vertical curat pe mobile */
+  /* candidate card — stack vertical pe mobile */
   .stats-row{grid-template-columns:repeat(2,1fr) !important}
   .card-grid{
     display:flex !important;
-    flex-direction:row !important;
-    gap:12px !important;
-    align-items:center !important;
+    flex-direction:column !important;
+    gap:14px !important;
   }
-  .candidate-card{overflow-x:hidden;padding:14px 16px !important}
+  .candidate-card{overflow-x:hidden;padding:16px !important}
   .candidate-card::before{display:none}
-  .candidate-main{align-items:flex-start !important;margin-bottom:10px}
-  .cand-info{min-width:0;flex:1}
-  .name{font-size:14px !important;white-space:normal !important;overflow:visible !important}
-  .small{max-width:100% !important;white-space:normal !important;overflow:visible !important}
-  .col-best{padding:10px 0 !important;border-top:1px solid var(--line) !important}
-  .col-matches{padding:10px 0 !important;border-top:1px solid var(--line) !important}
-  .best-role{align-items:center !important}
-  .role-title{font-size:13px !important}
-  .matches{gap:5px !important}
-  .match-chip{font-size:11px !important;padding:4px 8px !important}
-  .actions-inline{
-    flex-direction:row !important;
-    padding-top:10px !important;
-    border-top:1px solid var(--line) !important;
-    min-width:unset !important;
-    align-items:stretch !important;
-  }
-  .actions-inline .btn{flex:1 !important;justify-content:center !important;font-size:13px !important;padding:10px 14px !important}
+  .col-identity{gap:10px !important}
+  .c-avatar{width:44px !important;height:44px !important;font-size:15px !important}
+  .c-name{font-size:14px !important}
+  .c-line span{max-width:100% !important}
+  .col-professional{padding-top:0 !important;border-top:1px solid var(--line);padding-top:12px !important}
+  .col-actions{border-top:1px solid var(--line);padding-top:12px !important}
+  .action-btns{grid-template-columns:1fr 1fr !important}
+  .c-skills{gap:4px !important}
+  .skill-chip{font-size:10px !important;padding:3px 8px !important}
 
   /* job_applicants */
   .cand-card{grid-template-columns:42px 1fr !important}
@@ -624,45 +599,30 @@ html[data-theme="light"] .nav a.logout-link:hover{
   background:rgba(248,113,113,.08) !important;
 }
 
-/* Light mode text fix pentru continutul paginii Candidati */
+/* Light mode text fix */
 html[data-theme="light"] .main,
 html[data-theme="light"] .page-title,
-html[data-theme="light"] h1,
-html[data-theme="light"] h2,
-html[data-theme="light"] h3,
-html[data-theme="light"] .section-title,
+html[data-theme="light"] h1,html[data-theme="light"] h2,html[data-theme="light"] h3,
 html[data-theme="light"] .stat-value,
-html[data-theme="light"] .name,
-html[data-theme="light"] .role-title,
-html[data-theme="light"] .match-chip strong,
-html[data-theme="light"] .best-role,
+html[data-theme="light"] .c-name,
+html[data-theme="light"] .c-position,
+html[data-theme="light"] .ai-rec-role,
 html[data-theme="light"] .candidate-card,
-html[data-theme="light"] .filters,
-html[data-theme="light"] .card,
-html[data-theme="light"] .panel{
-  color:#07111f !important;
-}
-html[data-theme="light"] .page-sub,
-html[data-theme="light"] .hero-sub,
-html[data-theme="light"] .section-sub,
-html[data-theme="light"] .subtitle,
-html[data-theme="light"] .small,
-html[data-theme="light"] .role-sub,
-html[data-theme="light"] .mini-label,
+html[data-theme="light"] .filters{color:#07111f !important}
+html[data-theme="light"] .c-line,
+html[data-theme="light"] .c-experience,
+html[data-theme="light"] .c-section-label,
+html[data-theme="light"] .ai-rec-sub,
 html[data-theme="light"] .stat-label,
-html[data-theme="light"] .stat-help,
-html[data-theme="light"] .helper-text,
-html[data-theme="light"] .match-more{
-  color:#4b5563 !important;
-}
+html[data-theme="light"] .stat-help{color:#4b5563 !important}
 html[data-theme="light"] .stat-card,
 html[data-theme="light"] .candidate-card,
 html[data-theme="light"] .filters,
 html[data-theme="light"] .card,
-html[data-theme="light"] .panel{
-  background:#fff !important;
-  border-color:rgba(7,17,31,.10) !important;
-}
+html[data-theme="light"] .panel{background:#fff !important;border-color:rgba(7,17,31,.10) !important}
+html[data-theme="light"] .ai-rec-box{background:rgba(37,99,235,.06) !important;border-color:rgba(37,99,235,.18) !important}
+html[data-theme="light"] .skill-chip{background:rgba(0,0,0,.05) !important;border-color:rgba(0,0,0,.12) !important;color:#374151 !important}
+html[data-theme="light"] .status-quick-select{background:#f3f7fb !important;color:#07111f !important;border-color:rgba(7,17,31,.16) !important}
 html[data-theme="light"] input,
 html[data-theme="light"] select,
 html[data-theme="light"] textarea{
@@ -767,27 +727,129 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
                 {% for row in candidate_rows %}
                     {% set candidate = row.candidate %}
                     {% set best = row.best_match %}
+                    {% set cid = best.id if best else candidate.id %}
+                    {% set ai_role = (best.position or best.job_title or "") if best else "" %}
+                    {% set ai_family = (best.candidate_family or best.candidate_cluster or "") if best else "" %}
+                    {% set raw_skills = (candidate.skills or "") %}
+                    {% set skill_list = raw_skills.replace('\n',',').replace('•',',').replace(';',',').split(',') %}
+
                     <article class="candidate-card">
                         <div class="card-grid">
 
-                            <!-- COL 1: info candidat -->
-                            <div class="candidate-main">
-                                <div class="avatar">{{ (candidate.name or "?")[0] | upper }}</div>
-                                <div class="cand-info">
-                                    <div class="name">{{ candidate.name or "Candidat necunoscut" }}</div>
-                                    <div class="small">{{ candidate.email or "Email lipsa" }}</div>
-                                    <div class="small">{{ candidate.phone or "Telefon lipsa" }}</div>
-                                    <div class="small">{{ candidate.companies or "" }}{% if candidate.position %} · {{ candidate.position }}{% endif %}</div>
-                                    <div class="cand-status">
+                            <!-- COL 1: IDENTITY -->
+                            <div class="col-identity">
+                                <div class="c-avatar">{{ (candidate.name or "?")[0] | upper }}</div>
+                                <div class="c-info">
+                                    <div class="c-name">{{ candidate.name or "Candidat necunoscut" }}</div>
+
+                                    {% if candidate.email %}
+                                    <div class="c-line">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                        <span>{{ candidate.email }}</span>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if candidate.phone %}
+                                    <div class="c-line">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.08 3.4 2 2 0 0 1 3.05 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.13a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+                                        <span>{{ candidate.phone }}</span>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if candidate.companies %}
+                                    <div class="c-line">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                                        <span>{{ candidate.companies | truncate(40, true, '…') }}</span>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="c-badges">
                                         <span class="tag tag-{{ status_class(candidate.status) }}">{{ status_display(candidate.status) }}</span>
+                                        {% if ai_family %}
+                                            <span class="tag tag-family">{{ ai_family.replace('_',' ') }}</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- COL 2: actiuni -->
-                            <div class="actions-inline">
-                                <a class="btn btn-primary" href="/candidat/{{ best.id if best else candidate.id }}">Detalii</a>
-                                <a class="btn btn-cv" href="/cv/{{ best.id if best else candidate.id }}" target="_blank">CV</a>
+                            <!-- COL 2: PROFESSIONAL INFO -->
+                            <div class="col-professional">
+                                {% if candidate.position %}
+                                <div>
+                                    <div class="c-section-label">Pozitie curenta</div>
+                                    <div class="c-position">{{ candidate.position }}</div>
+                                </div>
+                                {% endif %}
+
+                                {% set skills_shown = namespace(count=0) %}
+                                {% set has_skills = [] %}
+                                {% for sk in skill_list %}
+                                    {% set sk_clean = sk.strip() %}
+                                    {% if sk_clean and sk_clean|length > 1 and sk_clean|length < 40 and has_skills|length < 7 %}
+                                        {% if has_skills.append(sk_clean) %}{% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if has_skills %}
+                                <div>
+                                    <div class="c-section-label">Competente</div>
+                                    <div class="c-skills">
+                                        {% for sk in has_skills %}
+                                            <span class="skill-chip">{{ sk }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if candidate.experience %}
+                                <div>
+                                    <div class="c-section-label">Experienta</div>
+                                    <div class="c-experience">{{ candidate.experience | truncate(140, true, '…') }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- COL 3: AI RECOMMENDATION + ACTIONS -->
+                            <div class="col-actions">
+
+                                {% if ai_role %}
+                                <div class="ai-rec-box">
+                                    <div class="ai-rec-label">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                                        Pozitie recomandata AI
+                                    </div>
+                                    <div class="ai-rec-role">{{ ai_role }}</div>
+                                    {% if best and best.job_title and best.job_title != ai_role %}
+                                        <div class="ai-rec-sub">Evaluat pentru: {{ best.job_title }}</div>
+                                    {% endif %}
+                                    {% if ai_family %}
+                                        <div class="ai-rec-family">{{ ai_family.replace('_',' ') }}</div>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <div class="ai-rec-box" style="opacity:.45">
+                                    <div class="ai-rec-label">Pozitie recomandata AI</div>
+                                    <div class="ai-rec-sub" style="font-size:12px">Fara analiza inca</div>
+                                </div>
+                                {% endif %}
+
+                                <div class="action-btns">
+                                    <a class="btn btn-primary" href="/candidat/{{ cid }}">Detalii</a>
+                                    <a class="btn btn-cv" href="/cv/{{ cid }}" target="_blank">CV</a>
+                                </div>
+
+                                <div class="status-select-wrap">
+                                    <select class="status-quick-select"
+                                            onchange="quickStatusUpdate({{ cid }}, this)"
+                                            data-current="{{ candidate.status or 'NOU' }}">
+                                        {% for s in ['NOU','CONTACTAT','INTERVIU','SELECTAT','RESPINS','ANGAJAT','EXCLUS'] %}
+                                            <option value="{{ s }}" {% if (candidate.status or 'NOU') == s %}selected{% endif %}>
+                                                {{ status_display(s) }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="status-saved-msg" id="msg-{{ cid }}">✓ Salvat</div>
+                                </div>
+
                             </div>
 
                         </div>
@@ -824,6 +886,44 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
   <a class="bn" href="/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
 </nav>
 
+<script>
+function quickStatusUpdate(cid, sel) {
+    const newStatus = sel.value;
+    const msgEl = document.getElementById('msg-' + cid);
+    const fd = new FormData();
+    fd.append('new_status', newStatus);
+    fetch('/candidat/' + cid + '/quick-status', {method: 'POST', body: fd})
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                sel.dataset.current = newStatus;
+                if (msgEl) {
+                    msgEl.classList.add('show');
+                    setTimeout(() => msgEl.classList.remove('show'), 1800);
+                }
+                // Actualizeaza badge-ul de status din cardul curent
+                const card = sel.closest('.candidate-card');
+                if (card) {
+                    const badge = card.querySelector('.tag[class*="tag-"]');
+                    if (badge) {
+                        const labels = {
+                            'NOU':'Nou','CONTACTAT':'Contactat','INTERVIU':'Interviu',
+                            'SELECTAT':'Potential candidat','RESPINS':'Potrivit altor roluri',
+                            'ANGAJAT':'Angajat','EXCLUS':'Exclus'
+                        };
+                        const classes = {
+                            'NOU':'tag-blue','CONTACTAT':'tag-yellow','INTERVIU':'tag-green',
+                            'SELECTAT':'tag-green','RESPINS':'tag-yellow','ANGAJAT':'tag-green','EXCLUS':'tag-red'
+                        };
+                        badge.textContent = labels[newStatus] || newStatus;
+                        badge.className = 'tag ' + (classes[newStatus] || 'tag-muted');
+                    }
+                }
+            }
+        })
+        .catch(() => { sel.value = sel.dataset.current; });
+}
+</script>
 <button class="login-theme-btn" onclick="toggleNexasTheme()" title="Schimba tema">
   <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
   <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>

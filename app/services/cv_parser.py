@@ -951,6 +951,23 @@ def _process_single_cv(args):
         return {"file": file, "data": None, "from_cache": False, "error": str(e)}
 
 
+def _get_already_analyzed_files(target_job):
+    """Returneaza setul de cv_file-uri deja salvate in Candidate DB pentru acest job."""
+    db = SessionLocal()
+    try:
+        rows = db.query(Candidate.cv_file).filter(
+            Candidate.job_title == target_job,
+            Candidate.cv_file != None,
+            Candidate.cv_file != ""
+        ).all()
+        return {r.cv_file for r in rows}
+    except Exception as e:
+        logger.warning(f"Nu s-au putut verifica candidatii existenti: {e}")
+        return set()
+    finally:
+        db.close()
+
+
 # ─── MAIN ENTRY POINT ─────────────────────────────────────────────────────────
 
 def process_cvs_for_job(target_job, job_requirements=None):
@@ -979,64 +996,74 @@ def process_cvs_for_job(target_job, job_requirements=None):
     if not all_files:
         return {"ok": False, "message": "Nu exista CV-uri. Verifica Cloudinary sau incarca CV-uri.", "saved": 0}
 
+    # Pre-check: care CV-uri sunt deja analizate si salvate in DB pentru acest job?
+    already_in_db = _get_already_analyzed_files(target_job)
+    new_files = [f for f in all_files if f not in already_in_db]
+    db_skipped = len(already_in_db.intersection(set(all_files)))
+
+    print(f"\nTotal CV-uri: {len(all_files)} | Deja in DB: {db_skipped} | De analizat: {len(new_files)}")
+    print("=" * 70)
+
     cache_hits = 0
     fresh_analyses = 0
     saved = 0
     results = []
 
-    tasks = [(file, target_job, profile, job_requirements) for file in all_files]
+    if new_files:
+        tasks = [(file, target_job, profile, job_requirements) for file in new_files]
 
-    print(f"\nProcesez {len(tasks)} CV-uri pentru postul: {target_job}")
-    print("=" * 70)
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {executor.submit(_process_single_cv, task): task[0] for task in tasks}
 
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        futures = {executor.submit(_process_single_cv, task): task[0] for task in tasks}
+            for future in as_completed(futures):
+                result = future.result()
+                file = result["file"]
 
-        for future in as_completed(futures):
-            result = future.result()
-            file = result["file"]
+                if result["error"]:
+                    print(f"✗ EROARE {file}: {result['error']}")
+                    continue
 
-            if result["error"]:
-                print(f"✗ EROARE {file}: {result['error']}")
-                continue
+                data = result["data"]
+                if not data:
+                    continue
 
-            data = result["data"]
-            if not data:
-                continue
+                if result["from_cache"]:
+                    cache_hits += 1
+                    print(f"⚡ CACHE: {file} -> {data.get('name')} (scor: {data.get('score')})")
+                else:
+                    fresh_analyses += 1
+                    print(f"✓ ANALIZAT: {file} -> {data.get('name')} (scor: {data.get('score')})")
 
-            if result["from_cache"]:
-                cache_hits += 1
-                print(f"⚡ CACHE: {file} -> {data.get('name')} (scor: {data.get('score')})")
-            else:
-                fresh_analyses += 1
-                print(f"✓ ANALIZAT: {file} -> {data.get('name')} (scor: {data.get('score')})")
-
-            save_candidate_to_db(data, file, target_job)
-            saved += 1
-            results.append({
-                "name": data.get("name"),
-                "score": data.get("score"),
-                "recommendation": data.get("recommendation"),
-                "priority": data.get("priority"),
-                "recommended_next_action": data.get("recommended_next_action"),
-            })
+                save_candidate_to_db(data, file, target_job)
+                saved += 1
+                results.append({
+                    "name": data.get("name"),
+                    "score": data.get("score"),
+                    "recommendation": data.get("recommendation"),
+                    "priority": data.get("priority"),
+                    "recommended_next_action": data.get("recommended_next_action"),
+                })
 
     results.sort(key=lambda x: x.get("score", 0), reverse=True)
 
     print("\n" + "=" * 70)
     print("SUMMARY:")
-    print(f"  Din cache (instant): {cache_hits}")
-    print(f"  Analizate acum:      {fresh_analyses}")
-    print(f"  Total salvati:       {saved}")
+    print(f"  Deja in baza de date: {db_skipped}")
+    print(f"  Din cache (instant):  {cache_hits}")
+    print(f"  Analizate acum (AI):  {fresh_analyses}")
+    print(f"  Noi salvati:          {saved}")
     print("=" * 70)
 
     parts = []
     if fresh_analyses > 0:
-        parts.append(f"{fresh_analyses} CV-uri analizate acum")
+        parts.append(f"{fresh_analyses} CV-uri noi analizate")
     if cache_hits > 0:
-        parts.append(f"{cache_hits} preluate instant din cache")
+        parts.append(f"{cache_hits} preluate din cache")
+    if db_skipped > 0:
+        parts.append(f"{db_skipped} deja existente in baza de date")
 
-    message = f"Analiza finalizata. {', '.join(parts)}. Total candidati: {saved}."
+    total_processed = db_skipped + saved
+    message = f"Analiza finalizata. {', '.join(parts)}. Total candidati pentru acest post: {total_processed}."
 
     return {
         "ok": True,

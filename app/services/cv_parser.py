@@ -370,133 +370,244 @@ def detect_required_license(target_job, profile=None):
 
 def build_prompt(text, target_job, job_requirements=None):
     profile = match_job_profile(target_job) or build_fallback_profile(target_job)
-    profile_json = json.dumps(profile, ensure_ascii=False, indent=2)
     required_license = detect_required_license(target_job, profile)
-    license_rule = f"Postul cere permis {required_license}. Nu cere alta categorie." if required_license else "Postul nu cere permis explicit."
+
+    level_map = {"Entry": "ENTRY", "Skilled": "JUNIOR/MIDDLE", "Senior": "SENIOR", "Middle": "MIDDLE"}
+    job_level = level_map.get(profile.get("level", "Middle"), "MIDDLE")
+
+    must_have = profile.get("must_have", [])
+    reject_if_missing = profile.get("reject_if_missing", [])
 
     job_req_block = ""
     if job_requirements and job_requirements.strip():
         job_req_block = (
-            "CERINTE REALE ALE POSTULUI (scrise de HR — PRIORITATE MAXIMA):\n"
-            + job_requirements.strip()
-            + "\n\nFOLOSESTE ACESTE CERINTE ca referinta principala pentru scoring. "
-            "Daca CV-ul nu indeplineste cerintele obligatorii de mai sus, penalizeaza scorul conform regulilor de calibrare.\n\n"
+            "CERINȚE OBLIGATORII COMPLETATE DE HR (PRIORITATE MAXIMĂ — citește înainte de orice altceva):\n"
+            + job_requirements.strip() + "\n\n"
         )
 
-    schema = """
-{
-  "candidate_name": "",
+    cerinte_block = ""
+    if required_license:
+        cerinte_block += f"⚠️  PERMIS {required_license} OBLIGATORIU. Dacă lipsește din CV → SCOR MAX 30 + REJECT.\n"
+    if reject_if_missing:
+        cerinte_block += "OBLIGATORII (lipsă = REJECT): " + ", ".join(reject_if_missing) + "\n"
+    if must_have:
+        cerinte_block += "MUST HAVE: " + ", ".join(must_have) + "\n"
+    if cerinte_block:
+        cerinte_block = "CERINȚE DETECTATE DIN PROFIL POST:\n" + cerinte_block + "\n"
+
+    schema = """{
+  "candidate_name": "Exact din CV sau Necunoscut",
   "email": "",
   "phone": "",
   "companies": [],
   "positions_held": [],
-  "current_position": "",
-  "recommended_role_for_candidate": "",
-  "target_position": "",
-  "job_domain": "",
-  "years_experience": 0,
-  "years_relevant_domain": 0,
+  "current_position": "Ultimul titlu din CV",
+  "recommended_role_for_candidate": "Jobul natural al candidatului bazat STRICT pe CV - IGNORA postul vizat - scrie INTOTDEAUNA ceva concret",
+
+  "job_level_detected": "ENTRY|JUNIOR|MIDDLE|SENIOR|EXECUTIVE",
+  "cv_quality_score": "CLEAR|DECENT|VAGUE|POOR",
+
   "experience_score": 0,
-  "skills_score": 0,
+  "education_score": 0,
   "soft_skills_score": 0,
-  "potential_score": 0,
-  "motivation_score": 0,
+  "penalties_total": 0,
+  "bonuses_total": 0,
+  "scoring_breakdown": "exp X/40 + edu Y/25 + soft Z/20 - penalitati W = total",
+
   "final_score": 0,
   "recommendation": "STRONG_YES|YES|MAYBE|NO|REJECT",
   "confidence_level": "high|medium|low",
-  "fit_percentage": 0,
-  "overqualification_risk": "low|medium|high",
-  "level_mismatch": "low|medium|high",
+
+  "overqualification_risk": "LOW|MEDIUM|HIGH",
+  "instability_risk": "LOW|MEDIUM|HIGH",
+  "level_mismatch": "LOW|MEDIUM|HIGH",
+
+  "years_experience": 0,
+  "years_relevant_domain": 0,
+
   "strengths": [],
   "gaps": [],
   "red_flags": [],
-  "green_flags": [],
   "transferable_skills": [],
-  "growth_potential": "low|medium|high",
-  "growth_ceiling": "",
-  "interview_questions": [],
-  "risk_level": "low|medium|high|critical",
-  "retention_probability": 0,
-  "wage_alignment": "aligned|higher|lower|unknown",
-  "summary": "",
-  "decision_reason": "",
+
+  "decision_reason": "2-3 propozitii clare cu citate din CV care justifica scorul",
   "missing_requirements": [],
   "must_verify_by_phone": [],
+
   "recommended_next_action": "CALL_NOW|CALL_LATER|KEEP_FOR_OTHER_ROLE|REJECT",
   "priority": "HIGH|MEDIUM|LOW",
-  "manager_summary": "",
-  "phone_call_script": "",
-  "better_role_match": "",
-  "reject_reason_internal": ""
-}
-"""
-    return (
-        "TU ESTI RECRUITER HR SENIOR CU 15+ ANI EXPERIENTA IN ROMANIA.\n\n"
-        f"ANALIZEZI CV-UL PENTRU POSTUL: {target_job}\n\n"
-        + job_req_block
-        + "PROFIL JOB:\n" + profile_json + "\n\n"
-        f"REGULA PERMIS: {license_rule}\n\n"
-        "═══════════════════════════════════════════════════════════\n"
-        "CALIBRARE NIVEL JOB — REGULI STRICTE DE SCORING\n"
-        "═══════════════════════════════════════════════════════════\n"
-        "Primul pas: determina nivelul jobului din titlu si cerinte.\n\n"
-        "JOB OPERATIONAL/ENTRY (operator, muncitor, depozitar, casier, curier, vanzator, paznic, stivuitorist, etc.):\n"
-        "  → Candidat cu studii superioare (licenta/master/doctorat) = SUPRACALIFICAT\n"
-        "    final_score MAXIM 35, overqualification_risk=high\n"
-        "    Motivul: nu va ramane, va pleca in 1-2 luni. Nu e potrivit.\n"
-        "  → Candidat fara studii superioare + experienta in domenii similare = IDEAL\n"
-        "    Poate lua scor 60-90 in functie de potrivire.\n"
-        "  → Candidat fara nicio experienta dar fara studii superioare = ACCEPTABIL\n"
-        "    Poate lua scor 45-60 (job accesibil, se poate instrui).\n\n"
-        "JOB CALIFICAT/SENIOR (coordonator, manager, director, analist, inginer, contabil, HR,\n"
-        "   financiar, IT, arhitect, medic, farmacist, consilier, inspector, referent,\n"
-        "   judecator, procuror, notar, diplomat, functionar public, etc.):\n"
-        "  → Candidat fara studii superioare in domeniu DIRECT relevant = SUBCALIFICAT\n"
-        "    final_score MAXIM 35\n"
-        "  → Candidat fara NICIO experienta in domeniu sau conexe = SUBCALIFICAT\n"
-        "    final_score MAXIM 38\n"
-        "  → Candidat cu background COMPLET DIFERIT (ex: vanzator/depozitar/sofer aplicand\n"
-        "    pentru consilier parlamentar, inspector fiscal, judecator, contabil, inginer, etc.):\n"
-        "    final_score MAXIM 32. Abilitatile de comunicare sau soft skills NU compenseaza\n"
-        "    lipsa totala de educatie si experienta in domeniu.\n"
-        "  → Candidat cu experienta partiala in domeniu: scor 39-55\n\n"
-        "JOB MESERIE CALIFICATA (electrician, sudor, mecanic, instalator, etc.):\n"
-        "  → Fara calificare/certificare practica = final_score MAXIM 38\n"
-        "  → Cu calificare dar fara experienta recenta = scor 40-55\n\n"
-        "REGULA CRITICA ANTI-INFLATIE SCOR:\n"
-        "Soft skills (comunicare, adaptabilitate, seriozitate) NU pot compensa lipsa\n"
-        "educatiei sau experientei de domeniu pentru roluri specializate.\n"
-        "Un vanzator NU poate lua 60 pentru 'consilier parlamentar' indiferent cat\n"
-        "de bun comunicator e — nu are pregatirea necesara.\n"
-        "Scorul reflecta POTRIVIREA REALA, nu potentialul abstract.\n"
-        "═══════════════════════════════════════════════════════════\n\n"
-        "REGULI OBLIGATORII:\n"
-        "- Extrage companiile/institutiile unde a lucrat candidatul si pune-le in companies. Nu inventa companii. Daca nu apar clar, lasa lista goala.\n"
-        "- Extrage functiile ocupate si pune-le in positions_held.\n"
-        "- current_position = ultima functie sau functia dominanta din CV.\n"
-        "- recommended_role_for_candidate = jobul cel mai potrivit pentru acest candidat pe piata muncii din Romania, bazat STRICT pe educatia, experienta si skillurile din CV. IGNORA complet postul cautat. Gandeste independent: daca omul are experienta de contabil, scrie 'Contabil'. Daca are experienta de sofer, scrie 'Sofer'. Daca are facultate tehnica si experienta in mentenanta, scrie 'Tehnician mentenanta'. NU copia job_title. NU lasa gol. Scrie intotdeauna un job concret si real.\n"
-        "- summary trebuie sa fie un rezumat HR curat. Nu include in summary textele: Risc supracalificare, Nepotrivire nivel, overqualification_risk, level_mismatch. Acestea exista separat in JSON.\n"
-        "- Respecta must_have, nice_to_have, reject_if_missing, red_flags si max_score_rules.\n"
-        "- Alege candidatul potrivit pentru postul cautat, nu candidatul cu cel mai impresionant CV.\n"
-        "- Pentru roluri operationale, entry-level sau repetitive, penalizeaza supracalificarea.\n"
-        "- Daca overqualification_risk este high, final_score maxim 40.\n"
-        "- Daca lipseste o cerinta din reject_if_missing, final_score maxim 35.\n"
-        "- Daca postul cere permis si permisul cerut lipseste, final_score maxim 30.\n\n"
-        "REGULI PENTRU CAMPURILE NOI DE DECIZIE:\n"
-        "- decision_reason = 1-2 propozitii clare de ce a primit acest scor. Concret, nu generic. Ex: 'Are 4 ani experienta directa in logistica si lucrul cu documente. Lipseste confirmarea pentru program in ture.'\n"
-        "- missing_requirements = lista cu ce lipseste concret din CV, formulat specific. Ex: ['Nu apare permis categoria B', 'Nu apare experienta cu Excel', 'Nu apare disponibilitatea pentru ture', 'Nu apare salariul dorit']. Daca nu lipseste nimic important, lasa lista goala.\n"
-        "- must_verify_by_phone = 3-5 intrebari scurte, concrete, de pus la telefon. Ex: ['Ai permis categoria B valabil?', 'Poti incepe in urmatoarele 2 saptamani?', 'Care este salariul net dorit?', 'Ai disponibilitate pentru program in ture?']\n"
-        "- recommended_next_action = CALL_NOW daca scor >= 75, CALL_LATER daca scor 55-74, KEEP_FOR_OTHER_ROLE daca scor < 55 dar candidatul e bun pe alt rol, REJECT daca nu are potential real.\n"
-        "- priority = HIGH daca scor >= 80, MEDIUM daca scor 60-79, LOW daca scor < 60.\n"
-        "- manager_summary = maxim 3 randuri pentru manager. Fara jargon HR. Ex: 'Candidat recomandat pentru interviu. Are 4 ani experienta relevanta si indeplineste cerintele principale. Trebuie verificata disponibilitatea pentru program si salariul dorit.'\n"
-        "- phone_call_script = text gata de folosit la telefon, in romani, natural, profesional. Include salut, motiv apel, 3-4 intrebari cheie si inchidere. Maxim 8 randuri.\n"
-        "- better_role_match = daca candidatul ar fi mai potrivit pentru alt rol decat cel cautat, scrie acel rol. Altfel lasa gol.\n"
-        "- reject_reason_internal = motiv scurt de respingere pentru uz intern HR. Nu se trimite candidatului. Scrie doar daca recommendation este NO sau REJECT.\n"
-        "- interview_questions = 4-6 intrebari specifice pentru interviu, bazate pe CV-ul acestui candidat.\n\n"
-        "SCORING:\n"
-        "85-100 STRONG_YES, 70-84 YES, 55-69 MAYBE, 40-54 NO, sub 40 REJECT.\n\n"
-        "Raspunde STRICT in JSON valid, fara markdown, folosind schema:\n" + schema + "\nCV:\n" + text[:15000]
-    )
+
+  "summary": "Rezumat HR curat, max 3 propozitii, fara jargon",
+  "manager_summary": "Max 3 randuri pentru hiring manager cu decizia si motivul",
+  "phone_call_script": "Text gata de folosit la telefon, in romana, natural, cu 3-4 intrebari cheie",
+  "interview_questions": [],
+
+  "retention_probability": 0,
+  "growth_potential": "LOW|MEDIUM|HIGH",
+  "better_role_match": "Alt rol mai potrivit sau gol",
+  "reject_reason_internal": "Motiv intern doar daca NO sau REJECT"
+}"""
+
+    return f"""EȘTI UN SISTEM AUTOMAT DE EVALUARE HR CU CALIBRARE PIAȚA ROMÂNIEI.
+Nu ești recruiter uman. Ești motor de scoring obiectiv care evaluează strict pe DATE din CV, nu pe potențial sau presupuneri.
+Scorul final trebuie să fie DEFENSIBIL: "De ce scor 47?" → se explică prin citate exacte din CV.
+
+═══════════════════════════════════════════════════════════
+POSTUL VIZAT: {target_job}
+NIVELUL DETECTAT: {job_level}
+{job_req_block}{cerinte_block}═══════════════════════════════════════════════════════════
+REGULA DE AUR: DOVEZI, NU SPECULAȚII
+═══════════════════════════════════════════════════════════
+
+ÎNAINTE DE ORICE SCORING, extrage EXACT din CV:
+  - Nume, perioadă, angajator, titlu, durată în luni/ani
+  - Dacă nu-i menționat clar = NU PRESUPUNE
+
+DOVEZI VALIDE (acordă puncte):
+  ✓ "5 ani analist financiar, 2019-2024"
+  ✓ "Excel avansat — pivot tables, VBA"
+  ✓ "Manager 8 oameni, creștere 40% revenue în 2023"
+  ✓ "Permis C/CE din 2015, activ"
+
+DOVEZI INVALIDE (0 puncte):
+  ✗ "Sunt comunicativ și orientat spre rezultate"
+  ✗ "Lucru bine în echipă"
+  ✗ "Experiență în domeniu" (fără detalii = VAGUITATE)
+  ✗ "Office avansat" fără specificație
+
+DACĂ CV E VAGU (perioade neprecizate, angajatori fără nume, titluri vagi):
+  → -8 puncte automat + cv_quality_score: VAGUE/POOR + must_verify obligatoriu + scor MAX 50
+
+═══════════════════════════════════════════════════════════
+FAZA 1: KNOCKOUT RULES (aplică ÎNAINTE de calculul de puncte)
+═══════════════════════════════════════════════════════════
+
+JOB OPERAȚIONAL/ENTRY (operator, depozitar, vânzător, paznic, casier, stivuitorist, curier, manipulant):
+  ├─ Candidat cu licență/master/doctorat = SUPRACALIFICAT → SCOR MAX 32 + REJECT
+  └─ Background total diferit fără nicio experiență similară → SCOR MAX 38
+
+JOB CALIFICAT/SENIOR (analist, inginer, contabil, consilier, inspector, referent, HR, IT, medic, avocat, notar, judecator):
+  ├─ Fără studii superioare în domeniu direct → SCOR MAX 30
+  ├─ Fără nicio experiență în domeniu sau conexe → SCOR MAX 35
+  ├─ Background complet diferit (ex: vânzător→Consilier Parlamentar, șofer→Inspector Fiscal, depozitar→Contabil) → SCOR MAX 25 + REJECT
+  └─ Experiență < 1 an în domeniu vizat → SCOR MAX 45
+
+JOB MESERIE CALIFICATĂ (electrician, sudor, mecanic, șofer TIR, instalator):
+  ├─ Fără atestat/certificare legală obligatorie → SCOR MAX 15 + REJECT
+  └─ Certificare expirată sau inactivă > 3 ani → SCOR MAX 25
+
+CERINȚĂ HARD LIPSĂ (oricare job):
+  └─ Orice cerință din lista OBLIGATORII de mai sus lipsește → SCOR MAX 35 + REJECT
+     NU scrie "merită o șansă" când cerința fundamentală lipsește.
+
+═══════════════════════════════════════════════════════════
+FAZA 2: SCORING EXPERIENȚĂ (0-40 PUNCTE)
+═══════════════════════════════════════════════════════════
+
+Ponderare temporală: ultimii 3 ani = 100% | 3-5 ani = 70% | >5 ani = 40%
+
+Experiență ZERO în domeniu (ENTRY):
+  Cu studii relevante: 20 | Fără studii relevante: 12 | 6-12 luni experiență: 30
+
+JUNIOR (1-3 ani în domeniu direct):
+  1 an: 32 | 2 ani: 36 | 3 ani: 40
+
+MIDDLE (3-7 ani direct):
+  3-4 ani: 37 | 5-6 ani: 39 | 7 ani: 40
+
+SENIOR (7+ ani, cu rezultate concrete dovedite):
+  7-10 ani stabili: 40 | 10+ ani + leadership: 40 | 10+ ani job-hopper: 30
+
+PENALITĂȚI EXPERIENȚĂ:
+  Pauză >6 luni neexplicată: -5 | Job <3 luni fără motiv: -3 per job
+  3+ schimbări industrie în 5 ani: -5 | CV vag (perioade imprecise): -8
+
+═══════════════════════════════════════════════════════════
+FAZA 3: SCORING EDUCAȚIE & CERTIFICĂRI (0-25 PUNCTE)
+═══════════════════════════════════════════════════════════
+
+Studii (contează doar dacă postul le cere):
+  Licență relevantă: 10 | Master relevant: 12 | Doctorat relevant: 13
+  Studii parțial relevante: 6 | Lipsă completă (când e obligatorie): 0
+
+Certificări:
+  Certificare obligatorie prezentă: 8 | Certificare obligatorie LIPSĂ: -15
+  Certificări relevante (AWS, SAP, Excel avansat, CISA, etc.): +3 | Cursuri recente relevante: +2
+
+Limbi (acordă puncte DOAR dacă postul le cere și sunt menționate explicit):
+  Nivel avansat dovedit: 5 | Nivel mediu menționat: 3 | Nemenționate: 0 — NU presupune engleză!
+
+═══════════════════════════════════════════════════════════
+FAZA 4: SOFT SKILLS & ATITUDINE (0-20 PUNCTE)
+REGULA: NUMAI dovezi concrete din CV — afirmațiile vagi = 0 puncte
+═══════════════════════════════════════════════════════════
+
+Leadership cu dovadă clară ("Manager 5+ oameni, 2+ ani"): 6 | Vag ("coordonez"): 2 | "Am spirit de lider": 0
+Rezultate măsurabile din CV: "Creștere 40% revenue 2024" → 5 | "Reducere costuri 15%" → 5 | Vag: 0
+Stabilitate: 5+ ani la 1-2 angajatori → 4 | Progres clar junior→senior → 3 | Job-hopper: -5
+Disponibilitate declarată explicit: 2 | Vagă/nedeclarată: 0
+
+INTERZIS acordare puncte pentru:
+"Sunt comunicativ", "muncitor", "adaptabil", "orientat spre rezultate" — ZERO fără dovadă concretă.
+
+═══════════════════════════════════════════════════════════
+FAZA 5: CALCUL SCOR FINAL (MAX 85 PUNCTE)
+═══════════════════════════════════════════════════════════
+
+SCOR = FAZA2 (0-40) + FAZA3 (0-25) + FAZA4 (0-20) + PENALITĂȚI (negative) + BONUSURI (positive)
+MAXIM ABSOLUT = 85 (restul de 15 puncte se câștigă la interviu față în față)
+
+APLICARE KNOCKOUT după calcul:
+  Cerință hard lipsă → final_score = MIN(calculat, 35) + recommendation = REJECT
+  Supracalificat evident → final_score = MIN(calculat, 38) + overqualification_risk = HIGH
+  CV total vag → final_score = MIN(calculat, 50) + must_verify_by_phone obligatoriu
+
+CATEGORII FINALE (pe scara 0-85):
+  70-85: STRONG_YES | 55-69: YES | 40-54: MAYBE | 25-39: NO | sub 25: REJECT
+
+ACȚIUNI RECOMANDATE:
+  recommended_next_action: CALL_NOW dacă scor >= 60 | CALL_LATER dacă scor 40-59 | KEEP_FOR_OTHER_ROLE dacă < 40 dar potrivit alt rol | REJECT dacă nu are potențial real
+  priority: HIGH dacă scor >= 65 | MEDIUM dacă scor 45-64 | LOW dacă < 45
+
+═══════════════════════════════════════════════════════════
+REGULI ANTI-INFLAȚIE (CRITICE — nu le ignora)
+═══════════════════════════════════════════════════════════
+
+SCOR NU CREȘTE pentru:
+  ✗ CV bine formatat sau aspectuos (design ≠ competență)
+  ✗ Soft skills enumerate fără dovadă ("sunt serios", "punctual")
+  ✗ Presupuneri: NU acorda permis dacă nu scrie, NU acorda engleză dacă nu scrie, NU acorda IT skills dacă nu scrie
+
+SCOR CREȘTE NUMAI pentru:
+  ✓ Ani numerici cu perioadă clară: "5 ani IT, 2019-2024"
+  ✓ Titlu de job + durată dovedite
+  ✓ Rezultat concret cuantificat cu cifre
+  ✓ Certificare/licență confirmată explicit în CV
+
+═══════════════════════════════════════════════════════════
+CÂMPURI OBLIGATORII — completează cu atenție
+═══════════════════════════════════════════════════════════
+
+candidate_name: extrage exact din CV, nu inventa
+email + phone: exact din CV, sau gol dacă lipsesc
+companies: lista angajatorilor menționați explicit — nu inventa
+positions_held: lista funcțiilor ocupate din CV
+current_position: ultimul titlu real din CV
+recommended_role_for_candidate: jobul natural al candidatului bazat pe CV real — IGNORĂ postul vizat — scrie ÎNTOTDEAUNA ceva concret (ex: "Contabil", "Sofer TIR", "Vanzator", "Inginer Mecanic")
+decision_reason: citează exact din CV ce justifică scorul (ex: "Are 6 ani experiență directă ca operator depozit, 2018-2024. Lipsește permisul de stivuitor menționat în cerințe.")
+must_verify_by_phone: 3-5 întrebări tăioase și directe pentru clarificat ÎNAINTE de interviu
+manager_summary: max 3 rânduri pentru hiring manager, fără jargon HR
+phone_call_script: text gata de folosit la telefon, în română, natural, cu salut + motiv apel + 3-4 întrebări cheie + închidere
+interview_questions: 4-6 întrebări specifice bazate pe CV-ul acestui candidat
+reject_reason_internal: completează NUMAI dacă recommendation este NO sau REJECT
+scoring_breakdown: scurt text cu calculul: "exp 36/40 + edu 10/25 + soft 8/20 - penalitati 5 = 49"
+
+Răspunde STRICT cu JSON valid. Zero text înainte sau după JSON.
+
+{schema}
+
+CV CANDIDAT:
+{text[:15000]}"""
 
 
 def analyze_cv_with_ai(text, target_job, job_requirements=None):
@@ -527,7 +638,7 @@ def parse_ai_response(content):
 
 def clean_score(v):
     try:
-        return max(0, min(100, int(v)))
+        return max(0, min(85, int(v)))
     except Exception:
         return 0
 
@@ -554,9 +665,10 @@ def normalize_recommendation(value, score):
     mapping = {"STRONG_YES":"HIRE","YES":"HIRE","MAYBE":"CONSIDER","NO":"REJECT","REJECT":"REJECT","HIRE":"HIRE","CONSIDER":"CONSIDER"}
     if value in mapping:
         return mapping[value]
-    if score >= 70:
+    # Scala 0-85: HIRE >= 55, CONSIDER >= 35, REJECT sub 35
+    if score >= 55:
         return "HIRE"
-    if score >= 45:
+    if score >= 35:
         return "CONSIDER"
     return "REJECT"
 
@@ -566,25 +678,25 @@ def recommendation_to_status(rec):
 
 
 def _compute_priority(score, data):
-    """Calculeaza priority local ca fallback daca AI nu returneaza corect."""
+    """Calculeaza priority local ca fallback daca AI nu returneaza corect. Scala 0-85."""
     ai_priority = as_text(data.get("priority", "")).upper().strip()
     if ai_priority in ("HIGH", "MEDIUM", "LOW"):
         return ai_priority
-    if score >= 80:
+    if score >= 65:
         return "HIGH"
-    if score >= 60:
+    if score >= 45:
         return "MEDIUM"
     return "LOW"
 
 
 def _compute_next_action(score, data):
-    """Calculeaza recommended_next_action local ca fallback."""
+    """Calculeaza recommended_next_action local ca fallback. Scala 0-85."""
     ai_action = as_text(data.get("recommended_next_action", "")).upper().strip()
     if ai_action in ("CALL_NOW", "CALL_LATER", "KEEP_FOR_OTHER_ROLE", "REJECT"):
         return ai_action
-    if score >= 75:
+    if score >= 60:
         return "CALL_NOW"
-    if score >= 55:
+    if score >= 40:
         return "CALL_LATER"
     better = as_text(data.get("better_role_match", "")).strip()
     if better:
@@ -674,12 +786,14 @@ def normalize_data(data, file, target_job, cv_text, profile):
 
     over_risk = as_text(data.get("overqualification_risk", "unknown")).lower() or "unknown"
     level_risk = as_text(data.get("level_mismatch", "unknown")).lower() or "unknown"
+    instability_risk = as_text(data.get("instability_risk", "unknown")).lower() or "unknown"
+    cv_quality = as_text(data.get("cv_quality_score", "")).upper() or "DECENT"
 
     clean_ai_summary = strip_risk_text(data.get("summary", data.get("match_analysis", "")))
     if not clean_ai_summary:
         clean_ai_summary = "Rezumat indisponibil. Verifica manual CV-ul."
 
-    summary = f"Risc supracalificare: {over_risk}. Nepotrivire nivel: {level_risk}. {clean_ai_summary}"
+    summary = f"Risc supracalificare: {over_risk}. Nepotrivire nivel: {level_risk}. Stabilitate: {instability_risk}. CV: {cv_quality}. {clean_ai_summary}"
 
     recommended_role = first_value(
         data.get("recommended_role_for_candidate"),
@@ -690,6 +804,17 @@ def normalize_data(data, file, target_job, cv_text, profile):
 
     priority = _compute_priority(score, data)
     recommended_next_action = _compute_next_action(score, data)
+
+    # scoring_breakdown pentru transparenta
+    scoring_bd = as_text(data.get("scoring_breakdown", ""))
+    if not scoring_bd:
+        exp = data.get("experience_score", 0)
+        edu = data.get("education_score", 0)
+        soft = data.get("soft_skills_score", 0)
+        pen = data.get("penalties_total", 0)
+        bon = data.get("bonuses_total", 0)
+        if any([exp, edu, soft, pen, bon]):
+            scoring_bd = f"exp {exp}/40 + edu {edu}/25 + soft {soft}/20 + pen {pen} + bon {bon} = {score}"
 
     normalized = {
         "name": name,
@@ -705,7 +830,6 @@ def normalize_data(data, file, target_job, cv_text, profile):
         "weaknesses": data.get("gaps", data.get("weaknesses","")),
         "summary": summary,
         "recommendation": rec,
-        # ── Campuri noi decizie ──
         "decision_reason":         as_text(data.get("decision_reason", "")),
         "missing_requirements":    as_text(data.get("missing_requirements", [])),
         "must_verify_by_phone":    as_text(data.get("must_verify_by_phone", [])),

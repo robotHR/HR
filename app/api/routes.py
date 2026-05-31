@@ -2887,10 +2887,7 @@ def _notify_hr_interview_event(
                 | 'programat_hr' | 'anulat_hr' | 'reprogramat_hr'
     """
     try:
-        hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or os.getenv("RESEND_FROM_EMAIL") or os.getenv("FROM_EMAIL")
-        if not hr_email:
-            print(f"[HR-NOTIF] WARN: HR_NOTIFICATION_EMAIL nesetat, eveniment '{event_type}' nu a fost trimis.")
-            return
+        hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or "nexas.axs@gmail.com"
 
         luni = {
             "01": "Ianuarie", "02": "Februarie", "03": "Martie",
@@ -2948,10 +2945,7 @@ Echipa NEXAS HR
 def _send_hr_notification_email(candidate_name: str, job_title: str, data: str, ora: str, locatie: str):
     """Notifica HR-ul cand un candidat si-a programat interviul."""
     try:
-        hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or os.getenv("RESEND_FROM_EMAIL") or os.getenv("FROM_EMAIL")
-        if not hr_email:
-            print("[SCHEDULE] WARN: HR_NOTIFICATION_EMAIL nesetat, notificarea HR nu a fost trimisa.")
-            return
+        hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or "nexas.axs@gmail.com"
 
         luni = {
             "01": "Ianuarie", "02": "Februarie", "03": "Martie",

@@ -24,14 +24,12 @@ from app.models.candidate_model import Candidate
 from app.models.cv_analysis_model import CvAnalysis
 
 from app.services.cloudinary_service import upload_cv_to_cloudinary, check_cv_exists_on_cloudinary, stream_cv_from_cloudinary
-from app.services.job_classifier import recalibrate_ai_result
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDER = "app/uploads"
-ANALYSIS_ENGINE_VERSION = "job_family_strict_v1"
 
 
 def sync_from_cloudinary():
@@ -88,7 +86,7 @@ client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPEN
 # ─── CACHE FUNCTIONS ──────────────────────────────────────────────────────────
 
 def _normalize_job_key(job_title):
-    return f"{ANALYSIS_ENGINE_VERSION}:{normalize_text(job_title).strip()}"
+    return normalize_text(job_title).strip()
 
 
 def get_cached_analysis(cv_file, job_title):
@@ -1279,88 +1277,59 @@ def normalize_data(data, file, target_job, cv_text, profile):
         "candidate_cluster":       candidate_cluster,
         "job_cluster":             job_cluster,
     }
-    # Motor nou: familia jobului decide eligibilitatea.
-    # AI-ul ramane util pentru extragere, dar scorul final este recalibrat determinist.
-    normalized = recalibrate_ai_result(normalized, target_job, cv_text, ai_score=score)
-
-    # Pastram regulile hard existente, de exemplu permis C/CE cand chiar este cerut.
     return apply_local_safety_rules(normalized, target_job, cv_text, profile,
-                                    candidate_cluster=None,
-                                    job_cluster=None)
+                                    candidate_cluster=candidate_cluster,
+                                    job_cluster=job_cluster)
 
 
 def save_candidate_to_db(data, file, target_job):
-    """
-    Upsert pe CV + job.
-
-    Inainte, fiecare reanalizare putea crea inca un rand pentru acelasi CV si acelasi job.
-    Acum actualizam randul existent. Asa dashboard-ul nu mai amesteca scoruri vechi cu scoruri noi.
-    """
-    db = SessionLocal()
     try:
+        db = SessionLocal()
         status = recommendation_to_status(data.get("recommendation", "CONSIDER"))
-        existing = db.query(Candidate).filter(
-            Candidate.cv_file == file,
-            Candidate.job_title == target_job
-        ).first()
-
-        values = {
-            "name": as_text(data.get("name", "")),
-            "email": as_text(data.get("email", "")),
-            "phone": as_text(data.get("phone", "")),
-            "position": as_text(data.get("position", "")),
-            "experience": as_text(data.get("years_experience", "")),
-            "skills": as_text(data.get("skills", "")),
-            "companies": as_text(data.get("companies", "")),
-            "score": clean_score(data.get("score", 0)),
-            "level": as_text(data.get("level", "")),
-            "strengths": as_text(data.get("strengths", "")),
-            "weaknesses": as_text(data.get("weaknesses", "")),
-            "summary": as_text(data.get("summary", "")),
-            "job_title": target_job,
-            "status": status,
-            "cv_file": file,
-            "decision_reason": as_text(data.get("decision_reason", "")),
-            "missing_requirements": as_text(data.get("missing_requirements", "")),
-            "must_verify_by_phone": as_text(data.get("must_verify_by_phone", "")),
-            "recommended_next_action": as_text(data.get("recommended_next_action", "")),
-            "priority": as_text(data.get("priority", "")),
-            "manager_summary": as_text(data.get("manager_summary", "")),
-            "phone_call_script": as_text(data.get("phone_call_script", "")),
-            "interview_questions": as_text(data.get("interview_questions", "")),
-            "better_role_match": as_text(data.get("better_role_match", "")),
-            "reject_reason_internal": as_text(data.get("reject_reason_internal", "")),
-            "candidate_cluster": as_text(data.get("candidate_cluster", "")) or None,
-            "job_cluster": as_text(data.get("job_cluster", "")) or None,
-        }
-
-        if existing:
-            for key, value in values.items():
-                setattr(existing, key, value)
-            candidate_id = existing.id
-            action = "ACTUALIZAT"
-        else:
-            candidate = Candidate(**values)
-            db.add(candidate)
-            db.flush()
-            candidate_id = candidate.id
-            action = "SALVAT"
-
+        candidate = Candidate(
+            name=as_text(data.get("name","")),
+            email=as_text(data.get("email","")),
+            phone=as_text(data.get("phone","")),
+            position=as_text(data.get("position","")),
+            experience=as_text(data.get("years_experience","")),
+            skills=as_text(data.get("skills","")),
+            companies=as_text(data.get("companies","")),
+            score=clean_score(data.get("score",0)),
+            level=as_text(data.get("level","")),
+            strengths=as_text(data.get("strengths","")),
+            weaknesses=as_text(data.get("weaknesses","")),
+            summary=as_text(data.get("summary","")),
+            job_title=target_job,
+            status=status,
+            cv_file=file,
+            # ── Campuri noi ──
+            decision_reason=as_text(data.get("decision_reason","")),
+            missing_requirements=as_text(data.get("missing_requirements","")),
+            must_verify_by_phone=as_text(data.get("must_verify_by_phone","")),
+            recommended_next_action=as_text(data.get("recommended_next_action","")),
+            priority=as_text(data.get("priority","")),
+            manager_summary=as_text(data.get("manager_summary","")),
+            phone_call_script=as_text(data.get("phone_call_script","")),
+            interview_questions=as_text(data.get("interview_questions","")),
+            better_role_match=as_text(data.get("better_role_match","")),
+            reject_reason_internal=as_text(data.get("reject_reason_internal","")),
+            candidate_cluster=data.get("candidate_cluster") or None,
+            job_cluster=data.get("job_cluster") or None,
+        )
+        db.add(candidate)
         db.commit()
-        print(f"✓ {action} IN BAZA DE DATE: {data.get('name','')} - {status} - scor {values['score']}")
+        candidate_id = candidate.id
+        db.close()
+        print("✓ SALVAT IN BAZA DE DATE:", data.get("name",""), "-", status)
         return candidate_id
     except Exception as e:
         print("EROARE LA SALVARE IN DB:", e)
         try:
             db.rollback()
-        except Exception:
-            pass
-        return None
-    finally:
-        try:
             db.close()
         except Exception:
             pass
+        return None
 
 
 # ─── PARALLEL TASK ────────────────────────────────────────────────────────────
@@ -1441,12 +1410,12 @@ def process_cvs_for_job(target_job, job_requirements=None):
     if not all_files:
         return {"ok": False, "message": "Nu exista CV-uri. Verifica Cloudinary sau incarca CV-uri.", "saved": 0}
 
-    # Motorul nou foloseste upsert. Analizam toate CV-urile pentru jobul cerut,
-    # ca scorurile vechi sa fie inlocuite cand schimbi logica.
-    new_files = list(all_files)
-    db_skipped = 0
+    # Pre-check: care CV-uri sunt deja analizate si salvate in DB pentru acest job?
+    already_in_db = _get_already_analyzed_files(target_job)
+    new_files = [f for f in all_files if f not in already_in_db]
+    db_skipped = len(already_in_db.intersection(set(all_files)))
 
-    print(f"\nTotal CV-uri: {len(all_files)} | De analizat/actualizat: {len(new_files)}")
+    print(f"\nTotal CV-uri: {len(all_files)} | Deja in DB: {db_skipped} | De analizat: {len(new_files)}")
     print("=" * 70)
 
     cache_hits = 0

@@ -736,12 +736,18 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
         if q_value and not any(q_value in candidate_search_blob(item) for item in sorted_items):
             continue
 
-        # Cand filtrul de job e activ, scorul afisat = scorul pe jobul cautat (nu best overall)
+        # Cand filtrul de job e activ, folosim strict analiza facuta pentru jobul cautat.
+        # Nu folosim scorul global al aceluiasi CV pe alt post, pentru ca ar ridica gresit
+        # candidati buni pe alt rol, dar slabi pentru rolul cautat.
         if job_value:
             job_items = [item for item in sorted_items
                          if job_value in (item.job_title or "").lower()
                          or job_value in (item.position or "").lower()]
-            job_items_sorted = sorted(job_items, key=lambda x: x.score or 0, reverse=True)
+            job_items_sorted = sorted(
+                job_items,
+                key=lambda x: (x.score or 0, x.id or 0),
+                reverse=True
+            )
             display_best = job_items_sorted[0] if job_items_sorted else best
             display_score = display_best.score or 0
         else:
@@ -781,7 +787,9 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             })
 
         rows.append({
-            "candidate": best,
+            # In pagina filtrata pe job, cardul principal trebuie sa reprezinte analiza pe jobul cautat,
+            # nu cea mai buna analiza globala a candidatului pe alt post.
+            "candidate": display_best if job_value else best,
             "best_match": display_best,
             "matches": matches,
             "best_score": display_score,
@@ -790,15 +798,20 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             "phones": sorted({item.phone for item in sorted_items if item.phone}),
         })
 
-    # Daca filtrul de job e activ, sortam si dupa compatibilitate (2>1>0)
+    # Daca filtrul de job e activ, sortam dupa analiza reala pentru jobul cautat.
+    # Ordinea devine: compatibilitate domeniu > scor pe jobul cautat > id.
     if job_value:
         def _row_sort(row, jv=job_value):
-            c = row["candidate"]
-            cc = getattr(c, "candidate_cluster", None) or None
-            jc = getattr(c, "job_cluster", None) or None
-            compat = _get_compat_level(c.position or "", jv,
-                                       candidate_cluster=cc, job_cluster=jc)
-            return (compat, row["best_score"])
+            m = row.get("best_match") or row.get("candidate")
+            cc = getattr(m, "candidate_cluster", None) or None
+            jc = getattr(m, "job_cluster", None) or None
+            compat = _get_compat_level(
+                getattr(m, "position", "") or "",
+                jv,
+                candidate_cluster=cc,
+                job_cluster=jc,
+            )
+            return (compat, row.get("best_score", 0) or 0, getattr(m, "id", 0) or 0)
         rows = sorted(rows, key=_row_sort, reverse=True)
     else:
         rows = sorted(rows, key=lambda row: (row["best_score"], row["candidate"].id or 0), reverse=True)

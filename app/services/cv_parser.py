@@ -297,12 +297,13 @@ def build_fallback_profile(target_job):
             "must_have": ["seriozitate", "punctualitate", "disponibilitate program"],
             "nice_to_have": ["experienta in domeniu similar", "permis auto"],
             "reject_if_missing": [],
-            "overqualified_risk": ["licenta", "master", "doctorat", "inginer", "economist", "jurist", "studii superioare"],
-            "red_flags": [],
+            "overqualified_risk": ["director general", "ceo", "rector", "profesor universitar", "consultant strategic"],
+            "red_flags": ["profil complet diferit fara experienta operationala", "senioritate nerealista pentru rol"],
             "max_score_rules": [
-                "REGULA CRITICA: Daca candidatul are studii superioare (licenta/master/doctorat), final_score MAXIM 35 — supracalificat, nu va ramane.",
+                "NU penaliza automat licenta/masterul. Studiile superioare sunt neutre daca omul are experienta reala in rol operational.",
+                "Daca profilul natural este complet diferit si nu exista experienta operationala similara, final_score maxim 35.",
                 "Daca candidatul nu are nicio experienta de munca, final_score maxim 58.",
-                "Candidatul cu experienta in domenii similare (depozit/logistica/munca fizica/vanzari) poate lua 60-90.",
+                "Candidatul cu experienta in domenii similare (depozit/logistica/munca fizica/retail/casierie) poate lua 60-90.",
             ],
         }
     elif is_skilled_trade:
@@ -487,16 +488,15 @@ FAZA 1: KNOCKOUT RULES (aplică ÎNAINTE de calculul de puncte)
 ═══════════════════════════════════════════════════════════
 
 JOB OPERAȚIONAL/ENTRY (operator, depozitar, vânzător, paznic, casier, stivuitorist, curier, manipulant):
-  ├─ NU respingi automat candidatul doar pentru că are studii superioare.
-  ├─ Dacă are studii superioare DAR are experiență reală în depozit/producție/retail/teren → evaluează normal.
-  ├─ Dacă are profil natural de birou/specialist/inginer/manager și NU are experiență operațională → SCOR MAX 28 + REJECT.
-  └─ Background total diferit fără nicio experiență similară → SCOR MAX 35.
+  ├─ NU penaliza automat licența/masterul. Studiile sunt neutre daca exista experienta practica relevanta.
+  ├─ Candidat cu studii superioare + experienta clara in rol operational = evalueaza normal dupa experienta.
+  └─ Background total diferit fără nicio experiență similară → SCOR MAX 35
 
 JOB CALIFICAT/SENIOR (analist, inginer, contabil, consilier, inspector, referent, HR, IT, medic, avocat, notar, judecator):
-  ├─ Studiile contează doar dacă postul le cere realist sau legal.
-  ├─ Fără experiență în domeniu sau domeniu conex → SCOR MAX 35.
-  ├─ Background complet diferit (ex: depozitar→Contabil, șofer→Inspector Fiscal) fără dovadă de reconversie → SCOR MAX 25 + REJECT.
-  └─ Experiență < 1 an în domeniu vizat → SCOR MAX 45, dacă nu există rezultate clare.
+  ├─ Fără studii superioare în domeniu direct → SCOR MAX 30
+  ├─ Fără nicio experiență în domeniu sau conexe → SCOR MAX 35
+  ├─ Background complet diferit (ex: vânzător→Consilier Parlamentar, șofer→Inspector Fiscal, depozitar→Contabil) → SCOR MAX 25 + REJECT
+  └─ Experiență < 1 an în domeniu vizat → SCOR MAX 45
 
 JOB MESERIE CALIFICATĂ (electrician, sudor, mecanic, șofer TIR, instalator):
   ├─ Fără atestat/certificare legală obligatorie → SCOR MAX 15 + REJECT
@@ -1091,95 +1091,12 @@ def _validate_cluster(val, fallback_text=""):
     return None
 
 
-def _job_super_cluster(target_job, job_cluster=None, profile=None):
-    """Returneaza super-clusterul postului, cu fallback pe profil si titlul jobului."""
-    jc = _validate_cluster(job_cluster or "", fallback_text=target_job)
-    if jc:
-        return jc
-    if profile:
-        domain = as_text(profile.get("domain", ""))
-        jc = _validate_cluster("", fallback_text=domain)
-        if jc:
-            return jc
-    cl = _detect_cluster(target_job)
-    return _SUPER.get(cl) if cl else None
-
-
-def _has_any_keyword(text, keywords):
-    t = normalize_text(text or "")
-    return any(k in t for k in keywords)
-
-
-OPERATIONAL_EVIDENCE_KW = [
-    "manipulant", "depozit", "gestionar", "picker", "ambalare", "etichetare",
-    "incarcare", "descarcare", "stivuitor", "iscir", "marfa", "marfuri",
-    "operator productie", "linie productie", "muncitor", "lucrator comercial", "casier",
-    "raft", "receptie marfa", "livrator", "curier", "sofer", "paza", "agent securitate",
-    "bucatar", "ospatar", "barista", "camerista", "curatenie", "teren", "ture"
-]
-
-OFFICE_SPECIALIST_KW = [
-    "inginer", "proiectant", "programator", "developer", "software", "it ", "contabil",
-    "economist", "jurist", "avocat", "consilier juridic", "hr", "recruiter", "manager",
-    "director", "coordonator", "analist", "consultant", "marketing specialist", "seo",
-    "ppc", "social media", "brand manager", "medic", "farmacist", "asistent medical",
-    "profesor", "trainer"
-]
-
-
-def _is_operational_job(target_job, job_cluster=None, profile=None):
-    sc = _job_super_cluster(target_job, job_cluster=job_cluster, profile=profile)
-    if sc != "blue_collar":
-        return False
-    # blue_collar include si roluri de teren unde experienta practica conteaza mai mult decat studiile
-    return True
-
-
-def _has_operational_evidence(cv_text, data):
-    combined = " ".join([
-        as_text(cv_text),
-        as_text(data.get("position", "")),
-        as_text(data.get("summary", "")),
-        as_text(data.get("strengths", "")),
-        as_text(data.get("skills", "")),
-        as_text(data.get("companies", "")),
-    ])
-    return _has_any_keyword(combined, OPERATIONAL_EVIDENCE_KW)
-
-
-def _looks_office_specialist_profile(cv_text, data, candidate_cluster=None):
-    cc = _validate_cluster(candidate_cluster or "", fallback_text=as_text(data.get("position", "")))
-    if cc in {"tech_ing", "business", "medical", "educatie"}:
-        return True
-    combined = " ".join([
-        as_text(data.get("position", "")),
-        as_text(data.get("summary", "")),
-        as_text(data.get("strengths", "")),
-        as_text(data.get("skills", "")),
-        as_text(cv_text)[:2500],
-    ])
-    return _has_any_keyword(combined, OFFICE_SPECIALIST_KW)
-
-
-def _cap_candidate(data, max_score, recommendation="REJECT", priority="LOW", action="REJECT", reason=""):
-    data["score"] = min(clean_score(data.get("score", 0)), max_score)
-    if recommendation:
-        data["recommendation"] = recommendation
-    if priority:
-        data["priority"] = priority
-    if action:
-        data["recommended_next_action"] = action
-    if reason:
-        data["reject_reason_internal"] = reason
-    return data
-
-
 def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_cluster=None, job_cluster=None):
     cv = normalize_text(cv_text)
     combined = normalize_text(" ".join([as_text(data.get(k,"")) for k in ["name","position","summary","strengths","skills"]]) + " " + cv[:3000])
 
     # ── Regula 1: supracalificare academica pentru rol operational ─────────────
-    operational_domains = ["Depozit Logistica","Retail Financiar","Retail","Transport Soferie","Transport Livrari","Productie","Constructii","HoReCa","Facility","Securitate"]
+    operational_domains = ["Operational", "Depozit Logistica", "Retail Financiar", "Retail", "Transport Soferie", "Transport Livrari", "Productie", "Constructii", "HoReCa", "Facility", "Securitate"]
     high_level = ["rector","profesor universitar","director general","ceo","antreprenor","consultant strategic","decan","academic"]
     if profile.get("domain") in operational_domains and any(w in combined for w in high_level):
         data["score"] = min(clean_score(data.get("score",0)), 35)
@@ -1188,26 +1105,6 @@ def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_clust
         data["priority"] = "LOW"
         data["recommended_next_action"] = "REJECT"
         data["reject_reason_internal"] = "Supracalificare ridicata pentru rol operational."
-
-    # ── Regula 1.5: realism de recrutare pentru joburi operationale ───────────
-    # Studiile superioare NU elimina candidatul. Il coboram doar cand CV-ul arata
-    # profil de birou/specialist si nu exista dovezi de munca operationala reala.
-    if _is_operational_job(target_job, job_cluster=job_cluster, profile=profile):
-        if _looks_office_specialist_profile(cv_text, data, candidate_cluster=candidate_cluster) and not _has_operational_evidence(cv_text, data):
-            _cap_candidate(
-                data,
-                28,
-                recommendation="REJECT",
-                priority="LOW",
-                action="REJECT",
-                reason="Profil de birou/specialist fara experienta operationala relevanta pentru rolul cautat."
-            )
-            clean_visible = strip_risk_text(data.get("summary", ""))
-            data["summary"] = set_summary_risk(
-                f"Profil nerealist pentru rol operational. {clean_visible}",
-                over_risk="high",
-                level_risk="high"
-            )
 
     # ── Regula 2: compatibilitate domeniu (3 niveluri) ────────────────────────
     natural_role = as_text(data.get("position", ""))
@@ -1245,6 +1142,31 @@ def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_clust
             if data.get("recommended_next_action") == "CALL_NOW":
                 data["recommended_next_action"] = "CALL_LATER"
             data["level_mismatch"] = "MEDIUM"
+
+    # ── Regula 3: rol operational cu experienta practica directa ─────────────
+    # Pentru casier/manipulant/depozit/retail, studiile superioare NU trebuie sa
+    # coboare candidatul daca CV-ul arata experienta reala in zona cautata.
+    if profile.get("domain") in operational_domains:
+        target_n = normalize_text(target_job)
+        operational_evidence = [
+            "casier", "casa de marcat", "pos", "incasari", "numerar", "retail",
+            "vanzator", "lucrator comercial", "magazin", "clienti",
+            "depozit", "manipulant", "picker", "ambalare", "marfa", "stivuitor",
+            "operator productie", "productie", "curier", "livrator", "sofer",
+            "incarcare", "descarcare"
+        ]
+        has_direct_operational = any(w in combined for w in operational_evidence)
+        job_words = [w for w in re.findall(r"[a-z0-9]+", target_n) if len(w) >= 4]
+        has_job_word = any(w in combined for w in job_words)
+
+        if has_direct_operational and has_job_word and clean_score(data.get("score", 0)) < 60:
+            data["score"] = 60
+            if data.get("recommendation") == "REJECT":
+                data["recommendation"] = "CONSIDER"
+            if data.get("priority") == "LOW":
+                data["priority"] = "MEDIUM"
+            data["recommended_next_action"] = data.get("recommended_next_action") or "CALL_LATER"
+
     req = detect_required_license(target_job, profile)
     if req:
         r = req.lower()

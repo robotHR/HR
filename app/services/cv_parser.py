@@ -764,32 +764,46 @@ def _compute_next_action(score, data):
 
 
 # ─── DOMAIN INCOMPATIBILITY MATRIX ───────────────────────────────────────────
+# Acoperire completa: 13 domenii profesionale din piata muncii din Romania
 
 _DOMAIN_KW = [
-    ("horeca",        ["bucatar", "ospatar", "barman", "restaurant", "cofetarie", "patiserie", "horeca", "bucatarie", "chef", "cook"]),
-    ("transport",     ["sofer", "tir", "curier", "livrari", "camion", "taximetrist", "taxi", "conducator auto", "livrator"]),
-    ("depozit_entry", ["stivuitorist", "manipulant", "picker", "packer", "lucrator depozit", "muncitor depozit", "operator depozit", "agent depozit"]),
-    ("retail_entry",  ["casier", "vanzator", "lucrator comercial", "agent vanzari", "lucrator magazin"]),
-    ("paza",          ["paznic", "agent paza", "guard", "bodyguard", "supraveghetor"]),
-    ("it_tech",       ["programator", "developer", "devops", "software", "it specialist", "web developer", "data analyst", "cloud", "cybersecurity", "network", "full stack", "backend", "frontend", "system admin", "it manager", "data engineer", "qa engineer"]),
-    ("inginer",       ["inginer", "arhitect tehnic", "proiectant", "inginer constructii", "inginer mecanic", "inginer electric"]),
-    ("medical",       ["medic", "asistent medical", "farmacist", "infirmiera", "radiolog", "stomatolog", "kinetoterapeut", "asistenta medicala"]),
-    ("financiar",     ["contabil", "economist", "auditor", "controller", "analist financiar", "cfo", "trezorier", "contabilitate"]),
-    ("juridic",       ["avocat", "jurist", "consilier juridic", "notar", "judecator", "procuror", "paralegal"]),
-    ("hr_recrutare",  ["recruiter", "specialist hr", "hr manager", "hr business partner", "talent acquisition", "resurse umane", "specialist recrutare"]),
+    ("horeca",        ["bucatar", "ospatar", "barman", "restaurant", "cofetarie", "patiserie", "horeca", "bucatarie", "chef", "cook", "sef bucatarie", "pizzar"]),
+    ("transport",     ["sofer", "tir", "curier", "livrari", "camion", "taximetrist", "taxi", "conducator auto", "livrator", "dispecer transport"]),
+    ("depozit_entry", ["stivuitorist", "manipulant", "picker", "packer", "lucrator depozit", "muncitor depozit", "operator depozit", "agent depozit", "sorter", "ambalator"]),
+    ("retail_entry",  ["casier", "vanzator", "lucrator comercial", "agent vanzari", "lucrator magazin", "reponitor", "operator vanzari"]),
+    ("paza",          ["paznic", "agent paza", "guard", "bodyguard", "supraveghetor", "agent securitate", "inspector paza"]),
+    ("constructii",   ["zidar", "faiantar", "zugrav", "tamplar", "dulgher", "instalator", "betonisc", "saper", "constructor", "montator", "lacatus", "sudor", "electrician constructii", "fierbar"]),
+    ("it_tech",       ["programator", "developer", "devops", "software", "it specialist", "web developer", "data analyst", "cloud", "cybersecurity", "network", "full stack", "backend", "frontend", "system admin", "it manager", "data engineer", "qa engineer", "scrum master", "product owner", "tech lead"]),
+    ("inginer",       ["inginer", "arhitect tehnic", "proiectant", "inginer constructii", "inginer mecanic", "inginer electric", "inginer productie", "inginer apa", "inginer energetic"]),
+    ("medical",       ["medic", "asistent medical", "asistenta medicala", "asistenta generalist", "farmacist", "infirmiera", "radiolog", "stomatolog", "kinetoterapeut", "logoped", "psiholog clinic", "dentist", "moasa", "brancardier"]),
+    ("financiar",     ["contabil", "economist", "auditor", "controller", "analist financiar", "cfo", "trezorier", "contabilitate", "specialist fiscal", "consultant fiscal"]),
+    ("juridic",       ["avocat", "jurist", "consilier juridic", "notar", "judecator", "procuror", "paralegal", "compliance", "contract manager"]),
+    ("hr_recrutare",  ["recruiter", "specialist hr", "hr manager", "hr business partner", "talent acquisition", "resurse umane", "specialist recrutare", "trainer corporativ"]),
+    ("educatie",      ["profesor", "invatator", "educator", "instructor", "formator", "trainer", "lector", "mentor"]),
 ]
 
 # Domenii incompatibile: natural_domain → [target_domains_incompatibile]
+# Logica: daca backgroundul candidatului e complet diferit de domeniu = nu are relevanta
 _INCOMPATIBLE = {
-    "horeca":        ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
-    "transport":     ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
-    "depozit_entry": ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
-    "retail_entry":  ["it_tech", "inginer", "medical", "juridic", "financiar"],
-    "paza":          ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical"],
-    "it_tech":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza"],
-    "inginer":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza"],
-    "medical":       ["it_tech", "depozit_entry", "transport", "horeca", "retail_entry"],
-    "financiar":     ["transport", "depozit_entry", "horeca", "retail_entry"],
+    # Operationali → Nu pentru roluri de cunostinte specializate
+    "horeca":        ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
+    "transport":     ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
+    "depozit_entry": ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
+    "retail_entry":  ["it_tech", "inginer", "medical", "juridic", "financiar", "educatie"],
+    "paza":          ["it_tech", "financiar", "juridic", "hr_recrutare", "inginer", "medical", "educatie"],
+    "constructii":   ["it_tech", "medical", "juridic", "financiar", "hr_recrutare", "educatie"],
+    # Specialisti tehnici → Nu pentru roluri operationale sau domenii complet diferite
+    "it_tech":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical", "juridic"],
+    "inginer":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "medical", "juridic", "hr_recrutare"],
+    # Medical → izolat de toate domeniile non-medicale
+    "medical":       ["it_tech", "depozit_entry", "transport", "horeca", "retail_entry", "inginer", "juridic", "financiar", "hr_recrutare", "constructii", "paza"],
+    # Financiar/Juridic/HR → Nu pentru operationali si domenii tehnice complet diferite
+    "financiar":     ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical"],
+    "juridic":       ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical", "it_tech"],
+    "hr_recrutare":  ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii", "medical", "inginer"],
+    # Educatie → Nu pentru operational sau tehnic complet nerelevant
+    "educatie":      ["transport", "depozit_entry", "horeca", "retail_entry", "paza", "constructii"],
+}
     "juridic":       ["transport", "depozit_entry", "horeca", "retail_entry"],
     "hr_recrutare":  ["transport", "depozit_entry", "horeca", "retail_entry"],
 }

@@ -24,12 +24,14 @@ from app.models.candidate_model import Candidate
 from app.models.cv_analysis_model import CvAnalysis
 
 from app.services.cloudinary_service import upload_cv_to_cloudinary, check_cv_exists_on_cloudinary, stream_cv_from_cloudinary
+from app.services.job_classifier import recalibrate_ai_result
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 UPLOAD_FOLDER = "app/uploads"
+ANALYSIS_ENGINE_VERSION = "job_family_strict_v1"
 
 
 def sync_from_cloudinary():
@@ -86,7 +88,7 @@ client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.getenv("OPEN
 # ─── CACHE FUNCTIONS ──────────────────────────────────────────────────────────
 
 def _normalize_job_key(job_title):
-    return normalize_text(job_title).strip()
+    return f"{ANALYSIS_ENGINE_VERSION}:{normalize_text(job_title).strip()}"
 
 
 def get_cached_analysis(cv_file, job_title):
@@ -487,16 +489,14 @@ FAZA 1: KNOCKOUT RULES (aplică ÎNAINTE de calculul de puncte)
 ═══════════════════════════════════════════════════════════
 
 JOB OPERAȚIONAL/ENTRY (operator, depozitar, vânzător, paznic, casier, stivuitorist, curier, manipulant):
-  ├─ NU respingi automat candidatul doar pentru că are studii superioare.
-  ├─ Dacă are studii superioare DAR are experiență reală în depozit/producție/retail/teren → evaluează normal.
-  ├─ Dacă are profil natural de birou/specialist/inginer/manager și NU are experiență operațională → SCOR MAX 28 + REJECT.
-  └─ Background total diferit fără nicio experiență similară → SCOR MAX 35.
+  ├─ Candidat cu licență/master/doctorat = SUPRACALIFICAT → SCOR MAX 32 + REJECT
+  └─ Background total diferit fără nicio experiență similară → SCOR MAX 38
 
 JOB CALIFICAT/SENIOR (analist, inginer, contabil, consilier, inspector, referent, HR, IT, medic, avocat, notar, judecator):
-  ├─ Studiile contează doar dacă postul le cere realist sau legal.
-  ├─ Fără experiență în domeniu sau domeniu conex → SCOR MAX 35.
-  ├─ Background complet diferit (ex: depozitar→Contabil, șofer→Inspector Fiscal) fără dovadă de reconversie → SCOR MAX 25 + REJECT.
-  └─ Experiență < 1 an în domeniu vizat → SCOR MAX 45, dacă nu există rezultate clare.
+  ├─ Fără studii superioare în domeniu direct → SCOR MAX 30
+  ├─ Fără nicio experiență în domeniu sau conexe → SCOR MAX 35
+  ├─ Background complet diferit (ex: vânzător→Consilier Parlamentar, șofer→Inspector Fiscal, depozitar→Contabil) → SCOR MAX 25 + REJECT
+  └─ Experiență < 1 an în domeniu vizat → SCOR MAX 45
 
 JOB MESERIE CALIFICATĂ (electrician, sudor, mecanic, șofer TIR, instalator):
   ├─ Fără atestat/certificare legală obligatorie → SCOR MAX 15 + REJECT
@@ -1091,89 +1091,6 @@ def _validate_cluster(val, fallback_text=""):
     return None
 
 
-def _job_super_cluster(target_job, job_cluster=None, profile=None):
-    """Returneaza super-clusterul postului, cu fallback pe profil si titlul jobului."""
-    jc = _validate_cluster(job_cluster or "", fallback_text=target_job)
-    if jc:
-        return jc
-    if profile:
-        domain = as_text(profile.get("domain", ""))
-        jc = _validate_cluster("", fallback_text=domain)
-        if jc:
-            return jc
-    cl = _detect_cluster(target_job)
-    return _SUPER.get(cl) if cl else None
-
-
-def _has_any_keyword(text, keywords):
-    t = normalize_text(text or "")
-    return any(k in t for k in keywords)
-
-
-OPERATIONAL_EVIDENCE_KW = [
-    "manipulant", "depozit", "gestionar", "picker", "ambalare", "etichetare",
-    "incarcare", "descarcare", "stivuitor", "iscir", "marfa", "marfuri",
-    "operator productie", "linie productie", "muncitor", "lucrator comercial", "casier",
-    "raft", "receptie marfa", "livrator", "curier", "sofer", "paza", "agent securitate",
-    "bucatar", "ospatar", "barista", "camerista", "curatenie", "teren", "ture"
-]
-
-OFFICE_SPECIALIST_KW = [
-    "inginer", "proiectant", "programator", "developer", "software", "it ", "contabil",
-    "economist", "jurist", "avocat", "consilier juridic", "hr", "recruiter", "manager",
-    "director", "coordonator", "analist", "consultant", "marketing specialist", "seo",
-    "ppc", "social media", "brand manager", "medic", "farmacist", "asistent medical",
-    "profesor", "trainer"
-]
-
-
-def _is_operational_job(target_job, job_cluster=None, profile=None):
-    sc = _job_super_cluster(target_job, job_cluster=job_cluster, profile=profile)
-    if sc != "blue_collar":
-        return False
-    # blue_collar include si roluri de teren unde experienta practica conteaza mai mult decat studiile
-    return True
-
-
-def _has_operational_evidence(cv_text, data):
-    combined = " ".join([
-        as_text(cv_text),
-        as_text(data.get("position", "")),
-        as_text(data.get("summary", "")),
-        as_text(data.get("strengths", "")),
-        as_text(data.get("skills", "")),
-        as_text(data.get("companies", "")),
-    ])
-    return _has_any_keyword(combined, OPERATIONAL_EVIDENCE_KW)
-
-
-def _looks_office_specialist_profile(cv_text, data, candidate_cluster=None):
-    cc = _validate_cluster(candidate_cluster or "", fallback_text=as_text(data.get("position", "")))
-    if cc in {"tech_ing", "business", "medical", "educatie"}:
-        return True
-    combined = " ".join([
-        as_text(data.get("position", "")),
-        as_text(data.get("summary", "")),
-        as_text(data.get("strengths", "")),
-        as_text(data.get("skills", "")),
-        as_text(cv_text)[:2500],
-    ])
-    return _has_any_keyword(combined, OFFICE_SPECIALIST_KW)
-
-
-def _cap_candidate(data, max_score, recommendation="REJECT", priority="LOW", action="REJECT", reason=""):
-    data["score"] = min(clean_score(data.get("score", 0)), max_score)
-    if recommendation:
-        data["recommendation"] = recommendation
-    if priority:
-        data["priority"] = priority
-    if action:
-        data["recommended_next_action"] = action
-    if reason:
-        data["reject_reason_internal"] = reason
-    return data
-
-
 def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_cluster=None, job_cluster=None):
     cv = normalize_text(cv_text)
     combined = normalize_text(" ".join([as_text(data.get(k,"")) for k in ["name","position","summary","strengths","skills"]]) + " " + cv[:3000])
@@ -1188,26 +1105,6 @@ def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_clust
         data["priority"] = "LOW"
         data["recommended_next_action"] = "REJECT"
         data["reject_reason_internal"] = "Supracalificare ridicata pentru rol operational."
-
-    # ── Regula 1.5: realism de recrutare pentru joburi operationale ───────────
-    # Studiile superioare NU elimina candidatul. Il coboram doar cand CV-ul arata
-    # profil de birou/specialist si nu exista dovezi de munca operationala reala.
-    if _is_operational_job(target_job, job_cluster=job_cluster, profile=profile):
-        if _looks_office_specialist_profile(cv_text, data, candidate_cluster=candidate_cluster) and not _has_operational_evidence(cv_text, data):
-            _cap_candidate(
-                data,
-                28,
-                recommendation="REJECT",
-                priority="LOW",
-                action="REJECT",
-                reason="Profil de birou/specialist fara experienta operationala relevanta pentru rolul cautat."
-            )
-            clean_visible = strip_risk_text(data.get("summary", ""))
-            data["summary"] = set_summary_risk(
-                f"Profil nerealist pentru rol operational. {clean_visible}",
-                over_risk="high",
-                level_risk="high"
-            )
 
     # ── Regula 2: compatibilitate domeniu (3 niveluri) ────────────────────────
     natural_role = as_text(data.get("position", ""))
@@ -1382,59 +1279,88 @@ def normalize_data(data, file, target_job, cv_text, profile):
         "candidate_cluster":       candidate_cluster,
         "job_cluster":             job_cluster,
     }
+    # Motor nou: familia jobului decide eligibilitatea.
+    # AI-ul ramane util pentru extragere, dar scorul final este recalibrat determinist.
+    normalized = recalibrate_ai_result(normalized, target_job, cv_text, ai_score=score)
+
+    # Pastram regulile hard existente, de exemplu permis C/CE cand chiar este cerut.
     return apply_local_safety_rules(normalized, target_job, cv_text, profile,
-                                    candidate_cluster=candidate_cluster,
-                                    job_cluster=job_cluster)
+                                    candidate_cluster=None,
+                                    job_cluster=None)
 
 
 def save_candidate_to_db(data, file, target_job):
+    """
+    Upsert pe CV + job.
+
+    Inainte, fiecare reanalizare putea crea inca un rand pentru acelasi CV si acelasi job.
+    Acum actualizam randul existent. Asa dashboard-ul nu mai amesteca scoruri vechi cu scoruri noi.
+    """
+    db = SessionLocal()
     try:
-        db = SessionLocal()
         status = recommendation_to_status(data.get("recommendation", "CONSIDER"))
-        candidate = Candidate(
-            name=as_text(data.get("name","")),
-            email=as_text(data.get("email","")),
-            phone=as_text(data.get("phone","")),
-            position=as_text(data.get("position","")),
-            experience=as_text(data.get("years_experience","")),
-            skills=as_text(data.get("skills","")),
-            companies=as_text(data.get("companies","")),
-            score=clean_score(data.get("score",0)),
-            level=as_text(data.get("level","")),
-            strengths=as_text(data.get("strengths","")),
-            weaknesses=as_text(data.get("weaknesses","")),
-            summary=as_text(data.get("summary","")),
-            job_title=target_job,
-            status=status,
-            cv_file=file,
-            # ── Campuri noi ──
-            decision_reason=as_text(data.get("decision_reason","")),
-            missing_requirements=as_text(data.get("missing_requirements","")),
-            must_verify_by_phone=as_text(data.get("must_verify_by_phone","")),
-            recommended_next_action=as_text(data.get("recommended_next_action","")),
-            priority=as_text(data.get("priority","")),
-            manager_summary=as_text(data.get("manager_summary","")),
-            phone_call_script=as_text(data.get("phone_call_script","")),
-            interview_questions=as_text(data.get("interview_questions","")),
-            better_role_match=as_text(data.get("better_role_match","")),
-            reject_reason_internal=as_text(data.get("reject_reason_internal","")),
-            candidate_cluster=data.get("candidate_cluster") or None,
-            job_cluster=data.get("job_cluster") or None,
-        )
-        db.add(candidate)
+        existing = db.query(Candidate).filter(
+            Candidate.cv_file == file,
+            Candidate.job_title == target_job
+        ).first()
+
+        values = {
+            "name": as_text(data.get("name", "")),
+            "email": as_text(data.get("email", "")),
+            "phone": as_text(data.get("phone", "")),
+            "position": as_text(data.get("position", "")),
+            "experience": as_text(data.get("years_experience", "")),
+            "skills": as_text(data.get("skills", "")),
+            "companies": as_text(data.get("companies", "")),
+            "score": clean_score(data.get("score", 0)),
+            "level": as_text(data.get("level", "")),
+            "strengths": as_text(data.get("strengths", "")),
+            "weaknesses": as_text(data.get("weaknesses", "")),
+            "summary": as_text(data.get("summary", "")),
+            "job_title": target_job,
+            "status": status,
+            "cv_file": file,
+            "decision_reason": as_text(data.get("decision_reason", "")),
+            "missing_requirements": as_text(data.get("missing_requirements", "")),
+            "must_verify_by_phone": as_text(data.get("must_verify_by_phone", "")),
+            "recommended_next_action": as_text(data.get("recommended_next_action", "")),
+            "priority": as_text(data.get("priority", "")),
+            "manager_summary": as_text(data.get("manager_summary", "")),
+            "phone_call_script": as_text(data.get("phone_call_script", "")),
+            "interview_questions": as_text(data.get("interview_questions", "")),
+            "better_role_match": as_text(data.get("better_role_match", "")),
+            "reject_reason_internal": as_text(data.get("reject_reason_internal", "")),
+            "candidate_cluster": as_text(data.get("candidate_cluster", "")) or None,
+            "job_cluster": as_text(data.get("job_cluster", "")) or None,
+        }
+
+        if existing:
+            for key, value in values.items():
+                setattr(existing, key, value)
+            candidate_id = existing.id
+            action = "ACTUALIZAT"
+        else:
+            candidate = Candidate(**values)
+            db.add(candidate)
+            db.flush()
+            candidate_id = candidate.id
+            action = "SALVAT"
+
         db.commit()
-        candidate_id = candidate.id
-        db.close()
-        print("✓ SALVAT IN BAZA DE DATE:", data.get("name",""), "-", status)
+        print(f"✓ {action} IN BAZA DE DATE: {data.get('name','')} - {status} - scor {values['score']}")
         return candidate_id
     except Exception as e:
         print("EROARE LA SALVARE IN DB:", e)
         try:
             db.rollback()
-            db.close()
         except Exception:
             pass
         return None
+    finally:
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 # ─── PARALLEL TASK ────────────────────────────────────────────────────────────
@@ -1515,12 +1441,12 @@ def process_cvs_for_job(target_job, job_requirements=None):
     if not all_files:
         return {"ok": False, "message": "Nu exista CV-uri. Verifica Cloudinary sau incarca CV-uri.", "saved": 0}
 
-    # Pre-check: care CV-uri sunt deja analizate si salvate in DB pentru acest job?
-    already_in_db = _get_already_analyzed_files(target_job)
-    new_files = [f for f in all_files if f not in already_in_db]
-    db_skipped = len(already_in_db.intersection(set(all_files)))
+    # Motorul nou foloseste upsert. Analizam toate CV-urile pentru jobul cerut,
+    # ca scorurile vechi sa fie inlocuite cand schimbi logica.
+    new_files = list(all_files)
+    db_skipped = 0
 
-    print(f"\nTotal CV-uri: {len(all_files)} | Deja in DB: {db_skipped} | De analizat: {len(new_files)}")
+    print(f"\nTotal CV-uri: {len(all_files)} | De analizat/actualizat: {len(new_files)}")
     print("=" * 70)
 
     cache_hits = 0

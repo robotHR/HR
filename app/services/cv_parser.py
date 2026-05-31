@@ -262,14 +262,85 @@ def match_job_profile(target_job):
 
 
 def build_fallback_profile(target_job):
-    return {
-        "job_title": target_job, "domain": "General", "level": "Middle",
-        "must_have": [], "nice_to_have": [], "reject_if_missing": [],
-        "overqualified_risk": ["rector","profesor universitar","director general","CEO","antreprenor"],
-        "red_flags": ["lipsa experienta relevanta", "CV generic"],
-        "max_score_rules": ["Daca experienta este complet diferita, scor maxim 45."],
-        "interview_questions": ["Ce experienta directa ai pentru acest rol?"]
-    }
+    job_lower = normalize_text(target_job)
+
+    operational_kw = [
+        "operator", "muncitor", "lucrator", "manipulant", "depozitar", "stivuitorist",
+        "curier", "casier", "ospatar", "vanzator", "agent vanzari", "curatenie",
+        "ingrijitor", "paznic", "agent paza", "spalator", "sorter", "ambalator",
+        "picker", "packer", "necalificat", "zilier", "ajutor",
+    ]
+    skilled_trade_kw = [
+        "electrician", "sudor", "lacatus", "mecanic auto", "mecanic", "instalator",
+        "zugrav", "zugrav vopsitor", "tamplar", "zidar", "faiantar", "montator",
+        "frigotehnist", "automatist", "mentenanta", "tehnic",
+    ]
+    senior_kw = [
+        "coordonator", "manager", "director", "analist", "inginer", "contabil",
+        "economist", "auditor", "consultant", "specialist", "expert", "sef",
+        "responsabil hr", "hr", "jurist", "avocat", "financiar", "controller",
+        "programator", "developer", "it", "arhitect", "medic", "farmacist",
+    ]
+
+    is_operational = any(kw in job_lower for kw in operational_kw)
+    is_skilled_trade = any(kw in job_lower for kw in skilled_trade_kw)
+    is_senior = any(kw in job_lower for kw in senior_kw)
+
+    if is_operational:
+        return {
+            "job_title": target_job, "domain": "Operational", "level": "Entry",
+            "requires_higher_education": False,
+            "must_have": ["seriozitate", "punctualitate", "disponibilitate program"],
+            "nice_to_have": ["experienta in domeniu similar", "permis auto"],
+            "reject_if_missing": [],
+            "overqualified_risk": ["licenta", "master", "doctorat", "inginer", "economist", "jurist", "studii superioare"],
+            "red_flags": [],
+            "max_score_rules": [
+                "REGULA CRITICA: Daca candidatul are studii superioare (licenta/master/doctorat), final_score MAXIM 35 — supracalificat, nu va ramane.",
+                "Daca candidatul nu are nicio experienta de munca, final_score maxim 58.",
+                "Candidatul cu experienta in domenii similare (depozit/logistica/munca fizica/vanzari) poate lua 60-85.",
+            ],
+        }
+    elif is_skilled_trade:
+        return {
+            "job_title": target_job, "domain": "Meserie calificata", "level": "Skilled",
+            "requires_higher_education": False,
+            "must_have": ["calificare sau experienta practica in meserie"],
+            "nice_to_have": ["certificate autorizatii", "experienta recenta"],
+            "reject_if_missing": ["experienta practica sau calificare in meserie"],
+            "overqualified_risk": ["master", "doctorat"],
+            "red_flags": ["fara experienta practica", "doar studii teoretice"],
+            "max_score_rules": [
+                "Fara experienta sau calificare practica in meserie, final_score maxim 38.",
+                "Candidat cu master/doctorat fara experienta practica, final_score maxim 35.",
+            ],
+        }
+    elif is_senior:
+        return {
+            "job_title": target_job, "domain": "Calificat/Senior", "level": "Senior",
+            "requires_higher_education": True,
+            "must_have": ["studii superioare relevante", "experienta minima in domeniu"],
+            "nice_to_have": ["certificari", "limbi straine", "experienta de conducere"],
+            "reject_if_missing": ["studii superioare", "experienta in domeniu"],
+            "overqualified_risk": [],
+            "red_flags": ["fara studii superioare", "fara experienta relevanta"],
+            "max_score_rules": [
+                "Fara studii superioare in domeniu relevant, final_score maxim 38.",
+                "Fara experienta relevanta in domeniu, final_score maxim 42.",
+                "Experienta partiala sau tangentiala, penalizare proportionala, scor 43-58.",
+            ],
+        }
+    else:
+        return {
+            "job_title": target_job, "domain": "General", "level": "Middle",
+            "requires_higher_education": False,
+            "must_have": [],
+            "nice_to_have": [],
+            "reject_if_missing": [],
+            "overqualified_risk": [],
+            "red_flags": ["lipsa experienta relevanta", "CV generic"],
+            "max_score_rules": ["Daca experienta este complet diferita de domeniu, scor maxim 45."],
+        }
 
 
 def detect_required_license(target_job, profile=None):
@@ -287,11 +358,20 @@ def detect_required_license(target_job, profile=None):
     return ""
 
 
-def build_prompt(text, target_job):
+def build_prompt(text, target_job, job_requirements=None):
     profile = match_job_profile(target_job) or build_fallback_profile(target_job)
     profile_json = json.dumps(profile, ensure_ascii=False, indent=2)
     required_license = detect_required_license(target_job, profile)
     license_rule = f"Postul cere permis {required_license}. Nu cere alta categorie." if required_license else "Postul nu cere permis explicit."
+
+    job_req_block = ""
+    if job_requirements and job_requirements.strip():
+        job_req_block = (
+            "CERINTE REALE ALE POSTULUI (scrise de HR — PRIORITATE MAXIMA):\n"
+            + job_requirements.strip()
+            + "\n\nFOLOSESTE ACESTE CERINTE ca referinta principala pentru scoring. "
+            "Daca CV-ul nu indeplineste cerintele obligatorii de mai sus, penalizeaza scorul conform regulilor de calibrare.\n\n"
+        )
 
     schema = """
 {
@@ -343,8 +423,34 @@ def build_prompt(text, target_job):
     return (
         "TU ESTI RECRUITER HR SENIOR CU 15+ ANI EXPERIENTA IN ROMANIA.\n\n"
         f"ANALIZEZI CV-UL PENTRU POSTUL: {target_job}\n\n"
-        "PROFIL JOB DEDICAT DIN config/job_profiles.json:\n" + profile_json + "\n\n"
+        + job_req_block
+        + "PROFIL JOB:\n" + profile_json + "\n\n"
         f"REGULA PERMIS: {license_rule}\n\n"
+        "═══════════════════════════════════════════════════════════\n"
+        "CALIBRARE NIVEL JOB — REGULI STRICTE DE SCORING\n"
+        "═══════════════════════════════════════════════════════════\n"
+        "Primul pas: determina nivelul jobului din titlu si cerinte.\n\n"
+        "JOB OPERATIONAL/ENTRY (operator, muncitor, depozitar, casier, curier, vanzator, paznic, etc.):\n"
+        "  → Candidat cu studii superioare (licenta/master/doctorat) = SUPRACALIFICAT\n"
+        "    final_score MAXIM 35, overqualification_risk=high\n"
+        "    Motivul: nu va ramane, va pleca in 1-2 luni. Nu e potrivit.\n"
+        "  → Candidat fara studii superioare + experienta in domenii similare = IDEAL\n"
+        "    Poate lua scor 60-90 in functie de potrivire.\n"
+        "  → Candidat fara nicio experienta dar fara studii superioare = ACCEPTABIL\n"
+        "    Poate lua scor 45-60 (job accesibil, se poate instrui).\n\n"
+        "JOB CALIFICAT/SENIOR (coordonator, manager, analist, inginer, contabil, HR, financiar, IT, etc.):\n"
+        "  → Candidat fara studii superioare relevante = SUBCALIFICAT\n"
+        "    final_score MAXIM 38\n"
+        "  → Candidat fara experienta minima ceruta = SUBCALIFICAT\n"
+        "    final_score MAXIM 42\n"
+        "  → Candidat cu experienta partiala = penalizare proportionala, scor 43-58\n\n"
+        "JOB MESERIE CALIFICATA (electrician, sudor, mecanic, instalator, etc.):\n"
+        "  → Fara calificare/certificare practica = final_score MAXIM 38\n"
+        "  → Cu calificare dar fara experienta recenta = scor 40-55\n\n"
+        "REGULA UNIVERSALA: Potrivirea nivel-la-nivel > cantitatea de calificari.\n"
+        "Un om cu liceu + 5 ani depozit e MAI POTRIVIT pentru 'operator depozit'\n"
+        "decat un inginer cu master. Scorul reflecta POTRIVIREA, nu valoarea absoluta.\n"
+        "═══════════════════════════════════════════════════════════\n\n"
         "REGULI OBLIGATORII:\n"
         "- Extrage companiile/institutiile unde a lucrat candidatul si pune-le in companies. Nu inventa companii. Daca nu apar clar, lasa lista goala.\n"
         "- Extrage functiile ocupate si pune-le in positions_held.\n"
@@ -374,13 +480,13 @@ def build_prompt(text, target_job):
     )
 
 
-def analyze_cv_with_ai(text, target_job):
+def analyze_cv_with_ai(text, target_job, job_requirements=None):
     if not os.getenv("OPENROUTER_API_KEY"):
         raise ValueError("Lipseste OPENROUTER_API_KEY din .env")
     model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
     response = client.chat.completions.create(
         model=model,
-        messages=[{"role": "user", "content": build_prompt(text, target_job)}]
+        messages=[{"role": "user", "content": build_prompt(text, target_job, job_requirements)}]
     )
     return response.choices[0].message.content
 
@@ -646,11 +752,7 @@ def save_candidate_to_db(data, file, target_job):
 # ─── PARALLEL TASK ────────────────────────────────────────────────────────────
 
 def _process_single_cv(args):
-    """
-    Proceseaza un singur CV — folosit de ThreadPoolExecutor.
-    Returneaza dict cu rezultatul sau eroarea.
-    """
-    file, target_job, profile = args
+    file, target_job, profile, job_requirements = args
 
     cached = get_cached_analysis(file, target_job)
     if cached:
@@ -666,7 +768,7 @@ def _process_single_cv(args):
         return {"file": file, "data": None, "from_cache": False, "error": "Nu s-a putut extrage text"}
 
     try:
-        ai_response = analyze_cv_with_ai(text, target_job)
+        ai_response = analyze_cv_with_ai(text, target_job, job_requirements)
         data = parse_ai_response(ai_response)
         if not data:
             return {"file": file, "data": None, "from_cache": False, "error": "Raspuns AI invalid"}
@@ -682,13 +784,15 @@ def _process_single_cv(args):
 
 # ─── MAIN ENTRY POINT ─────────────────────────────────────────────────────────
 
-def process_cvs_for_job(target_job):
+def process_cvs_for_job(target_job, job_requirements=None):
     target_job = target_job.strip()
     if not target_job:
         return {"ok": False, "message": "Nu ai completat postul.", "saved": 0}
 
     profile = match_job_profile(target_job) or build_fallback_profile(target_job)
     print("Profil job folosit:", profile.get("job_title"), "-", profile.get("domain"))
+    if job_requirements:
+        print("Cerinte post din platforma: DA")
 
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     synced = sync_from_cloudinary()
@@ -711,7 +815,7 @@ def process_cvs_for_job(target_job):
     saved = 0
     results = []
 
-    tasks = [(file, target_job, profile) for file in all_files]
+    tasks = [(file, target_job, profile, job_requirements) for file in all_files]
 
     print(f"\nProcesez {len(tasks)} CV-uri pentru postul: {target_job}")
     print("=" * 70)

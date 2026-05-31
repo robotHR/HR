@@ -39,7 +39,6 @@ from app.services.cv_parser import (
     _is_domain_incompatible,
     _get_compat_level,
 )
-from app.services.job_classifier import evaluate_candidate_record, evaluate_match, classify_job
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
 from app.services.gmail_service import (
@@ -384,17 +383,14 @@ def update_candidate_manual(candidate_id, name, email, phone, status, position, 
 
 
 def group_candidates_by_job(candidates):
-    """
-    Dashboard pe joburi.
-    Pentru fiecare job, aratam doar candidatii eligibili pentru familia acelui job.
-    Nu mai afisam liste lungi cu scoruri 50-70 din domenii gresite.
-    """
     jobs = {}
 
     for candidate in candidates:
         job_name = candidate.job_title or "Fara categorie"
+
         if job_name not in jobs:
             jobs[job_name] = {"latest_id": candidate.id, "candidates": []}
+
         jobs[job_name]["latest_id"] = max(jobs[job_name]["latest_id"], candidate.id)
         jobs[job_name]["candidates"].append(candidate)
 
@@ -402,19 +398,13 @@ def group_candidates_by_job(candidates):
 
     final_jobs = {}
     for job_name, data in sorted_jobs:
-        filtered = []
-        for c in data["candidates"]:
-            decision = evaluate_candidate_record(job_name, c, strict=True)
-            if decision.include:
-                # Nu scriem in DB aici. Doar recalibram pentru afisare.
-                try:
-                    c.score = decision.score
-                except Exception:
-                    pass
-                filtered.append((c, decision))
-
-        filtered.sort(key=lambda pair: (pair[1].score, pair[0].score or 0, pair[0].id or 0), reverse=True)
-        final_jobs[job_name] = [pair[0] for pair in filtered]
+        def _sort_key(c, jn=job_name):
+            cc = getattr(c, "candidate_cluster", None) or None
+            jc = getattr(c, "job_cluster", None) or None
+            compat = _get_compat_level(c.position or "", jn,
+                                       candidate_cluster=cc, job_cluster=jc)
+            return (compat, c.score or 0)
+        final_jobs[job_name] = sorted(data["candidates"], key=_sort_key, reverse=True)
 
     return final_jobs
 
@@ -712,74 +702,65 @@ def candidate_search_blob(candidate):
 
 def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", min_score=0):
     """
-    Lista unica de candidati, cu filtru strict pe familia jobului cautat.
-
-    Regula noua:
-    - daca userul cauta un job in q sau selecteaza job, afisam doar CV-uri eligibile realist;
-    - scorul AI nu mai poate ridica un candidat din alta familie;
-    - acelasi CV ramane grupat, dar best_match este analiza relevanta pentru jobul cautat.
+    Intoarce o lista unica de candidati.
+    Fiecare rand contine candidatul principal si toate potrivirile pe posturi.
     """
     grouped = defaultdict(list)
     for candidate in candidates:
         grouped[candidate_identity_key(candidate)].append(candidate)
 
     rows = []
-    q_value = (q or "").strip()
-    q_lower = q_value.lower()
+    q_value = (q or "").strip().lower()
     status_value = (status or "").strip()
-    job_value = (job or "").strip()
-    job_lower = job_value.lower()
+    job_value = (job or "").strip().lower()
     skill_value = (skill or "").strip().lower()
-
-    # In proiectul tau, cautarea text poate fi job sau cautare simpla.
-    # Tratam q ca job doar daca taxonomia il recunoaste.
-    q_job_class = classify_job(q_value) if q_value else None
-    q_is_job = bool(q_job_class and q_job_class.is_known and q_job_class.confidence >= 60)
-    target_job = job_value or (q_value if q_is_job else "")
-    strict_job_search = bool(target_job)
 
     for _, items in grouped.items():
         sorted_items = sorted(items, key=lambda item: (item.score or 0, item.id or 0), reverse=True)
+        best = sorted_items[0]
 
         if status_value and not any((item.status or "") == status_value for item in sorted_items):
+            continue
+
+        # Filtru job: candidatul trebuie sa aiba cel putin o analiza pentru jobul cautat
+        if job_value and not any(
+            job_value in (item.job_title or "").lower()
+            or job_value in (item.position or "").lower()
+            for item in sorted_items
+        ):
             continue
 
         if skill_value and not any(skill_value in candidate_search_blob(item) for item in sorted_items):
             continue
 
-        eligible_items = []
-        decisions = {}
+        if q_value and not any(q_value in candidate_search_blob(item) for item in sorted_items):
+            continue
 
-        if strict_job_search:
-            for item in sorted_items:
-                decision = evaluate_candidate_record(target_job, item, strict=True)
-                decisions[item.id] = decision
-                if decision.include:
-                    eligible_items.append((item, decision))
-
-            # Filtru strict: daca nu e in familia jobului, nu apare.
-            if not eligible_items:
-                continue
-
-            eligible_items.sort(key=lambda pair: (pair[1].score, pair[0].score or 0, pair[0].id or 0), reverse=True)
-            display_best, best_decision = eligible_items[0]
-            display_score = best_decision.score
-            best = display_best
+        # Cand filtrul de job e activ, scorul afisat = scorul pe jobul cautat (nu best overall)
+        if job_value:
+            job_items = [item for item in sorted_items
+                         if job_value in (item.job_title or "").lower()
+                         or job_value in (item.position or "").lower()]
+            job_items_sorted = sorted(job_items, key=lambda x: x.score or 0, reverse=True)
+            display_best = job_items_sorted[0] if job_items_sorted else best
+            display_score = display_best.score or 0
         else:
-            # Fara cautare job, dashboard/lista generala ramane bazata pe scorul salvat.
-            best = sorted_items[0]
             display_best = best
             display_score = best.score or 0
-
-            if q_lower and not any(q_lower in candidate_search_blob(item) for item in sorted_items):
-                continue
 
         if min_score and display_score < min_score:
             continue
 
+        # Construieste lista de matches, cu jobul cautat primul daca filtrul e activ
         matches = []
         seen_jobs = set()
-        all_items_ordered = [pair[0] for pair in eligible_items] if strict_job_search else sorted_items
+        all_items_ordered = sorted_items
+
+        if job_value:
+            # Punem jobul cautat primul, restul dupa scor
+            job_first = [i for i in sorted_items if job_value in (i.job_title or "").lower() or job_value in (i.position or "").lower()]
+            rest = [i for i in sorted_items if i not in job_first]
+            all_items_ordered = job_first + rest
 
         for item in all_items_ordered:
             job_name = item.job_title or item.position or "Nespecificat"
@@ -787,20 +768,16 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             if key in seen_jobs:
                 continue
             seen_jobs.add(key)
-
-            decision = decisions.get(item.id)
-            score_value = decision.score if decision else (item.score or 0)
             matches.append({
                 "id": item.id,
                 "job_title": job_name,
                 "position": item.position or "Nespecificat",
-                "score": score_value,
+                "score": item.score or 0,
                 "status": item.status or "NOU",
                 "summary": clean_summary(item.summary),
                 "cv_file": item.cv_file,
                 "candidate_cluster": getattr(item, "candidate_cluster", None),
                 "job_cluster": getattr(item, "job_cluster", None),
-                "match_relation": decision.relation if decision else "SAVED",
             })
 
         rows.append({
@@ -813,7 +790,18 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             "phones": sorted({item.phone for item in sorted_items if item.phone}),
         })
 
-    rows = sorted(rows, key=lambda row: (row["best_score"], row["best_match"].id or 0), reverse=True)
+    # Daca filtrul de job e activ, sortam si dupa compatibilitate (2>1>0)
+    if job_value:
+        def _row_sort(row, jv=job_value):
+            c = row["candidate"]
+            cc = getattr(c, "candidate_cluster", None) or None
+            jc = getattr(c, "job_cluster", None) or None
+            compat = _get_compat_level(c.position or "", jv,
+                                       candidate_cluster=cc, job_cluster=jc)
+            return (compat, row["best_score"])
+        rows = sorted(rows, key=_row_sort, reverse=True)
+    else:
+        rows = sorted(rows, key=lambda row: (row["best_score"], row["candidate"].id or 0), reverse=True)
     return rows
 
 
@@ -1498,7 +1486,7 @@ def _run_reanalizare_completa():
                     _reanalize_progress["done"] += 1
                     continue
 
-                from app.services.cv_parser import extract_text_from_file, analyze_cv_with_ai, parse_ai_response, normalize_data, save_analysis_to_cache, save_candidate_to_db, match_job_profile, build_fallback_profile
+                from app.services.cv_parser import extract_text_from_file, analyze_cv_with_ai, parse_ai_response, normalize_data, save_analysis_to_cache, match_job_profile, build_fallback_profile
                 text = extract_text_from_file(path)
                 if not text:
                     _reanalize_progress["done"] += 1
@@ -1510,8 +1498,7 @@ def _run_reanalizare_completa():
                     profile = match_job_profile(job_title) or build_fallback_profile(job_title)
                     normalized = normalize_data(data, cv_file, job_title, text, profile)
                     save_analysis_to_cache(cv_file, job_title, normalized)
-                    save_candidate_to_db(normalized, cv_file, job_title)
-                    print(f"[RE-ANALIZARE] ✓ {cv_file} → {job_title} scor={normalized.get('score')}")
+                    print(f"[RE-ANALIZARE] ✓ {cv_file} → {job_title}")
             except Exception as e:
                 print(f"[RE-ANALIZARE] ✗ {cv_file}: {e}")
             finally:

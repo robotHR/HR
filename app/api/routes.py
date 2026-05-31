@@ -2110,7 +2110,7 @@ async def force_reanalyze(candidate_id: int, background_tasks: BackgroundTasks):
 # ─── REMINDER INTERVIURI ──────────────────────────────────────────────────────
 
 def _send_interview_reminder_email(idata: dict):
-    """Trimite email reminder cu 3 ore inainte de interviu cu linkuri confirma/anuleaza."""
+    """Trimite email reminder cu o zi inainte de interviu (la ora 19:00 ora Romaniei)."""
     from datetime import datetime as dt
     try:
         base_url = idata.get("base_url", "")
@@ -2134,10 +2134,10 @@ Anuleaza interviul:
 
         send_email_api(
             to_email=idata["candidate_email"],
-            subject=f"Reminder: interviu in 3 ore — {idata['job_title'] or 'postul aplicat'}",
+            subject=f"Reminder: interviu maine — {idata['job_title'] or 'postul aplicat'}",
             body=f"""Buna ziua, {idata['candidate_name'] or 'Candidat'},
 
-Va reamintim ca astazi, la ora {idata['ora']}, aveti programat un interviu pentru postul de {idata['job_title'] or 'postul aplicat'}.{locatie_line}
+Va reamintim ca maine, {idata['data']}, la ora {idata['ora']}, aveti programat un interviu pentru postul de {idata['job_title'] or 'postul aplicat'}.{locatie_line}
 {confirm_section}
 Cu respect,
 Echipa HR NEXAS
@@ -2159,42 +2159,40 @@ Echipa HR NEXAS
 
 
 def _schedule_interview_reminders(background_tasks: BackgroundTasks, base_url: str = ""):
-    """Verifica interviuri in urmatoarele 3 ore si trimite reminder daca nu s-a trimis deja."""
+    """Verifica interviuri de maine si trimite reminder dupa ora 19:00 ora Romaniei."""
     from datetime import datetime, timedelta
-    now = datetime.utcnow()
-    today = now.strftime("%Y-%m-%d")
-    window_start = now + timedelta(hours=3)
-    window_end = now + timedelta(hours=4)
+    # Ora Romaniei: UTC+3 vara (EEST), UTC+2 iarna — folosim +3 ca aproximare sigura
+    ro_now = datetime.utcnow() + timedelta(hours=3)
+    if ro_now.hour < 19:
+        return  # Trimitem reminderele doar dupa ora 19:00 ora Romaniei
+    tomorrow_ro = (ro_now + timedelta(days=1)).strftime("%Y-%m-%d")
 
     try:
         db = SessionLocal()
-        candidates_today = db.query(Interview).filter(
-            Interview.data == today,
+        interviews_maine = db.query(Interview).filter(
+            Interview.data == tomorrow_ro,
             Interview.reminder_sent.isnot(True),
             Interview.status.in_(["programat", "confirmat"]),
             Interview.candidate_email.isnot(None),
         ).all()
 
         interviews_data = []
-        for i in candidates_today:
+        for i in interviews_maine:
             try:
-                interview_dt = datetime.strptime(f"{i.data} {i.ora}", "%Y-%m-%d %H:%M")
-                if window_start <= interview_dt <= window_end:
-                    # Genereaza action_token daca nu exista
-                    if not i.action_token:
-                        i.action_token = secrets.token_urlsafe(24)
-                        db.commit()
-                    interviews_data.append({
-                        "id": i.id,
-                        "candidate_email": i.candidate_email,
-                        "candidate_name": i.candidate_name,
-                        "job_title": i.job_title,
-                        "data": i.data,
-                        "ora": i.ora,
-                        "locatie": i.locatie,
-                        "action_token": i.action_token,
-                        "base_url": base_url,
-                    })
+                if not i.action_token:
+                    i.action_token = secrets.token_urlsafe(24)
+                    db.commit()
+                interviews_data.append({
+                    "id": i.id,
+                    "candidate_email": i.candidate_email,
+                    "candidate_name": i.candidate_name,
+                    "job_title": i.job_title,
+                    "data": i.data,
+                    "ora": i.ora,
+                    "locatie": i.locatie,
+                    "action_token": i.action_token,
+                    "base_url": base_url,
+                })
             except Exception:
                 continue
         db.close()
@@ -2202,7 +2200,7 @@ def _schedule_interview_reminders(background_tasks: BackgroundTasks, base_url: s
         for idata in interviews_data:
             background_tasks.add_task(_send_interview_reminder_email, idata)
         if interviews_data:
-            print(f"[REMINDER] Trimise {len(interviews_data)} remindere pentru ora {window_start.strftime('%H:%M')}")
+            print(f"[REMINDER] Trimise {len(interviews_data)} remindere pentru maine {tomorrow_ro}")
     except Exception as e:
         print(f"[REMINDER] WARN schedule error: {e}")
 
@@ -2457,7 +2455,7 @@ async def create_interview_api(
         event_description=f"Interviu programat pe {data} la ora {ora}. Locatie: {locatie or 'nespecificata'}."
     )
 
-    # Trimite email in background
+    # Trimite email candidat in background
     if candidate.email:
         background_tasks.add_task(
             _send_interview_scheduled_email,
@@ -2468,6 +2466,18 @@ async def create_interview_api(
             ora=ora,
             locatie=locatie,
         )
+
+    # Notifica HR
+    background_tasks.add_task(
+        _notify_hr_interview_event,
+        "programat_hr",
+        candidate.name or "Candidat",
+        candidate.job_title or "postul aplicat",
+        data,
+        ora,
+        locatie,
+        candidate.email or "",
+    )
 
     return JSONResponse({
         "success": True,
@@ -2513,6 +2523,7 @@ async def cancel_interview_api(interview_id: int, background_tasks: BackgroundTa
     job_title = interview.job_title or "postul aplicat"
     data = interview.data
     ora = interview.ora
+    locatie = interview.locatie or ""
     cand_id = interview.candidate_id
 
     interview.status = "anulat"
@@ -2536,11 +2547,23 @@ async def cancel_interview_api(interview_id: int, background_tasks: BackgroundTa
             ora=ora,
         )
 
+    background_tasks.add_task(
+        _notify_hr_interview_event,
+        "anulat_hr",
+        cand_name,
+        job_title,
+        data,
+        ora,
+        locatie,
+        cand_email or "",
+    )
+
     return JSONResponse({"success": True})
 
 
 @router.post("/calendar/api/interview/{interview_id}/edit-ora")
 async def edit_interview_ora(
+    background_tasks: BackgroundTasks,
     interview_id: int,
     ora: str = Form(...),
     data: str = Form(""),
@@ -2557,18 +2580,50 @@ async def edit_interview_ora(
         interview.data = data
     db.commit()
 
+    cand_name = interview.candidate_name or "Candidat"
+    cand_email = interview.candidate_email or ""
+    job_title = interview.job_title or "postul aplicat"
+    new_data = interview.data
+    new_ora = interview.ora
+    locatie = interview.locatie or ""
+
     result = {
         "id": interview.id,
         "candidate_id": interview.candidate_id,
-        "candidate_name": interview.candidate_name or "—",
-        "job_title": interview.job_title or "—",
-        "data": interview.data,
-        "ora": interview.ora,
-        "locatie": interview.locatie,
+        "candidate_name": cand_name,
+        "job_title": job_title,
+        "data": new_data,
+        "ora": new_ora,
+        "locatie": locatie,
         "durata": interview.durata or 60,
         "status": interview.status,
     }
     db.close()
+
+    # Notifica HR despre reprogramare
+    background_tasks.add_task(
+        _notify_hr_interview_event,
+        "reprogramat_hr",
+        cand_name,
+        job_title,
+        new_data,
+        new_ora,
+        locatie,
+        cand_email,
+    )
+
+    # Notifica candidatul despre noua ora
+    if cand_email:
+        background_tasks.add_task(
+            _send_interview_rescheduled_email,
+            to_email=cand_email,
+            candidate_name=cand_name,
+            job_title=job_title,
+            data=new_data,
+            ora=new_ora,
+            locatie=locatie,
+        )
+
     return JSONResponse({"success": True, "interview": result})
 
 
@@ -2815,6 +2870,76 @@ Echipa HR NEXAS
         print(f"[SCHEDULE] WARN email invite esuat catre {to_email}: {e}")
 
 
+def _notify_hr_interview_event(
+    event_type: str,
+    candidate_name: str,
+    job_title: str,
+    data: str,
+    ora: str,
+    locatie: str = "",
+    candidate_email: str = "",
+):
+    """Notifica HR-ul pentru orice eveniment legat de un interviu.
+
+    event_type: 'confirmat_candidat' | 'anulat_candidat' | 'programat_hr' | 'anulat_hr' | 'reprogramat_hr'
+    """
+    try:
+        hr_email = os.getenv("HR_NOTIFICATION_EMAIL") or os.getenv("RESEND_FROM_EMAIL") or os.getenv("FROM_EMAIL")
+        if not hr_email:
+            print(f"[HR-NOTIF] WARN: HR_NOTIFICATION_EMAIL nesetat, eveniment '{event_type}' nu a fost trimis.")
+            return
+
+        luni = {
+            "01": "Ianuarie", "02": "Februarie", "03": "Martie",
+            "04": "Aprilie", "05": "Mai", "06": "Iunie",
+            "07": "Iulie", "08": "August", "09": "Septembrie",
+            "10": "Octombrie", "11": "Noiembrie", "12": "Decembrie"
+        }
+        try:
+            parts = data.split("-")
+            data_fmt = f"{int(parts[2])} {luni.get(parts[1], parts[1])} {parts[0]}"
+        except Exception:
+            data_fmt = data
+
+        subjects = {
+            "confirmat_candidat": f"CONFIRMAT — {candidate_name.upper()} — {data_fmt} {ora}",
+            "anulat_candidat":    f"ANULAT DE CANDIDAT — {candidate_name.upper()} — {data_fmt} {ora}",
+            "programat_hr":       f"INTERVIU PROGRAMAT — {candidate_name.upper()} — {data_fmt} {ora}",
+            "anulat_hr":          f"INTERVIU ANULAT DE HR — {candidate_name.upper()} — {data_fmt} {ora}",
+            "reprogramat_hr":     f"INTERVIU REPROGRAMAT — {candidate_name.upper()} — {data_fmt} {ora}",
+        }
+        messages = {
+            "confirmat_candidat": f"Candidatul {candidate_name} a CONFIRMAT participarea la interviu.",
+            "anulat_candidat":    f"Candidatul {candidate_name} a ANULAT interviul din link-ul de email.",
+            "programat_hr":       f"Ai programat un interviu nou pentru {candidate_name}.",
+            "anulat_hr":          f"Interviul candidatului {candidate_name} a fost ANULAT de HR.",
+            "reprogramat_hr":     f"Interviul candidatului {candidate_name} a fost REPROGRAMAT de HR.",
+        }
+        subject = subjects.get(event_type, f"Eveniment interviu — {candidate_name.upper()}")
+        mesaj = messages.get(event_type, f"Eveniment: {event_type}")
+
+        locatie_line = f"\nLocatie: {locatie}" if locatie else ""
+        email_line = f"\nEmail candidat: {candidate_email}" if candidate_email else ""
+
+        send_email_api(
+            to_email=hr_email,
+            subject=subject,
+            body=f"""{mesaj}
+
+Candidat: {candidate_name}
+Post: {job_title}
+Data: {data_fmt}
+Ora: {ora}{locatie_line}{email_line}
+
+Poti vedea detaliile in platforma NEXAS HR.
+
+Echipa NEXAS HR
+""",
+        )
+    except Exception as e:
+        print(f"[HR-NOTIF] WARN email HR notif '{event_type}' esuat: {e}")
+
+
 def _send_hr_notification_email(candidate_name: str, job_title: str, data: str, ora: str, locatie: str):
     """Notifica HR-ul cand un candidat si-a programat interviul."""
     try:
@@ -2893,6 +3018,50 @@ Echipa HR NEXAS
         print(f"[SCHEDULE] WARN email anulare esuat catre {to_email}: {e}")
 
 
+def _send_interview_rescheduled_email(
+    to_email: str,
+    candidate_name: str,
+    job_title: str,
+    data: str,
+    ora: str,
+    locatie: str = "",
+):
+    """Notifica candidatul ca ora/data interviului a fost modificata de HR."""
+    try:
+        luni = {
+            "01": "Ianuarie", "02": "Februarie", "03": "Martie",
+            "04": "Aprilie", "05": "Mai", "06": "Iunie",
+            "07": "Iulie", "08": "August", "09": "Septembrie",
+            "10": "Octombrie", "11": "Noiembrie", "12": "Decembrie"
+        }
+        try:
+            parts = data.split("-")
+            data_fmt = f"{int(parts[2])} {luni.get(parts[1], parts[1])} {parts[0]}"
+        except Exception:
+            data_fmt = data
+
+        locatie_line = f"\nLocatie: {locatie}" if locatie else ""
+
+        send_email_api(
+            to_email=to_email,
+            subject=f"Interviu reprogramat — {job_title}",
+            body=f"""Buna ziua, {candidate_name},
+
+Va informam ca interviul pentru postul de {job_title} a fost reprogramat.
+
+Noua data: {data_fmt}
+Noua ora: {ora}{locatie_line}
+
+Va rugam sa confirmati disponibilitatea. Ne cerem scuze pentru inconvenient.
+
+Cu respect,
+Echipa HR NEXAS
+""",
+        )
+    except Exception as e:
+        print(f"[SCHEDULE] WARN email reprogramare esuat catre {to_email}: {e}")
+
+
 # ─── CONFIRMARE / ANULARE INTERVIU (linkuri din email) ───────────────────────
 
 def _interview_action_page(title: str, message: str, color: str = "#22c7b8") -> str:
@@ -2942,7 +3111,18 @@ async def confirma_interviu(action_token: str):
     ora = interview.ora
     data = interview.data
     job = interview.job_title or "postul aplicat"
+    cand_name = interview.candidate_name or "Candidat"
+    cand_email = interview.candidate_email or ""
+    locatie = interview.locatie or ""
     db.close()
+
+    try:
+        _notify_hr_interview_event(
+            "confirmat_candidat", cand_name, job, data, ora,
+            locatie=locatie, candidate_email=cand_email,
+        )
+    except Exception:
+        pass
 
     return HTMLResponse(_interview_action_page(
         "Participare confirmata!",
@@ -2969,6 +3149,12 @@ async def anuleaza_interviu(action_token: str):
         ))
 
     cand_id = interview.candidate_id
+    cand_name = interview.candidate_name or "Candidat"
+    cand_email = interview.candidate_email or ""
+    job = interview.job_title or "postul aplicat"
+    data = interview.data
+    ora = interview.ora
+    locatie = interview.locatie or ""
     interview.status = "anulat"
     db.commit()
     db.close()
@@ -2979,6 +3165,14 @@ async def anuleaza_interviu(action_token: str):
             "APLICAT",
             event_title="Interviu anulat de candidat",
             event_description="Candidatul a anulat interviul din link-ul de reminder.",
+        )
+    except Exception:
+        pass
+
+    try:
+        _notify_hr_interview_event(
+            "anulat_candidat", cand_name, job, data, ora,
+            locatie=locatie, candidate_email=cand_email,
         )
     except Exception:
         pass

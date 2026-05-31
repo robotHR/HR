@@ -38,6 +38,7 @@ from app.services.cv_parser import (
     normalize_text,
     _is_domain_incompatible,
     _get_compat_level,
+    realistic_role_match_level,
 )
 from app.services.cloudinary_service import upload_cv_to_cloudinary, stream_cv_from_cloudinary
 
@@ -805,9 +806,18 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
             c = row.get("best_match") or row.get("candidate")
             cc = getattr(c, "candidate_cluster", None) or None
             jc = getattr(c, "job_cluster", None) or None
+            role_text = " ".join([
+                getattr(c, "position", "") or "",
+                getattr(c, "recommended_role_for_candidate", "") or "",
+                getattr(c, "summary", "") or "",
+                getattr(c, "skills", "") or "",
+            ])
+            role_level = realistic_role_match_level(role_text, jv)
             compat = _get_compat_level(c.position or "", jv,
                                        candidate_cluster=cc, job_cluster=jc)
-            return (compat, row["best_score"], getattr(c, "id", 0) or 0)
+            # Ordinea realista: potrivire directa pe rol, compatibilitate domeniu,
+            # apoi scorul AI. Altfel un sofer cu scor 67 poate trece peste un ospatar.
+            return (role_level, compat, row["best_score"], getattr(c, "id", 0) or 0)
         rows = sorted(rows, key=_row_sort, reverse=True)
     else:
         rows = sorted(rows, key=lambda row: (row["best_score"], row["candidate"].id or 0), reverse=True)

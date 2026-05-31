@@ -795,13 +795,13 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
                                 <div class="mini-label">Potrivit pentru</div>
                                 {% if best %}
                                     <div class="best-role">
-                                        <div class="score-cell {% if row.best_score >= 60 %}score-green{% elif row.best_score >= 40 %}score-yellow{% else %}score-red{% endif %}">{{ row.best_score }}</div>
+                                        <div class="score-cell {% if row.best_score >= 70 %}score-green{% elif row.best_score >= 45 %}score-yellow{% else %}score-red{% endif %}">{{ row.best_score }}</div>
                                         <div class="role-info">
                                             {% set natural_role = best.position if (best.position and best.position|lower != best.job_title|lower) else best.job_title %}
                                             <div class="role-title">{{ natural_role or "Nespecificat" }}</div>
-                                            {% if row.best_score >= 60 %}
+                                            {% if row.best_score >= 70 %}
                                                 <span class="ai-badge top">Top Candidat</span>
-                                            {% elif row.best_score >= 40 %}
+                                            {% elif row.best_score >= 45 %}
                                                 <span class="ai-badge potential">Potential</span>
                                             {% else %}
                                                 <span class="ai-badge other">De evaluat</span>
@@ -818,7 +818,7 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
                                 <div class="mini-label">Posturi analizate</div>
                                 <div class="matches">
                                     {% for match in row.matches[:5] %}
-                                        <a href="/candidat/{{ match.id }}" class="match-chip {% if (match.score or 0) >= 60 %}chip-top{% elif (match.score or 0) >= 40 %}chip-potential{% else %}chip-low{% endif %}">
+                                        <a href="/candidat/{{ match.id }}" class="match-chip {% if (match.score or 0) >= 70 %}chip-top{% elif (match.score or 0) >= 45 %}chip-potential{% else %}chip-low{% endif %}">
                                             {{ match.job_title }}&nbsp;<strong>{{ match.score }}</strong>
                                         </a>
                                     {% endfor %}

@@ -302,7 +302,7 @@ def build_fallback_profile(target_job):
             "max_score_rules": [
                 "REGULA CRITICA: Daca candidatul are studii superioare (licenta/master/doctorat), final_score MAXIM 35 — supracalificat, nu va ramane.",
                 "Daca candidatul nu are nicio experienta de munca, final_score maxim 58.",
-                "Candidatul cu experienta in domenii similare (depozit/logistica/munca fizica/vanzari) poate lua 60-85.",
+                "Candidatul cu experienta in domenii similare (depozit/logistica/munca fizica/vanzari) poate lua 60-90.",
             ],
         }
     elif is_skilled_trade:
@@ -412,7 +412,7 @@ def build_prompt(text, target_job, job_requirements=None):
   "soft_skills_score": 0,
   "penalties_total": 0,
   "bonuses_total": 0,
-  "scoring_breakdown": "exp X/40 + edu Y/25 + soft Z/20 - penalitati W = total",
+  "scoring_breakdown": "exp X/40 + edu Y/25 + soft Z/20 + bonus B/5 - penalitati W = total",
 
   "final_score": 0,
   "recommendation": "STRONG_YES|YES|MAYBE|NO|REJECT",
@@ -526,48 +526,74 @@ PENALITĂȚI EXPERIENȚĂ:
 FAZA 3: SCORING EDUCAȚIE & CERTIFICĂRI (0-25 PUNCTE)
 ═══════════════════════════════════════════════════════════
 
-Studii (contează doar dacă postul le cere):
-  Licență relevantă: 10 | Master relevant: 12 | Doctorat relevant: 13
-  Studii parțial relevante: 6 | Lipsă completă (când e obligatorie): 0
+REGULA EDUCAȚIE (aplică în ordine):
+  1. Postul cere licență → candidatul are licență în domeniu relevant: 25/25 (PUNCTAJ COMPLET)
+  2. Postul cere licență → candidatul are master relevant: 25/25 (echivalent sau superior)
+  3. Postul cere master → candidatul are master relevant: 25/25
+  4. Postul cere master → candidatul are DOAR licență: 15/25 (penalizare pentru lipsă master explicit cerut)
+  5. Postul NU menționează explicit studii → candidatul are licență relevantă: 15/25 (bonus)
+  6. Studii parțial relevante (domeniu conex, nu direct): 10/25
+  7. Lipsă completă studii superioare când postul le cere explicit: 0/25
 
-Certificări:
-  Certificare obligatorie prezentă: 8 | Certificare obligatorie LIPSĂ: -15
-  Certificări relevante (AWS, SAP, Excel avansat, CISA, etc.): +3 | Cursuri recente relevante: +2
+NU penaliza licența dacă postul NU cere explicit master sau doctorat.
+
+Certificări (se adaugă la scorul de educație, maxim 25 total):
+  Certificare obligatorie prezentă: +8 | Certificare obligatorie LIPSĂ: -15
+  Certificări relevante în domeniu (AWS, SAP, Excel avansat, CISA, CFA, etc.): +3 fiecare
+  Cursuri recente relevante (sub 2 ani): +2
 
 Limbi (acordă puncte DOAR dacă postul le cere și sunt menționate explicit):
   Nivel avansat dovedit: 5 | Nivel mediu menționat: 3 | Nemenționate: 0 — NU presupune engleză!
 
 ═══════════════════════════════════════════════════════════
 FAZA 4: SOFT SKILLS & ATITUDINE (0-20 PUNCTE)
-REGULA: NUMAI dovezi concrete din CV — afirmațiile vagi = 0 puncte
+REGULA GENERALĂ: Dovezi concrete = puncte depline. Afirmații vagi = 0.
+REGULA CV ROMÂNESC: CV-urile românești descriu adesea responsabilități, nu KPI-uri cu cifre.
+  Dacă nu există KPI-uri cuantificate DAR există responsabilități clare + stabilitate angajator,
+  acordă max 15/20 (nu 0). Aplică această regulă NUMAI pentru CV-uri românești fără cifre.
 ═══════════════════════════════════════════════════════════
 
-Leadership cu dovadă clară ("Manager 5+ oameni, 2+ ani"): 6 | Vag ("coordonez"): 2 | "Am spirit de lider": 0
-Rezultate măsurabile din CV: "Creștere 40% revenue 2024" → 5 | "Reducere costuri 15%" → 5 | Vag: 0
+Leadership cu dovadă clară ("Manager 5+ oameni, 2+ ani"): 6
+Leadership implicit din responsabilități descrise (coordonare echipă, fără cifre exacte): 3
+"Am spirit de lider" fără nicio dovadă: 0
+
+Rezultate măsurabile cu cifre din CV: "Creștere 40% revenue 2024" → 5 | "Reducere costuri 15%" → 5
+Rezultate descrise fără cifre (CV românesc tipic): "Coordonat proiecte de implementare", "Gestionat relații clienți cheie" → 2-3
+Vag complet ("am obținut rezultate bune"): 0
+
 Stabilitate: 5+ ani la 1-2 angajatori → 4 | Progres clar junior→senior → 3 | Job-hopper: -5
 Disponibilitate declarată explicit: 2 | Vagă/nedeclarată: 0
 
 INTERZIS acordare puncte pentru:
-"Sunt comunicativ", "muncitor", "adaptabil", "orientat spre rezultate" — ZERO fără dovadă concretă.
+"Sunt comunicativ", "muncitor", "adaptabil", "orientat spre rezultate" — ZERO fără nicio dovadă.
+
+PLAFON CV ROMÂNESC FĂRĂ KPI-URI: dacă candidatul nu are nicio cifră/rezultat cuantificat
+  dar are responsabilități clare și stabilitate angajator, soft_skills_score MAX 15/20.
 
 ═══════════════════════════════════════════════════════════
-FAZA 5: CALCUL SCOR FINAL (MAX 85 PUNCTE)
+FAZA 5: CALCUL SCOR FINAL (MAX 90 PUNCTE)
 ═══════════════════════════════════════════════════════════
 
-SCOR = FAZA2 (0-40) + FAZA3 (0-25) + FAZA4 (0-20) + PENALITĂȚI (negative) + BONUSURI (positive)
-MAXIM ABSOLUT = 85 (restul de 15 puncte se câștigă la interviu față în față)
+SCOR = FAZA2 (0-40) + FAZA3 (0-25) + FAZA4 (0-20) + BONUS (0-5) + PENALITĂȚI (negative)
+MAXIM ABSOLUT = 90 (restul de 10 puncte se câștigă la interviu față în față)
+
+BONUS 0-5 PUNCTE (acordă NUMAI dacă există dovadă clară):
+  +5: Certificări excepționale în domeniu (ex: CFA, ACCA, PMP, AWS Solutions Architect) + match exact industrie + rezultate documentate
+  +3: Certificare relevantă recunoscută internațional sau experiență exactă în industria clientului
+  +1-2: Formare continuă recentă demonstrată (cursuri, certificări minore relevante în ultimii 2 ani)
+  0: Fără dovadă concretă de valoare adăugată excepțională
 
 APLICARE KNOCKOUT după calcul:
   Cerință hard lipsă → final_score = MIN(calculat, 35) + recommendation = REJECT
   Supracalificat evident → final_score = MIN(calculat, 38) + overqualification_risk = HIGH
   CV total vag → final_score = MIN(calculat, 50) + must_verify_by_phone obligatoriu
 
-CATEGORII FINALE (pe scara 0-85):
-  70-85: STRONG_YES | 55-69: YES | 40-54: MAYBE | 25-39: NO | sub 25: REJECT
+CATEGORII FINALE (pe scara 0-90):
+  70-90: STRONG_YES (TOP CANDIDAT) | 45-69: YES (POTENȚIAL) | sub 45: NO/REJECT (NERECOMANDAT)
 
 ACȚIUNI RECOMANDATE:
-  recommended_next_action: CALL_NOW dacă scor >= 60 | CALL_LATER dacă scor 40-59 | KEEP_FOR_OTHER_ROLE dacă < 40 dar potrivit alt rol | REJECT dacă nu are potențial real
-  priority: HIGH dacă scor >= 65 | MEDIUM dacă scor 45-64 | LOW dacă < 45
+  recommended_next_action: CALL_NOW dacă scor >= 65 | CALL_LATER dacă scor 45-64 | KEEP_FOR_OTHER_ROLE dacă < 45 dar potrivit alt rol | REJECT dacă nu are potențial real
+  priority: HIGH dacă scor >= 70 | MEDIUM dacă scor 45-69 | LOW dacă < 45
 
 ═══════════════════════════════════════════════════════════
 REGULI ANTI-INFLAȚIE (CRITICE — nu le ignora)
@@ -638,7 +664,7 @@ def parse_ai_response(content):
 
 def clean_score(v):
     try:
-        return max(0, min(85, int(v)))
+        return max(0, min(90, int(v)))
     except Exception:
         return 0
 
@@ -665,10 +691,10 @@ def normalize_recommendation(value, score):
     mapping = {"STRONG_YES":"HIRE","YES":"HIRE","MAYBE":"CONSIDER","NO":"REJECT","REJECT":"REJECT","HIRE":"HIRE","CONSIDER":"CONSIDER"}
     if value in mapping:
         return mapping[value]
-    # Scala 0-85: HIRE >= 55, CONSIDER >= 35, REJECT sub 35
-    if score >= 55:
+    # Scala 0-90: HIRE >= 70, CONSIDER >= 45, REJECT sub 45
+    if score >= 70:
         return "HIRE"
-    if score >= 35:
+    if score >= 45:
         return "CONSIDER"
     return "REJECT"
 
@@ -678,11 +704,11 @@ def recommendation_to_status(rec):
 
 
 def _compute_priority(score, data):
-    """Calculeaza priority local ca fallback daca AI nu returneaza corect. Scala 0-85."""
+    """Calculeaza priority local ca fallback daca AI nu returneaza corect. Scala 0-90."""
     ai_priority = as_text(data.get("priority", "")).upper().strip()
     if ai_priority in ("HIGH", "MEDIUM", "LOW"):
         return ai_priority
-    if score >= 65:
+    if score >= 70:
         return "HIGH"
     if score >= 45:
         return "MEDIUM"
@@ -690,13 +716,13 @@ def _compute_priority(score, data):
 
 
 def _compute_next_action(score, data):
-    """Calculeaza recommended_next_action local ca fallback. Scala 0-85."""
+    """Calculeaza recommended_next_action local ca fallback. Scala 0-90."""
     ai_action = as_text(data.get("recommended_next_action", "")).upper().strip()
     if ai_action in ("CALL_NOW", "CALL_LATER", "KEEP_FOR_OTHER_ROLE", "REJECT"):
         return ai_action
-    if score >= 60:
+    if score >= 65:
         return "CALL_NOW"
-    if score >= 40:
+    if score >= 45:
         return "CALL_LATER"
     better = as_text(data.get("better_role_match", "")).strip()
     if better:
@@ -814,7 +840,7 @@ def normalize_data(data, file, target_job, cv_text, profile):
         pen = data.get("penalties_total", 0)
         bon = data.get("bonuses_total", 0)
         if any([exp, edu, soft, pen, bon]):
-            scoring_bd = f"exp {exp}/40 + edu {edu}/25 + soft {soft}/20 + pen {pen} + bon {bon} = {score}"
+            scoring_bd = f"exp {exp}/40 + edu {edu}/25 + soft {soft}/20 + bonus {bon}/5 - pen {pen} = {score}"
 
     normalized = {
         "name": name,

@@ -257,6 +257,8 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
   transition:.15s;
 }
 .match-chip:hover{border-color:var(--bline);background:var(--bsoft)}
+.match-chip.chip-potential{background:var(--ysoft);border-color:var(--yline);color:#fcd38a}
+.match-chip.chip-potential strong{color:#fcd38a}
 .match-chip strong{color:#fff;font-weight:800;font-size:11px}
 .match-chip.low{opacity:.55}
 .match-more{font-size:10px;color:var(--muted);padding:2px 0}
@@ -336,9 +338,8 @@ textarea{min-height:80px;resize:vertical;line-height:1.5}
 .match-chip strong{font-weight:800;font-size:11px}
 .match-chip.chip-top{background:var(--tsoft);border-color:var(--tline);color:var(--t2)}
 .match-chip.chip-top strong{color:var(--t2)}
-.match-chip.chip-potential{background:var(--ysoft);border-color:var(--yline);color:#fcd38a}
-.match-chip.chip-potential strong{color:#fcd38a}
-.match-chip:hover{border-color:var(--bline);background:var(--bsoft)}
+.match-chip.chip-low{background:var(--rsoft);border-color:var(--rline);color:#ffb4b7}
+.match-chip.chip-low strong{color:#ffb4b7}
 
 /* ─── BOTTOM NAV hidden on desktop ─── */
 .bnav{display:none}
@@ -728,16 +729,16 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
             <div>
                 <div class="eyebrow">Baza de candidati</div>
                 <h1 class="page-title syne-only">Candidati</h1>
-                <div class="page-sub">Candidati unici, cu rolurile pentru care se potrivesc si scorul AI pe fiecare post.</div>
+                <div class="page-sub">Fiecare persoana e afisata o singura data. Coloana <strong>Potrivit pentru</strong> = ce spune AI ca e candidatul natural. Coloana <strong>Posturi analizate</strong> = joburile pentru care a fost evaluat si scorul obtinut.</div>
             </div>
             <div class="head-pill">{{ stats.filtered }} candidati unici afisati</div>
         </div>
 
         <div class="stats-row">
-            <div class="stat-card"><div class="stat-label">Analize totale</div><div class="stat-value">{{ stats.total }}</div></div>
-            <div class="stat-card"><div class="stat-label">Candidati unici</div><div class="stat-value">{{ stats.unique_total }}</div></div>
-            <div class="stat-card"><div class="stat-label">Afisati</div><div class="stat-value">{{ stats.filtered }}</div></div>
-            <div class="stat-card"><div class="stat-label">Potriviri afisate</div><div class="stat-value">{{ stats.analyses_filtered }}</div></div>
+            <div class="stat-card"><div class="stat-label">Analize in baza de date</div><div class="stat-value">{{ stats.total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Persoane unice</div><div class="stat-value">{{ stats.unique_total }}</div></div>
+            <div class="stat-card"><div class="stat-label">Afisate acum</div><div class="stat-value">{{ stats.filtered }}</div></div>
+            <div class="stat-card"><div class="stat-label">Analize afisate</div><div class="stat-value">{{ stats.analyses_filtered }}</div></div>
             <div class="stat-card"><div class="stat-label">Interviu</div><div class="stat-value">{{ stats.interviu }}</div></div>
             <div class="stat-card"><div class="stat-label">Angajati</div><div class="stat-value">{{ stats.angajat }}</div></div>
         </div>
@@ -789,44 +790,43 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
                                 </div>
                             </div>
 
-                            <!-- COL 2: cel mai bun rol -->
+                            <!-- COL 2: potrivit natural pentru (recommended_role_for_candidate) -->
                             <div class="col-best">
-                                <div class="mini-label">Cel mai bun rol</div>
+                                <div class="mini-label">Potrivit pentru</div>
                                 {% if best %}
                                     <div class="best-role">
-                                        <div class="score-cell {% if (best.score or 0) >= 75 %}score-green{% elif (best.score or 0) >= 50 %}score-yellow{% else %}score-red{% endif %}">{{ best.score }}</div>
+                                        <div class="score-cell {% if row.best_score >= 75 %}score-green{% elif row.best_score >= 50 %}score-yellow{% else %}score-red{% endif %}">{{ row.best_score }}</div>
                                         <div class="role-info">
-                                            <div class="role-title">{{ best.job_title }}</div>
-                                            {% if best.position and best.position|lower != best.job_title|lower %}
-                                            <div class="ai-suggestion"><span class="ai-sugg-label">Sugestie AI:</span> {{ best.position }}</div>
-                                            {% endif %}
-                                            {% if (best.score or 0) >= 75 %}
+                                            {% set natural_role = best.position if (best.position and best.position|lower != best.job_title|lower) else best.job_title %}
+                                            <div class="role-title">{{ natural_role or "Nespecificat" }}</div>
+                                            {% if row.best_score >= 75 %}
                                                 <span class="ai-badge top">Top Candidat</span>
-                                            {% elif (best.score or 0) >= 50 %}
+                                            {% elif row.best_score >= 50 %}
                                                 <span class="ai-badge potential">Potential</span>
                                             {% else %}
-                                                <span class="ai-badge other">Potrivit Altor Roluri</span>
+                                                <span class="ai-badge other">De evaluat</span>
                                             {% endif %}
                                         </div>
                                     </div>
                                 {% else %}
-                                    <div class="role-sub">Fara potrivire AI</div>
+                                    <div class="role-sub">Fara analiza AI</div>
                                 {% endif %}
                             </div>
 
-                            <!-- COL 3: posturi potrivite (doar 50+, fara cel mai bun rol) -->
+                            <!-- COL 3: toate posturile analizate cu scorurile lor -->
                             <div class="col-matches">
-                                <div class="mini-label">Posturi potrivite</div>
+                                <div class="mini-label">Posturi analizate</div>
                                 <div class="matches">
-                                    {% set shown = [] %}
-                                    {% for match in row.matches %}
-                                        {% if (match.score or 0) >= 50 and shown|length < 5 and match.job_title != (best.job_title if best else '') %}
-                                            {% set _ = shown.append(match) %}
-                                            <span class="match-chip {% if (match.score or 0) >= 75 %}chip-top{% else %}chip-potential{% endif %}">{{ match.job_title }}<strong>{{ match.score }}</strong></span>
-                                        {% endif %}
+                                    {% for match in row.matches[:5] %}
+                                        <a href="/candidat/{{ match.id }}" class="match-chip {% if (match.score or 0) >= 75 %}chip-top{% elif (match.score or 0) >= 50 %}chip-potential{% else %}chip-low{% endif %}">
+                                            {{ match.job_title }}&nbsp;<strong>{{ match.score }}</strong>
+                                        </a>
                                     {% endfor %}
-                                    {% if shown|length == 0 %}
-                                        <span class="match-more">Nicio alta potrivire relevanta</span>
+                                    {% if row.matches|length > 5 %}
+                                        <span class="match-more">+{{ row.matches|length - 5 }} altele</span>
+                                    {% endif %}
+                                    {% if row.matches|length == 0 %}
+                                        <span class="match-more">Nicio analiza disponibila</span>
                                     {% endif %}
                                 </div>
                             </div>

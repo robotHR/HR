@@ -115,6 +115,9 @@ def ensure_candidate_extra_columns():
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS better_role_match VARCHAR"))
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS reject_reason_internal TEXT"))
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS created_at TIMESTAMP"))
+        # ── Clustere domeniu AI (Variant B) ──
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidate_cluster VARCHAR"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_cluster VARCHAR"))
 
 
 ensure_candidate_extra_columns()
@@ -396,8 +399,10 @@ def group_candidates_by_job(candidates):
     final_jobs = {}
     for job_name, data in sorted_jobs:
         def _sort_key(c, jn=job_name):
-            # compat: 2=compatibil, 1=upskill, 0=incompatibil → sortam DESC
-            compat = _get_compat_level(c.position or "", jn)
+            cc = getattr(c, "candidate_cluster", None) or None
+            jc = getattr(c, "job_cluster", None) or None
+            compat = _get_compat_level(c.position or "", jn,
+                                       candidate_cluster=cc, job_cluster=jc)
             return (compat, c.score or 0)
         final_jobs[job_name] = sorted(data["candidates"], key=_sort_key, reverse=True)
 
@@ -771,6 +776,8 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
                 "status": item.status or "NOU",
                 "summary": clean_summary(item.summary),
                 "cv_file": item.cv_file,
+                "candidate_cluster": getattr(item, "candidate_cluster", None),
+                "job_cluster": getattr(item, "job_cluster", None),
             })
 
         rows.append({
@@ -786,7 +793,11 @@ def build_unique_candidate_rows(candidates, q="", status="", job="", skill="", m
     # Daca filtrul de job e activ, sortam si dupa compatibilitate (2>1>0)
     if job_value:
         def _row_sort(row, jv=job_value):
-            compat = _get_compat_level(row["candidate"].position or "", jv)
+            c = row["candidate"]
+            cc = getattr(c, "candidate_cluster", None) or None
+            jc = getattr(c, "job_cluster", None) or None
+            compat = _get_compat_level(c.position or "", jv,
+                                       candidate_cluster=cc, job_cluster=jc)
             return (compat, row["best_score"])
         rows = sorted(rows, key=_row_sort, reverse=True)
     else:

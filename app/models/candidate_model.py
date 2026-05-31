@@ -45,4 +45,8 @@ class Candidate(Base):
     better_role_match        = Column(String, nullable=True)   # Alt rol mai potrivit pentru candidat
     reject_reason_internal   = Column(Text,   nullable=True)   # Motiv respingere (intern, nu se trimite)
 
+    # ── Clustere domeniu (clasificate de AI) ──────────────────────────────────
+    candidate_cluster = Column(String, nullable=True)  # Super-cluster natural al candidatului
+    job_cluster       = Column(String, nullable=True)  # Super-cluster al postului vizat
+
     created_at = Column(DateTime, default=datetime.utcnow)

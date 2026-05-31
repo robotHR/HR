@@ -445,7 +445,10 @@ def build_prompt(text, target_job, job_requirements=None):
   "retention_probability": 0,
   "growth_potential": "LOW|MEDIUM|HIGH",
   "better_role_match": "Alt rol mai potrivit sau gol",
-  "reject_reason_internal": "Motiv intern doar daca NO sau REJECT"
+  "reject_reason_internal": "Motiv intern doar daca NO sau REJECT",
+
+  "candidate_cluster": "SUPER-CLUSTERUL candidatului bazat pe rolul sau NATURAL. Alege EXACT UNUL: blue_collar | constructii_tehnic | tech_ing | medical | business | support | educatie. GHID: blue_collar=HoReCa/Transport/Depozit/Retail/Paza/Agricultura(orice munca operationala-manuala); constructii_tehnic=Constructii/Automotive; tech_ing=IT/Software/Inginerie; medical=Medic/Asistent/Farmacist/Psiholog; business=Contabil/Jurist/HR/Manager/SalesB2B/Financiar; support=Admin/CallCenter/Marketing/ONG; educatie=Profesor/Trainer/Coach.",
+  "job_cluster": "SUPER-CLUSTERUL POSTULUI VIZAT. Exemple: gestionar depozit=blue_collar, sef depozit=blue_collar, sofer=blue_collar, bucatar=blue_collar, contabil=business, asistent medical=medical, programator=tech_ing, zugrav=constructii_tehnic, specialist hr=business, call center=support."
 }"""
 
     return f"""EȘTI UN SISTEM AUTOMAT DE EVALUARE HR CU CALIBRARE PIAȚA ROMÂNIEI.
@@ -1017,32 +1020,45 @@ def _detect_cluster(text):
     return None
 
 
-def _get_compat_level(natural_role, target_job, cv_text=""):
+def _get_compat_level(natural_role, target_job, cv_text="", candidate_cluster=None, job_cluster=None):
     """
     Returneaza nivelul de compatibilitate domeniu:
       2 = COMPATIBIL (fara limitare)
       1 = UPSKILL (scor max 45)
       0 = INCOMPATIBIL (scor max 28 + REJECT)
+
+    Prioritate 1: clustere clasificate de AI (candidate_cluster / job_cluster din DB)
+    Prioritate 2: keyword detection ca fallback pentru inregistrari vechi
     """
-    nc = _detect_cluster(natural_role)
-    tc = _detect_cluster(target_job)
+    ns, ts = None, None
 
-    if not nc or not tc:
-        return 2  # domeniu necunoscut = nu penaliza
-    if nc == tc:
-        return 2  # acelasi cluster = compatibil
+    # Prioritate 1: clustere AI din DB (mai precise decat keyword matching)
+    if candidate_cluster and job_cluster:
+        cc = as_text(candidate_cluster).lower().strip()
+        jc = as_text(job_cluster).lower().strip()
+        if cc in VALID_CLUSTERS and jc in VALID_CLUSTERS:
+            ns, ts = cc, jc
 
-    ns = _SUPER.get(nc)
-    ts = _SUPER.get(tc)
+    # Prioritate 2: keyword detection fallback
     if not ns or not ts:
-        return 2
+        nc = _detect_cluster(natural_role)
+        tc = _detect_cluster(target_job)
+        if not nc or not tc:
+            return 2  # domeniu necunoscut = nu penaliza
+        if nc == tc:
+            return 2  # acelasi cluster = compatibil
+        ns = _SUPER.get(nc, "")
+        ts = _SUPER.get(tc, "")
+        if not ns or not ts:
+            return 2
+
     if ns == ts:
         return 2  # acelasi super-cluster = compatibil
 
     level = _SC_COMPAT.get((ns, ts), 2)
 
-    # Exceptie: Constructii → Inginerie cu studii superioare in CV
-    if nc == "constructii" and tc == "inginerie" and level == 1:
+    # Exceptie: constructii_tehnic → tech_ing cu studii superioare in CV
+    if ns == "constructii_tehnic" and ts == "tech_ing" and level == 1:
         cv_n = normalize_text(cv_text or "")
         edu_kw = ["licenta", "master", "facultate", "universitate", "inginer", "tehnica constructii", "politehn", "utcb", "utcn"]
         if any(kw in cv_n for kw in edu_kw):
@@ -1056,7 +1072,23 @@ def _is_domain_incompatible(natural_role, target_job, cv_text=""):
     return _get_compat_level(natural_role, target_job, cv_text) == 0
 
 
-def apply_local_safety_rules(data, target_job, cv_text, profile):
+VALID_CLUSTERS = {"blue_collar", "constructii_tehnic", "tech_ing", "medical", "business", "support", "educatie"}
+
+
+def _validate_cluster(val, fallback_text=""):
+    """Valideaza si returneaza un super-cluster valid, cu fallback la keyword detection."""
+    v = as_text(val).lower().strip().replace("-", "_").replace(" ", "_")
+    if v in VALID_CLUSTERS:
+        return v
+    cl = _detect_cluster(fallback_text)
+    if cl:
+        sc = _SUPER.get(cl)
+        if sc in VALID_CLUSTERS:
+            return sc
+    return None
+
+
+def apply_local_safety_rules(data, target_job, cv_text, profile, candidate_cluster=None, job_cluster=None):
     cv = normalize_text(cv_text)
     combined = normalize_text(" ".join([as_text(data.get(k,"")) for k in ["name","position","summary","strengths","skills"]]) + " " + cv[:3000])
 
@@ -1074,7 +1106,9 @@ def apply_local_safety_rules(data, target_job, cv_text, profile):
     # ── Regula 2: compatibilitate domeniu (3 niveluri) ────────────────────────
     natural_role = as_text(data.get("position", ""))
     if natural_role:
-        compat = _get_compat_level(natural_role, target_job, cv_text)
+        compat = _get_compat_level(natural_role, target_job, cv_text,
+                                   candidate_cluster=candidate_cluster,
+                                   job_cluster=job_cluster)
         nc = _detect_cluster(natural_role)
         tc = _detect_cluster(target_job)
 
@@ -1205,6 +1239,16 @@ def normalize_data(data, file, target_job, cv_text, profile):
         if any([exp, edu, soft, pen, bon]):
             scoring_bd = f"exp {exp}/40 + edu {edu}/25 + soft {soft}/20 + bonus {bon}/5 - pen {pen} = {score}"
 
+    # Clustere domeniu clasificate de AI
+    candidate_cluster = _validate_cluster(
+        data.get("candidate_cluster", ""),
+        fallback_text=recommended_role
+    )
+    job_cluster = _validate_cluster(
+        data.get("job_cluster", ""),
+        fallback_text=target_job
+    )
+
     normalized = {
         "name": name,
         "email": data.get("email",""),
@@ -1229,8 +1273,12 @@ def normalize_data(data, file, target_job, cv_text, profile):
         "interview_questions":     as_text(data.get("interview_questions", [])),
         "better_role_match":       as_text(data.get("better_role_match", "")),
         "reject_reason_internal":  as_text(data.get("reject_reason_internal", "")),
+        "candidate_cluster":       candidate_cluster,
+        "job_cluster":             job_cluster,
     }
-    return apply_local_safety_rules(normalized, target_job, cv_text, profile)
+    return apply_local_safety_rules(normalized, target_job, cv_text, profile,
+                                    candidate_cluster=candidate_cluster,
+                                    job_cluster=job_cluster)
 
 
 def save_candidate_to_db(data, file, target_job):
@@ -1264,6 +1312,8 @@ def save_candidate_to_db(data, file, target_job):
             interview_questions=as_text(data.get("interview_questions","")),
             better_role_match=as_text(data.get("better_role_match","")),
             reject_reason_internal=as_text(data.get("reject_reason_internal","")),
+            candidate_cluster=data.get("candidate_cluster") or None,
+            job_cluster=data.get("job_cluster") or None,
         )
         db.add(candidate)
         db.commit()

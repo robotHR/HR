@@ -42,7 +42,6 @@ async def protect_private_pages(request: Request, call_next):
         "/api/sloturi",
         "/interviu",
         "/evalueaza",
-        "/demo",
     ]
 
     is_public = any(

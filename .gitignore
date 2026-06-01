@@ -6,3 +6,25 @@ __pycache__/
 *.db
 *.sqlite3
 .DS_Store
+
+# Credentials — nu se commit niciodata
+credentials.json
+service_account.json
+token.json
+*.key
+*.pem
+
+# Fisiere incarcate de utilizatori
+app/uploads/*
+!app/uploads/.gitkeep
+uploads/*
+!uploads/.gitkeep
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/

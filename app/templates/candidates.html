@@ -774,10 +774,12 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
 
                             <!-- COL 2: PROFESSIONAL INFO -->
                             <div class="col-professional">
-                                {% if candidate.position %}
+                                {% set ai_summary = (best.summary or candidate.summary or "") | string %}
+                                {% set ai_summary_clean = ai_summary.split('Potrivire:')[0].split('Familie:')[0].strip() %}
+                                {% if ai_summary_clean %}
                                 <div>
-                                    <div class="c-section-label">Pozitie curenta</div>
-                                    <div class="c-position">{{ candidate.position }}</div>
+                                    <div class="c-section-label">Rezumat AI</div>
+                                    <div class="c-experience">{{ ai_summary_clean | truncate(160, true, '…') }}</div>
                                 </div>
                                 {% endif %}
 
@@ -800,12 +802,6 @@ html[data-theme="light"] .sbf-yellow,.bar-fill.yellow{background:#d97706}
                                 </div>
                                 {% endif %}
 
-                                {% if candidate.experience %}
-                                <div>
-                                    <div class="c-section-label">Experienta</div>
-                                    <div class="c-experience">{{ candidate.experience | truncate(140, true, '…') }}</div>
-                                </div>
-                                {% endif %}
                             </div>
 
                             <!-- COL 3: AI RECOMMENDATION + ACTIONS -->

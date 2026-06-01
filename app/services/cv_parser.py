@@ -669,7 +669,7 @@ Răspunde STRICT cu JSON valid. Zero text înainte sau după JSON.
 {schema}
 
 CV CANDIDAT:
-{text[:15000]}"""
+{text[:8000]}"""
 
 
 def analyze_cv_with_ai(text, target_job, job_requirements=None):
@@ -1459,7 +1459,7 @@ def process_cvs_for_job(target_job, job_requirements=None):
     if new_files:
         tasks = [(file, target_job, profile, job_requirements) for file in new_files]
 
-        with ThreadPoolExecutor(max_workers=3) as executor:
+        with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {executor.submit(_process_single_cv, task): task[0] for task in tasks}
 
             for future in as_completed(futures):

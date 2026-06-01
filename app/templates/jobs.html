@@ -360,6 +360,21 @@ input,select,textarea{font-size:14px;font-weight:600}
 table,th,td{font-size:13px}
 
 
+/* ── AI GENERATE ── */
+.ai-gen-box{display:flex;flex-direction:column;gap:7px}
+.ai-gen-label{font-size:10px;font-weight:900;color:var(--teal);text-transform:uppercase;letter-spacing:.14em}
+.btn-gen-ai{
+  width:100%;padding:15px 20px;border-radius:13px;
+  background:linear-gradient(135deg,#22c7b8 0%,#5da9ff 100%);
+  color:#07111f;font-size:15px;font-weight:900;letter-spacing:.05em;
+  border:none;cursor:pointer;font-family:'DM Sans',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 6px 24px rgba(34,199,184,.28);transition:.18s;
+}
+.btn-gen-ai:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(34,199,184,.42)}
+.btn-gen-ai:disabled{opacity:.6;cursor:wait;transform:none !important}
+.gen-status{font-size:12px;font-weight:700;color:var(--muted);line-height:1.4}
+
 /* ─── FIX SIDEBAR JOBS CA DASHBOARD ─── */
 .sidebar{
   width:220px !important;
@@ -574,19 +589,16 @@ html[data-theme="light"] .nav a.logout-link:hover{
                         <label>Departament</label>
                         <input type="text" name="departament" placeholder="Ex: Logistica, Productie">
                     </div>
-                    <div class="field">
-                        <label>Locatie</label>
-                        <input type="text" name="locatie" placeholder="Ex: Bucuresti">
+                    <div class="field full ai-gen-box">
+                        <div class="ai-gen-label">Completeaza cu AI</div>
+                        <button type="button" id="genBtn" class="btn-gen-ai" onclick="generateJobWithAI()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                            <span id="genBtnText">GENEREAZA</span>
+                        </button>
+                        <div id="genStatus" class="gen-status" style="display:none"></div>
                     </div>
-                    <div class="field">
-                        <label>Tip contract</label>
-                        <select name="tip_contract">
-                            <option value="Full-time">Full-time</option>
-                            <option value="Part-time">Part-time</option>
-                            <option value="Contract">Contract</option>
-                            <option value="Sezonier">Sezonier</option>
-                        </select>
-                    </div>
+                    <input type="hidden" name="locatie" value="Bucuresti">
+                    <input type="hidden" name="tip_contract" value="Full-time">
                     <div class="field full">
                         <label>Descriere scurta</label>
                         <textarea name="descriere" placeholder="Descrie pe scurt rolul si profilul cautat."></textarea>
@@ -601,7 +613,13 @@ html[data-theme="light"] .nav a.logout-link:hover{
                     </div>
                     <div class="field full">
                         <label>Ce oferim</label>
-                        <textarea name="ce_oferim" placeholder="- Beneficiu 1&#10;- Beneficiu 2"></textarea>
+                        <textarea name="ce_oferim">Venit mediu brut lunar de 7300 RON raportat la norma de lucru menționată în anunț (include salariu brut, tichete de masă, bonusuri și sporuri);
+Te bucuri de un plan personalizat de școlarizare și de un trainer-mentor dedicat;
+Îți recompensăm orice oră lucrată în plus, în weekend sau cu ocazia sărbătorilor legale;
+Ai cel puțin un weekend liber pe lună și câte 2 zile libere de Crăciun și de Paște, precum și zile de concediu în plus, pe măsură ce crești alături de noi;
+Pentru că sănătatea ta contează pentru noi, beneficiezi de asigurare medicală privată și de asigurare de viață și accident;
+Ne dorim ca ziua ta de naștere să fie specială și de aceea, îți oferim o zi liberă de care să te bucuri;
+Ai acces la programe de școlarizare dedicate pentru dezvoltarea ta continuă.</textarea>
                     </div>
                 </div>
                 <button class="btn btn-primary" type="submit" style="width:100%;margin-top:16px">Adauga post</button>
@@ -704,6 +722,44 @@ html[data-theme="light"] .nav a.logout-link:hover{
 </div>
 
 <script>
+async function generateJobWithAI() {
+    const titlu = document.querySelector('input[name="titlu"]').value.trim();
+    const departament = document.querySelector('input[name="departament"]').value.trim();
+    if (!titlu) { alert('Completeaza titlul postului inainte de generare.'); return; }
+
+    const btn = document.getElementById('genBtn');
+    const btnText = document.getElementById('genBtnText');
+    const genStatus = document.getElementById('genStatus');
+
+    btn.disabled = true;
+    btnText.textContent = 'Generez...';
+    genStatus.style.display = 'block';
+    genStatus.style.color = 'var(--muted)';
+    genStatus.textContent = 'AI analizeaza rolul si genereaza descrierea...';
+
+    try {
+        const resp = await fetch('/posturi/genereaza-ai', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({titlu, departament, locatie: 'Bucuresti'})
+        });
+        const result = await resp.json();
+        if (!result.ok) throw new Error(result.error || 'Eroare necunoscuta');
+        const data = result.data || {};
+        if (data.descriere) document.querySelector('textarea[name="descriere"]').value = data.descriere;
+        if (data.responsabilitati) document.querySelector('textarea[name="responsabilitati"]').value = data.responsabilitati;
+        if (data.cerinte) document.querySelector('textarea[name="cerinte"]').value = data.cerinte;
+        genStatus.style.color = 'var(--t2)';
+        genStatus.textContent = '✓ Continut generat. Verifica si ajusteaza daca e necesar, apoi apasa Adauga post.';
+    } catch(e) {
+        genStatus.style.color = '#ffb4b7';
+        genStatus.textContent = 'Eroare: ' + (e.message || 'AI temporar indisponibil');
+    } finally {
+        btn.disabled = false;
+        btnText.textContent = 'GENEREAZA';
+    }
+}
+
 function openEdit(btn) {
     const d = btn.dataset;
     document.getElementById('editForm').action = '/posturi/' + d.id + '/editeaza';

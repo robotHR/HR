@@ -2483,8 +2483,13 @@ async def apply_to_job(
     nume: str = Form(...),
     email: str = Form(...),
     telefon: str = Form(""),
-    cv_file: UploadFile = File(...)
+    cv_file: UploadFile = File(...),
+    gdpr_consimtamant: str = Form("")
 ):
+    # ── Validare consimtamant GDPR ───────────────────────────────────────────
+    if gdpr_consimtamant != "1":
+        return RedirectResponse(url=f"/cariere/{job_id}?error=Trebuie sa bifezi acordul GDPR pentru a aplica.", status_code=303)
+
     # ── Validari rapide (fara I/O blocant) ──────────────────────────────────
     db = SessionLocal()
     job = db.query(JobPost).filter(JobPost.id == job_id, JobPost.activ == True).first()
@@ -2539,6 +2544,7 @@ async def apply_to_job(
 
     # ── Salvam candidatul imediat in DB cu datele din formular ──────────────
     # score=0 si status="pending" — vor fi actualizate de background task
+    from datetime import datetime as _dt
     db = SessionLocal()
     candidate = Candidate(
         name=nume,
@@ -2551,6 +2557,8 @@ async def apply_to_job(
         status="pending",
         cv_file=final_filename,
         visible_in_dashboard=0,  # ascuns pana cand AI-ul termina analiza
+        gdpr_consent=1,
+        gdpr_consent_at=_dt.utcnow(),
     )
     db.add(candidate)
     db.commit()
@@ -3744,3 +3752,37 @@ h2{{font-size:20px;font-weight:800;margin-bottom:10px}}
 p{{font-size:14px;color:rgba(255,255,255,.6);line-height:1.6}}
 </style></head>
 <body><div class="box"><div class="icon">⚠️</div><h2>Link invalid</h2><p>{msg}</p></div></body></html>"""
+
+
+# ── GDPR: stergere date candidat la cerere ────────────────────────────────────
+@router.delete("/candidat/{candidate_id}/sterge-gdpr")
+async def sterge_gdpr_candidat(candidate_id: int, request: Request):
+    if not request.session.get("logged_in"):
+        return JSONResponse({"error": "Neautorizat"}, status_code=401)
+
+    db = SessionLocal()
+    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    if not candidate:
+        db.close()
+        return JSONResponse({"error": "Candidatul nu a fost gasit"}, status_code=404)
+
+    # Anonimizam datele personale in loc sa stergem inregistrarea
+    # (pastram scorul si pozitia pentru statistici, eliminam datele de contact)
+    from datetime import datetime as _dt
+    candidate.name = f"[STERS GDPR #{candidate_id}]"
+    candidate.email = f"gdpr_deleted_{candidate_id}@nexas.internal"
+    candidate.phone = None
+    candidate.cv_file = None
+    candidate.gdpr_consent = 0
+    candidate.gdpr_consent_at = None
+    db.commit()
+    db.close()
+
+    log_candidate_event(
+        candidate_id=candidate_id,
+        event_type="GDPR",
+        title="Date sterse la cerere GDPR",
+        description=f"Datele personale au fost anonimizate la {_dt.utcnow().strftime('%d.%m.%Y %H:%M')} UTC",
+    )
+
+    return JSONResponse({"ok": True, "message": "Datele personale au fost anonimizate."})

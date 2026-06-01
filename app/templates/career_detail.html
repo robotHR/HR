@@ -74,6 +74,10 @@
             border-style:dashed;
         }
         input[type="file"]:hover{border-color:var(--blue-2);background:var(--blue-light)}
+        .gdpr-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:var(--radius-md);padding:12px 14px}
+        .gdpr-row input[type="checkbox"]{width:18px;height:18px;min-width:18px;margin-top:2px;accent-color:var(--blue-2);cursor:pointer;border:none;background:none;box-shadow:none;padding:0}
+        .gdpr-row label{font-size:12px;font-weight:500;color:var(--gray-600);text-transform:none;letter-spacing:0;line-height:1.55;cursor:pointer}
+        .gdpr-row label a{color:var(--blue-2);text-decoration:underline}
         .btn-apply{
             width:100%;
             padding:15px;
@@ -208,10 +212,18 @@
                     <label>CV (PDF, DOC, DOCX) *</label>
                     <input type="file" name="cv_file" accept=".pdf,.doc,.docx" required>
                 </div>
+                <div class="gdpr-row">
+                    <input type="checkbox" name="gdpr_consimtamant" id="gdprCheck" value="1" required>
+                    <label for="gdprCheck">
+                        Sunt de acord cu procesarea datelor mele cu caracter personal (nume, email, telefon, CV)
+                        de catre NEXAS in scopul selectiei si recrutarii, conform
+                        <a href="https://eur-lex.europa.eu/legal-content/RO/TXT/?uri=CELEX:32016R0679" target="_blank" rel="noopener">Regulamentului GDPR (UE) 2016/679</a>.
+                        Datele vor fi stocate maxim 12 luni. *
+                    </label>
+                </div>
                 <button class="btn-apply" type="submit" id="submitBtn">Trimite aplicatia →</button>
                 <div class="form-note" id="submitNote">
-                    Prin trimiterea acestui formular esti de acord cu procesarea datelor tale in scopul recrutarii.
-                    Vei primi o confirmare pe email.
+                    Vei primi o confirmare pe email dupa trimitere.
                 </div>
             </form>
             <script>

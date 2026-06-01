@@ -49,4 +49,7 @@ class Candidate(Base):
     candidate_cluster = Column(String, nullable=True)  # Super-cluster natural al candidatului
     job_cluster       = Column(String, nullable=True)  # Super-cluster al postului vizat
 
+    gdpr_consent = Column(Integer, default=0)        # 1 = a bifat consimtamantul GDPR
+    gdpr_consent_at = Column(DateTime, nullable=True) # data/ora acordarii consimtamantului
+
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -118,6 +118,9 @@ def ensure_candidate_extra_columns():
         # ── Clustere domeniu AI (Variant B) ──
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidate_cluster VARCHAR"))
         conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_cluster VARCHAR"))
+        # ── GDPR ──
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS gdpr_consent INTEGER DEFAULT 0"))
+        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS gdpr_consent_at TIMESTAMP"))
 
 
 ensure_candidate_extra_columns()

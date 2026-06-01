@@ -1864,12 +1864,6 @@ async def edit_job(
 
 # ─── PAGINA PUBLICA CARIERE ───────────────────────────────────────────────────
 
-@router.get("/demo", response_class=HTMLResponse)
-async def demo_page():
-    with open("app/templates/demo.html", "r", encoding="utf-8") as f:
-        return HTMLResponse(content=f.read())
-
-
 @router.get("/cariere", response_class=HTMLResponse)
 async def careers_page(request: Request):
     db = SessionLocal()

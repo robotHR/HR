@@ -678,7 +678,9 @@ def analyze_cv_with_ai(text, target_job, job_requirements=None):
     model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
     response = client.chat.completions.create(
         model=model,
-        messages=[{"role": "user", "content": build_prompt(text, target_job, job_requirements)}]
+        messages=[{"role": "user", "content": build_prompt(text, target_job, job_requirements)}],
+        max_tokens=900,
+        timeout=45,
     )
     return response.choices[0].message.content
 
@@ -1457,7 +1459,7 @@ def process_cvs_for_job(target_job, job_requirements=None):
     if new_files:
         tasks = [(file, target_job, profile, job_requirements) for file in new_files]
 
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {executor.submit(_process_single_cv, task): task[0] for task in tasks}
 
             for future in as_completed(futures):

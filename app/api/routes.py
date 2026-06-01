@@ -1573,6 +1573,122 @@ async def jobs_page(request: Request, message: str = ""):
     )
 
 
+def _job_ai_fallback(titlu: str, locatie: str = "", departament: str = "") -> dict:
+    title = (titlu or "post").strip() or "post"
+    loc = (locatie or "").strip()
+    dept = (departament or "").strip()
+    low = (title + " " + dept).lower()
+
+    if any(k in low for k in ["stivuitor", "forklift", "depozit"]):
+        dept = dept or "Logistica"
+        descriere = f"Cautam stivuitorist pentru activitati de manipulare, depozitare si pregatire marfa{(' in ' + loc) if loc else ''}."
+        responsabilitati = "- Manipularea marfii cu stivuitorul in conditii de siguranta\n- Incarcarea si descarcarea paletilor\n- Pregatirea comenzilor conform documentelor\n- Verificarea starii marfii la primire si livrare\n- Respectarea regulilor interne de lucru si siguranta"
+        cerinte = "- Experienta anterioara pe stivuitor\n- Autorizatie ISCIR valabila\n- Atentie la detalii si responsabilitate\n- Disponibilitate pentru program full-time\n- Seriozitate si capacitate de lucru in echipa"
+    elif any(k in low for k in ["casier", "cashier", "vanzari", "retail", "sales"]):
+        dept = dept or "Retail"
+        descriere = f"Cautam {title} pentru activitati de incasare, relationare cu clientii si suport operational{(' in ' + loc) if loc else ''}."
+        responsabilitati = "- Incasarea produselor si operarea casei de marcat\n- Gestionarea platilor cash si card\n- Oferirea de suport clientilor\n- Verificarea documentelor si a bonurilor fiscale\n- Respectarea procedurilor interne"
+        cerinte = "- Experienta in retail reprezinta avantaj\n- Atentie la numerar si documente\n- Abilitati bune de comunicare\n- Disponibilitate pentru program full-time\n- Seriozitate si corectitudine"
+    elif any(k in low for k in ["sofer", "tir", "camion", "transport", "curier", "livrare"]):
+        dept = dept or "Transport"
+        descriere = f"Cautam {title} pentru activitati de transport si livrare{(' in ' + loc) if loc else ''}."
+        responsabilitati = "- Transportul marfii la destinatiile stabilite\n- Respectarea rutelor si a programului de livrare\n- Verificarea documentelor de transport\n- Intretinerea de baza a autovehiculului\n- Raportarea eventualelor incidente"
+        cerinte = "- Permis de conducere categoria corespunzatoare postului\n- Experienta in transport reprezinta avantaj\n- Seriozitate si punctualitate\n- Cunostinte rutiere bune\n- Disponibilitate pentru deplasari"
+    elif any(k in low for k in ["sudor", "lacatus", "mecanic", "instalator", "electrician", "tehnic"]):
+        dept = dept or "Productie"
+        descriere = f"Cautam {title} pentru activitati tehnice si de mentenanta{(' in ' + loc) if loc else ''}."
+        responsabilitati = "- Executarea lucrarilor specifice postului conform standardelor\n- Verificarea si intretinerea echipamentelor\n- Respectarea normelor de siguranta la locul de munca\n- Colaborarea cu echipa tehnica\n- Raportarea defectiunilor si a interventiilor efectuate"
+        cerinte = "- Calificare sau experienta in domeniu\n- Autorizatii necesare postului (daca e cazul)\n- Atentie la detalii si responsabilitate\n- Disponibilitate full-time\n- Capacitate de lucru in echipa"
+    elif any(k in low for k in ["software", "developer", "programator", "it", "frontend", "backend"]):
+        dept = dept or "IT"
+        descriere = f"Cautam {title} pentru dezvoltarea si mentenanta aplicatiilor software{(' in ' + loc) if loc else ''}."
+        responsabilitati = "- Dezvoltarea de functionalitati noi\n- Mentenanta si optimizarea codului existent\n- Colaborarea cu echipa tehnica si de produs\n- Testarea si documentarea modificarilor\n- Respectarea standardelor de calitate"
+        cerinte = "- Experienta in dezvoltare software\n- Cunostinte de programare si baze de date\n- Experienta cu Git si lucru in echipa\n- Gandire logica si atentie la detalii\n- Studii tehnice sau proiecte relevante"
+    else:
+        dept = dept or "Operational"
+        descriere = f"Cautam {title}{(' in ' + loc) if loc else ''}, pentru un rol stabil, cu responsabilitati clare si integrare intr-o echipa organizata."
+        responsabilitati = "- Realizarea activitatilor specifice postului\n- Respectarea procedurilor interne\n- Colaborarea cu echipa si superiorul direct\n- Raportarea problemelor aparute in activitate\n- Pastrarea unui standard bun de calitate"
+        cerinte = "- Experienta relevanta reprezinta avantaj\n- Seriozitate si responsabilitate\n- Atentie la detalii\n- Disponibilitate pentru program full-time\n- Capacitate de lucru in echipa"
+
+    return {
+        "departament": dept,
+        "tip_contract": "Full-time",
+        "descriere": descriere,
+        "responsabilitati": responsabilitati,
+        "cerinte": cerinte,
+        "ce_oferim": "",
+    }
+
+
+@router.post("/posturi/genereaza-ai")
+async def generate_job_description(request: Request):
+    try:
+        payload = await request.json()
+    except Exception:
+        return JSONResponse({"ok": False, "error": "Payload invalid."}, status_code=400)
+
+    titlu = (payload.get("titlu") or "").strip()
+    locatie = (payload.get("locatie") or "").strip()
+    departament = (payload.get("departament") or "").strip()
+
+    if not titlu:
+        return JSONResponse({"ok": False, "error": "Completeaza titlul postului."}, status_code=400)
+
+    fallback = _job_ai_fallback(titlu, locatie, departament)
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        return JSONResponse({"ok": True, "source": "fallback", "data": fallback})
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
+        model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+        prompt = f"""Esti un recruiter senior din Romania. Genereaza o fisa scurta de post, realista si usor de publicat.
+
+Date primite:
+Titlu post: {titlu}
+Locatie: {locatie or 'Bucuresti'}
+Departament: {departament or 'nespecificat'}
+
+Reguli:
+- Raspunde doar JSON valid, fara text in afara JSON-ului.
+- Textul sa fie in romana, cu diacritice corecte.
+- Responsabilitatile si cerintele sa fie liste cu liniute, separate prin \\n.
+- Limbaj simplu si realist, potrivit pentru piata muncii din Romania.
+- Daca postul cere autorizatii sau calificari specifice, include-le la cerinte.
+- NU genera campul ce_oferim.
+
+Schema JSON:
+{{
+  "departament": "...",
+  "descriere": "...",
+  "responsabilitati": "- ...\\n- ...",
+  "cerinte": "- ...\\n- ..."
+}}"""
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.25,
+            max_tokens=700,
+        )
+        content = (response.choices[0].message.content or "").strip()
+        content = re.sub(r"^```(?:json)?", "", content).strip()
+        content = re.sub(r"```$", "", content).strip()
+        data = json.loads(content)
+
+        result = fallback.copy()
+        for key in ["departament", "descriere", "responsabilitati", "cerinte"]:
+            val = data.get(key)
+            if isinstance(val, str) and val.strip():
+                result[key] = val.strip()
+
+        return JSONResponse({"ok": True, "source": "ai", "data": result})
+    except Exception as exc:
+        print(f"[JOB AI] Fallback folosit. Eroare: {exc}")
+        return JSONResponse({"ok": True, "source": "fallback", "data": fallback})
+
+
 @router.post("/posturi/adauga")
 async def add_job(
     titlu: str = Form(...),

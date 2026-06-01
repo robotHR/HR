@@ -1272,12 +1272,19 @@ async def quick_status_update(candidate_id: int, new_status: str = Form("")):
 
 
 @router.post("/analizeaza-job")
-async def analyze_job(target_job: str = Form(...)):
+async def analyze_job(background_tasks: BackgroundTasks, target_job: str = Form(...)):
+    global _analiza_progress
+    if _analiza_progress.get("running"):
+        return RedirectResponse(
+            url="/?message=O analiza este deja in curs pentru: " + _analiza_progress.get("job", ""),
+            status_code=303
+        )
+
     batch_id = str(int(time.time()))
     after_id = get_max_candidate_id()
     final_files = get_final_cv_files()
 
-    # Cauta daca exista un post in platforma cu cerinte definite
+    # Cauta cerinte din platforma (operatie rapida, ruleaza sincron)
     job_requirements = None
     try:
         db = SessionLocal()
@@ -1304,25 +1311,23 @@ async def analyze_job(target_job: str = Form(...)):
             ])).strip()
             if reqs:
                 job_requirements = reqs
-                print(f"[ANALIZA] Post gasit in platforma: '{best_match.titlu}' — cerinte folosite pentru scoring.")
+                print(f"[ANALIZA] Post gasit: '{best_match.titlu}' — cerinte folosite pentru scoring.")
     except Exception as e:
-        print(f"[ANALIZA] Nu s-au putut incarca cerintele din platforma: {e}")
+        print(f"[ANALIZA] Nu s-au putut incarca cerintele: {e}")
 
-    result = process_cvs_for_job(target_job, job_requirements=job_requirements)
+    _analiza_progress.update({
+        "running": True,
+        "done": False,
+        "job": target_job,
+        "started_at": time.time(),
+        "result_message": "",
+    })
 
-    mark_new_candidates_batch(
-        after_id=after_id,
-        batch_id=batch_id,
-        visible=1,
-        only_files=None,
-        hide_final_files=True
+    background_tasks.add_task(
+        _run_analiza_bg, target_job, after_id, batch_id, job_requirements, bool(final_files)
     )
 
-    message = result.get("message", "Analiza finalizata.")
-    if final_files:
-        message += " Candidatii marcati Angajat, Exclus sau Potrivit altor roluri nu mai apar in dashboard."
-
-    return RedirectResponse(url=f"/?message={message}", status_code=303)
+    return RedirectResponse(url="/", status_code=303)
 
 
 @router.post("/upload-cv-uri")
@@ -1459,6 +1464,7 @@ async def delete_all_database(confirm_delete: str = Form("")):
 # ─── RE-ANALIZĂ CU LOGICĂ NOUĂ ──────────────────────────────────────────────
 
 _reanalize_progress = {"total": 0, "done": 0, "running": False}
+_analiza_progress = {"running": False, "done": False, "job": "", "started_at": 0.0, "result_message": ""}
 
 
 def _run_reanalizare_completa():
@@ -1521,6 +1527,25 @@ def _run_reanalizare_completa():
         print(f"[RE-ANALIZARE] Finalizat: {_reanalize_progress['done']}/{_reanalize_progress['total']}")
 
 
+def _run_analiza_bg(target_job: str, after_id: int, batch_id: str, job_requirements, has_final_files: bool):
+    global _analiza_progress
+    try:
+        result = process_cvs_for_job(target_job, job_requirements=job_requirements)
+        mark_new_candidates_batch(after_id=after_id, batch_id=batch_id, visible=1, only_files=None, hide_final_files=True)
+        message = result.get("message", "Analiza finalizata.")
+        if has_final_files:
+            message += " Candidatii marcati Angajat, Exclus sau Potrivit altor roluri nu mai apar in dashboard."
+        _analiza_progress["result_message"] = message
+        _analiza_progress["done"] = True
+        print(f"[ANALIZA BG] Finalizat: {target_job}")
+    except Exception as e:
+        _analiza_progress["result_message"] = f"Eroare la analiza: {str(e)}"
+        _analiza_progress["done"] = True
+        print(f"[ANALIZA BG] Eroare: {e}")
+    finally:
+        _analiza_progress["running"] = False
+
+
 @router.post("/reanalize-completa")
 async def reanalize_completa(background_tasks: BackgroundTasks):
     global _reanalize_progress
@@ -1552,6 +1577,27 @@ async def reanalize_status():
         "done": p.get("done", 0),
         "percent": int(p["done"] / p["total"] * 100) if p.get("total") else 0,
     })
+
+
+@router.get("/analiza-status")
+async def analiza_status():
+    p = _analiza_progress
+    elapsed = int(time.time() - p["started_at"]) if p.get("started_at") else 0
+    return JSONResponse({
+        "running": p.get("running", False),
+        "done": p.get("done", False),
+        "job": p.get("job", ""),
+        "result_message": p.get("result_message", ""),
+        "elapsed": elapsed,
+    })
+
+
+@router.post("/analiza-ack")
+async def analiza_ack():
+    global _analiza_progress
+    _analiza_progress["done"] = False
+    _analiza_progress["result_message"] = ""
+    return JSONResponse({"ok": True})
 
 
 # ─── POSTURI VACANTE (INTERN) ────────────────────────────────────────────────

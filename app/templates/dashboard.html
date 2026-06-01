@@ -947,6 +947,42 @@ html[data-theme="light"] .loading-note{
     color:#667085 !important;
 }
 
+/* ── ANALIZA BACKGROUND BANNER ── */
+.analiza-banner{
+    display:none;align-items:center;gap:14px;
+    padding:13px 18px;border-radius:13px;margin-bottom:16px;
+    font-family:'DM Sans',sans-serif;
+}
+.analiza-banner.running{
+    background:rgba(93,169,255,.10);border:1px solid rgba(93,169,255,.25);
+}
+.analiza-banner.done{
+    background:rgba(34,199,184,.10);border:1px solid rgba(34,199,184,.25);
+}
+.ab-spinner{
+    width:20px;height:20px;border-radius:50%;flex-shrink:0;
+    border:2.5px solid rgba(93,169,255,.22);border-top-color:#5da9ff;
+    animation:ab-spin .9s linear infinite;
+}
+.analiza-banner.done .ab-spinner{display:none}
+.ab-check{display:none;font-size:20px;flex-shrink:0}
+.analiza-banner.done .ab-check{display:block}
+.ab-body{flex:1;min-width:0}
+.ab-title{font-size:13px;font-weight:800;color:#fff}
+.analiza-banner.running .ab-title{color:#7cc4ff}
+.analiza-banner.done .ab-title{color:#5ee6da}
+.ab-sub{font-size:11px;color:rgba(255,255,255,.50);margin-top:2px;line-height:1.4}
+.ab-dismiss{
+    margin-left:auto;flex-shrink:0;
+    background:rgba(34,199,184,.15);border:1px solid rgba(34,199,184,.28);
+    color:#5ee6da;padding:6px 14px;border-radius:8px;
+    font-size:12px;font-weight:800;cursor:pointer;
+    font-family:'DM Sans',sans-serif;white-space:nowrap;
+    transition:.14s;
+}
+.ab-dismiss:hover{background:rgba(34,199,184,.26)}
+@keyframes ab-spin{to{transform:rotate(360deg)}}
+
 </style>
     <link rel="stylesheet" href="/static/css/theme.css">
     <script src="/static/js/theme.js"></script>
@@ -995,6 +1031,16 @@ html[data-theme="light"] .loading-note{
         {% if message %}
             <div class="message">{{ message }}</div>
         {% endif %}
+
+        <div class="analiza-banner" id="analizaBanner">
+            <div class="ab-spinner"></div>
+            <div class="ab-check">✓</div>
+            <div class="ab-body">
+                <div class="ab-title" id="abTitle">Analiza in curs...</div>
+                <div class="ab-sub" id="abSub">AI proceseaza CV-urile</div>
+            </div>
+            <button class="ab-dismiss" id="abDismiss" style="display:none" onclick="dismissAnaliza()">OK, am vazut</button>
+        </div>
 
         <section class="hero">
             <div class="hero-grid">
@@ -1182,7 +1228,7 @@ html[data-theme="light"] .loading-note{
                 <div class="match-title">Analiza pe posturi</div>
                 <div class="section-sub">Introduci unul sau mai multe posturi, iar agentul analizeaza CV-urile existente.</div>
 
-                <form action="/analizeaza-job" method="post" class="loading-form" data-title="Se analizeaza CV-urile existente" data-text="Agentul reanalizeaza CV-urile existente si decide pentru ce post este potrivit fiecare candidat.">
+                <form action="/analizeaza-job" method="post">
                     <div class="form-line">
                         <input type="text" name="target_job" placeholder="Sofer TIR, Casier, Coordonator logistica" required>
                         <button type="submit" class="btn-secondary">Analizeaza CV-uri</button>
@@ -1671,6 +1717,52 @@ document.addEventListener("DOMContentLoaded", function(){
 })();
 </script>
 
+
+<script>
+(function(){
+    var banner = document.getElementById('analizaBanner');
+    var abTitle = document.getElementById('abTitle');
+    var abSub = document.getElementById('abSub');
+    var abDismiss = document.getElementById('abDismiss');
+    var pollTimer = null;
+
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function fmt(s){ return pad2(Math.floor(s/60)) + ':' + pad2(s%60); }
+
+    function checkAnaliza(){
+        fetch('/analiza-status')
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                if(d.running){
+                    banner.style.display = 'flex';
+                    banner.className = 'analiza-banner running';
+                    abTitle.textContent = 'Analiza in curs pentru: ' + d.job;
+                    abSub.textContent = 'AI proceseaza CV-urile... ' + fmt(d.elapsed || 0);
+                    abDismiss.style.display = 'none';
+                    if(!pollTimer) pollTimer = setInterval(checkAnaliza, 4000);
+                } else if(d.done){
+                    clearInterval(pollTimer); pollTimer = null;
+                    banner.style.display = 'flex';
+                    banner.className = 'analiza-banner done';
+                    abTitle.textContent = '✓ Analiza finalizata — ' + d.job;
+                    abSub.textContent = d.result_message || 'Candidatii au fost procesati.';
+                    abDismiss.style.display = 'block';
+                } else {
+                    banner.style.display = 'none';
+                    clearInterval(pollTimer); pollTimer = null;
+                }
+            })
+            .catch(function(){});
+    }
+
+    window.dismissAnaliza = function(){
+        fetch('/analiza-ack', {method:'POST'}).catch(function(){});
+        banner.style.display = 'none';
+    };
+
+    checkAnaliza();
+})();
+</script>
 
 <nav class="bnav">
   <a class="bn on" href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Panou</span></a>

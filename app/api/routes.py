@@ -1398,45 +1398,56 @@ async def descarca_gmail():
     )
 
 
+def _run_gmail_analiza_bg(target_job: str):
+    global _analiza_progress
+    try:
+        gmail_result = download_cv_attachments(max_results=30)
+        downloaded = gmail_result["downloaded_count"]
+        skipped = gmail_result["skipped_count"]
+
+        if target_job.strip():
+            analysis_result = process_cvs_for_job(target_job.strip())
+            saved = analysis_result.get("saved", 0)
+            message = (
+                f"Gmail verificat. CV-uri noi: {downloaded}, sarite: {skipped}. "
+                f"{saved} candidati procesati pentru {target_job}."
+            )
+        else:
+            message = (
+                f"Gmail verificat. CV-uri noi: {downloaded}, sarite: {skipped}. "
+                "Fara job specificat — CV-urile sunt salvate, analizeaza-le manual."
+            )
+        _analiza_progress["result_message"] = message
+        _analiza_progress["done"] = True
+        print(f"[GMAIL BG] Finalizat: {target_job or 'fara job'}")
+    except Exception as e:
+        _analiza_progress["result_message"] = f"Eroare Gmail: {str(e)}"
+        _analiza_progress["done"] = True
+        print(f"[GMAIL BG] Eroare: {e}")
+    finally:
+        _analiza_progress["running"] = False
+
+
 @router.post("/gmail-si-analiza")
-async def gmail_and_analyze(target_job: str = Form("")):
-    """
-    Descarca CV-uri noi din Gmail + analizeaza pentru jobul specificat.
-    Duplicatele sunt verificate pe Cloudinary.
-    """
-    gmail_result = download_cv_attachments(max_results=30)
-
-    downloaded = gmail_result["downloaded_count"]
-    skipped = gmail_result["skipped_count"]
-
-    if target_job.strip() and downloaded > 0:
-        try:
-            analysis_result = process_cvs_for_job(target_job.strip())
-            message = (
-                f"Gmail verificat. CV-uri noi: {downloaded}, sarite: {skipped}. "
-                f"Analiza finalizata: {analysis_result.get('saved', 0)} candidati salvati pentru {target_job}."
-            )
-        except Exception as e:
-            message = (
-                f"Gmail verificat. CV-uri noi: {downloaded}, sarite: {skipped}. "
-                f"Eroare la analiza: {str(e)}"
-            )
-    elif target_job.strip() and downloaded == 0:
-        try:
-            analysis_result = process_cvs_for_job(target_job.strip())
-            message = (
-                f"Gmail verificat. Nu exista CV-uri noi (toate deja descarcate). "
-                f"Analiza din cache: {analysis_result.get('saved', 0)} candidati pentru {target_job}."
-            )
-        except Exception as e:
-            message = f"Gmail verificat. CV-uri noi: 0. Eroare la analiza: {str(e)}"
-    else:
-        message = (
-            f"Gmail verificat. CV-uri noi descarcate: {downloaded}, sarite: {skipped}. "
-            f"Nu ai specificat un job pentru analiza."
+async def gmail_and_analyze(background_tasks: BackgroundTasks, target_job: str = Form("")):
+    global _analiza_progress
+    if _analiza_progress.get("running"):
+        return RedirectResponse(
+            url="/?message=O analiza este deja in curs pentru: " + _analiza_progress.get("job", ""),
+            status_code=303
         )
 
-    return RedirectResponse(url=f"/?message={message}", status_code=303)
+    job_label = target_job.strip() or "Gmail import"
+    _analiza_progress.update({
+        "running": True,
+        "done": False,
+        "job": job_label,
+        "started_at": time.time(),
+        "result_message": "",
+    })
+
+    background_tasks.add_task(_run_gmail_analiza_bg, target_job)
+    return RedirectResponse(url="/", status_code=303)
 
 
 @router.post("/sterge-baza")

@@ -1445,19 +1445,42 @@ def process_cvs_for_job(target_job, job_requirements=None):
 
     # Motorul nou foloseste upsert. Analizam toate CV-urile pentru jobul cerut,
     # ca scorurile vechi sa fie inlocuite cand schimbi logica.
-    new_files = list(all_files)
     db_skipped = 0
-
-    print(f"\nTotal CV-uri: {len(all_files)} | De analizat/actualizat: {len(new_files)}")
-    print("=" * 70)
-
     cache_hits = 0
     fresh_analyses = 0
     saved = 0
     results = []
 
-    if new_files:
-        tasks = [(file, target_job, profile, job_requirements) for file in new_files]
+    # Pre-split: cache check rapid (DB queries simple, fara API)
+    to_analyze = []
+    cached_data = {}
+    for f in all_files:
+        cached = get_cached_analysis(f, target_job)
+        if cached:
+            cached_data[f] = cached
+        else:
+            to_analyze.append(f)
+
+    print(f"\nTotal CV-uri: {len(all_files)} | Cache: {len(cached_data)} | De analizat API: {len(to_analyze)}")
+    print("=" * 70)
+
+    # Procesam cache hits direct, fara thread pool
+    for f, data in cached_data.items():
+        cache_hits += 1
+        print(f"⚡ CACHE: {f} -> {data.get('name')} (scor: {data.get('score')})")
+        save_candidate_to_db(data, f, target_job)
+        saved += 1
+        results.append({
+            "name": data.get("name"),
+            "score": data.get("score"),
+            "recommendation": data.get("recommendation"),
+            "priority": data.get("priority"),
+            "recommended_next_action": data.get("recommended_next_action"),
+        })
+
+    # Doar CV-urile noi merg la API, in paralel
+    if to_analyze:
+        tasks = [(file, target_job, profile, job_requirements) for file in to_analyze]
 
         with ThreadPoolExecutor(max_workers=8) as executor:
             futures = {executor.submit(_process_single_cv, task): task[0] for task in tasks}
@@ -1474,12 +1497,8 @@ def process_cvs_for_job(target_job, job_requirements=None):
                 if not data:
                     continue
 
-                if result["from_cache"]:
-                    cache_hits += 1
-                    print(f"⚡ CACHE: {file} -> {data.get('name')} (scor: {data.get('score')})")
-                else:
-                    fresh_analyses += 1
-                    print(f"✓ ANALIZAT: {file} -> {data.get('name')} (scor: {data.get('score')})")
+                fresh_analyses += 1
+                print(f"✓ ANALIZAT: {file} -> {data.get('name')} (scor: {data.get('score')})")
 
                 save_candidate_to_db(data, file, target_job)
                 saved += 1

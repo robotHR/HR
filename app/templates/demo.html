@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXAS HR — Demo Interactiv</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f172a;--bg2:#131e35;--card:#1a2238;--card2:#1e2a42;
+  --border:rgba(255,255,255,0.08);--blue:#2563eb;--blue-l:rgba(37,99,235,0.15);
+  --teal:#0ea5e9;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+  --text:#f1f5f9;--text2:rgba(255,255,255,0.55);--text3:rgba(255,255,255,0.28);
+  --r:14px;--sw:220px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);min-width:var(--sw);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0}
+.sb-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.brand{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.brand span{color:var(--blue)}
+.brand-sub{font-size:10px;color:var(--text2);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.demo-badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:9px;font-weight:800;letter-spacing:.1em;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:6px;vertical-align:middle}
+.nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-sec{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 10px 4px;margin-top:4px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text2);transition:all .15s;margin-bottom:1px;user-select:none}
+.ni:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.ni.on{background:var(--blue-l);color:var(--blue);font-weight:700}
+.ni-ico{width:18px;text-align:center;font-size:15px}
+.nb{margin-left:auto;background:var(--blue);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px}
+.sb-foot{padding:12px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:10px}
+.uav{width:32px;height:32px;border-radius:99px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.uname{font-size:13px;font-weight:600}
+.urole{font-size:11px;color:var(--text2)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sw);flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;background:var(--bg);position:sticky;top:0;z-index:10;flex-shrink:0}
+.tb-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.tb-sub{font-size:12px;color:var(--text2);margin-top:1px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+/* ── VIEWS ── */
+.view{display:none;padding:24px 28px;flex:1}
+.view.on{display:block}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px}
+.sl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.sv{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
+.sd{font-size:11px;color:var(--green);margin-top:4px}
+
+/* ── BANNER ── */
+.banner{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(37,99,235,.2),rgba(14,165,233,.15));border:1px solid rgba(37,99,235,.3);border-radius:var(--r);padding:14px 18px;margin-bottom:20px}
+.banner.done{background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.1));border-color:rgba(16,185,129,.35)}
+.b-ico{font-size:20px}
+.b-ico.spin{animation:spin 2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.b-title{font-size:14px;font-weight:700}
+.b-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.prog{width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin-top:8px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:99px;transition:width .4s ease}
+
+/* ── GRID 2 ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.card-t{font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+
+/* ── CAND ITEM (dashboard) ── */
+.ci{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s;margin:0 -10px}
+.ci:hover{background:rgba(255,255,255,.04)}
+.cav{width:36px;height:36px;border-radius:99px;background:var(--blue-l);border:1px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--blue);flex-shrink:0}
+.cn{font-size:13.5px;font-weight:600}
+.cp{font-size:11.5px;color:var(--text2)}
+.cscore{margin-left:auto;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;flex-shrink:0}
+.sh{color:var(--green)}.sm{color:var(--yellow)}.sl2{color:var(--red)}
+
+/* ── PRIORITY ── */
+.pri{font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.ph{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.pm{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+.pl{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+
+/* ── ACTIVITY ── */
+.ai{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+.ai:last-child{border-bottom:none}
+.a-dot{width:8px;height:8px;border-radius:99px;background:var(--blue);margin-top:5px;flex-shrink:0}
+.a-txt{font-size:12.5px;line-height:1.5}
+.a-time{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.bp{background:var(--blue);color:#fff}
+.bp:hover{opacity:.9;transform:translateY(-1px)}
+.bg{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
+.bg:hover{background:rgba(255,255,255,.1)}
+.bai{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff}
+.bai:hover{opacity:.9;transform:translateY(-1px)}
+.bsm{padding:5px 12px;font-size:12px;border-radius:7px}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fb{padding:6px 14px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s}
+.fb.on,.fb:hover{background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
+
+/* ── TABLE ── */
+.ctable{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.cth{display:grid;grid-template-columns:2fr 1.5fr 80px 100px 110px 70px;gap:12px;padding:11px 18px;background:var(--card2);font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.ctr{display:grid;grid-template-columns:2fr 1.5fr 80px 100px 110px 70px;gap:12px;padding:12px 18px;border-top:1px solid var(--border);align-items:center;cursor:pointer;transition:background .15s}
+.ctr:hover{background:rgba(255,255,255,.03)}
+.ct-n{font-size:13.5px;font-weight:600}
+.ct-e{font-size:11px;color:var(--text2);margin-top:2px}
+.ct-p{font-size:12.5px;color:var(--text2)}
+.ct-s{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.stb{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:6px;display:inline-block}
+.st-n{background:rgba(37,99,235,.15);color:#60a5fa}
+.st-c{background:rgba(16,185,129,.15);color:var(--green)}
+.st-i{background:rgba(245,158,11,.15);color:var(--yellow)}
+.st-r{background:rgba(239,68,68,.1);color:#f87171}
+
+/* ── JOBS ── */
+.jlist{display:grid;gap:12px;margin-bottom:20px}
+.jc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:border-color .15s}
+.jc:hover{border-color:var(--blue)}
+.jico{width:44px;height:44px;border-radius:11px;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.jt{font-size:15px;font-weight:700}
+.jm{font-size:12px;color:var(--text2);margin-top:3px}
+.jstat{margin-left:auto;text-align:right;flex-shrink:0}
+.jnum{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--blue)}
+.jnl{font-size:11px;color:var(--text2)}
+.bad-on{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.bad-off{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+
+/* ── AI BOX ── */
+.ai-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:20px}
+.ai-inp{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.ai-inp:focus{border-color:var(--blue)}
+.ai-inp-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.ai-field{margin-bottom:12px}
+.ai-fl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.ai-fv{font-size:13px;line-height:1.65;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px 13px}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fadeup{animation:fadeup .4s ease forwards}
+
+/* ── INTERVIEWS ── */
+.ilist{display:grid;gap:12px}
+.icard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;display:flex;align-items:center;gap:16px}
+.idate{background:var(--blue-l);border:1px solid var(--blue);border-radius:10px;padding:10px 14px;text-align:center;flex-shrink:0}
+.id-day{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--blue)}
+.id-mo{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase}
+.in{font-size:14px;font-weight:700}
+.im{font-size:12px;color:var(--text2);margin-top:3px}
+.ist{margin-left:auto;font-size:11px;font-weight:700;padding:4px 10px;border-radius:7px;flex-shrink:0}
+.ist-ok{background:rgba(16,185,129,.15);color:var(--green)}
+.ist-w{background:rgba(245,158,11,.15);color:var(--yellow)}
+
+/* ── CARIERE PREVIEW ── */
+.cp-wrap{background:#f8fafc;border-radius:var(--r);overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+.cp-hdr{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 24px;display:flex;align-items:center}
+.cp-brand{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0f172a}
+.cp-brand span{color:#2563eb}
+.cp-hero{background:linear-gradient(135deg,#0f172a,#1e3a6e);padding:30px 24px;color:#fff}
+.cp-hero h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.cp-hero p{font-size:13px;color:rgba(255,255,255,.6)}
+.cp-list{background:#f8fafc;padding:20px 24px}
+.cp-jc{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.cp-jc:hover{border-color:#2563eb;box-shadow:0 4px 16px rgba(37,99,235,.12)}
+.cp-ji h3{font-size:14px;font-weight:700;color:#0f172a}
+.cp-ji p{font-size:12px;color:#64748b;margin-top:3px}
+.cp-ab{margin-left:auto;background:#2563eb;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto}
+.overlay.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:680px;padding:28px;position:relative}
+.mcl{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:99px;background:rgba(255,255,255,.08);border:none;color:var(--text2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.mname{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:4px}
+.mpos{font-size:13px;color:var(--text2);margin-bottom:16px}
+.scircle{display:inline-flex;align-items:center;justify-content:center;width:68px;height:68px;border-radius:99px;border:3px solid var(--green);font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--green)}
+.ms{background:var(--card2);border-radius:10px;padding:14px;margin-bottom:10px}
+.ms-t{font-size:10.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.ms-c{font-size:13.5px;line-height:1.65}
+
+/* ── DOTS ANIM ── */
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+.dots span{animation:blink 1.4s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+
+/* ── DEMO TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:12px;color:var(--text2);max-width:220px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast strong{color:var(--text);display:block;margin-bottom:4px;font-size:13px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .g2{grid-template-columns:1fr}
+  .cth,.ctr{grid-template-columns:2fr 70px 90px 60px;gap:8px}
+  .ct-p{display:none}
+}
+@media(max-width:640px){
+  :root{--sw:0px}
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="brand">N<span>E</span>XAS <span class="demo-badge">DEMO</span></div>
+    <div class="brand-sub">HR Intelligence Platform</div>
+  </div>
+  <div class="nav">
+    <div class="nav-sec">Principal</div>
+    <div class="ni on" onclick="sv('dashboard',this)"><span class="ni-ico">📊</span>Dashboard</div>
+    <div class="ni" onclick="sv('candidati',this)"><span class="ni-ico">👥</span>Candidati<span class="nb">23</span></div>
+    <div class="ni" onclick="sv('posturi',this)"><span class="ni-ico">💼</span>Posturi<span class="nb">4</span></div>
+    <div class="ni" onclick="sv('interviuri',this)"><span class="ni-ico">📅</span>Interviuri<span class="nb">3</span></div>
+    <div class="nav-sec">Public</div>
+    <div class="ni" onclick="sv('cariere',this)"><span class="ni-ico">🌐</span>Pagina Cariere</div>
+  </div>
+  <div class="sb-foot">
+    <div class="user-row">
+      <div class="uav">M</div>
+      <div><div class="uname">Maria Popescu</div><div class="urole">HR Manager</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══════════════════════ DASHBOARD ══════════════════════ -->
+<div id="v-dashboard" class="view on">
+  <div class="topbar">
+    <div><div class="tb-title">Dashboard</div><div class="tb-sub">Buna ziua, Maria! Ai 3 candidati noi de revizuit.</div></div>
+    <div class="tb-right">
+      <button class="btn bg bsm" onclick="runBannerDemo()">▶ Demo analiza AI</button>
+      <button class="btn bp bsm" onclick="sv('posturi', document.querySelectorAll('.ni')[2])">+ Post nou</button>
+    </div>
+  </div>
+  <div style="padding:24px 28px">
+
+    <!-- Banner -->
+    <div id="dBanner" style="display:none" class="banner">
+      <span class="b-ico spin" id="bIco">⚙️</span>
+      <div style="flex:1">
+        <div class="b-title" id="bTitle">Analiza in curs pentru: Manager Vanzari Regional</div>
+        <div class="b-sub" id="bSub">AI proceseaza 8 CV-uri... <span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
+        <div class="prog"><div class="prog-fill" id="bProg" style="width:0%"></div></div>
+      </div>
+      <button id="bDismiss" class="btn bg bsm" style="display:none;flex-shrink:0;margin-left:8px" onclick="document.getElementById('dBanner').style.display='none'">OK, am vazut</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="sc"><div class="sl">Total candidati</div><div class="sv">127</div><div class="sd">↑ +23 luna aceasta</div></div>
+      <div class="sc"><div class="sl">Procesati AI</div><div class="sv">127</div><div class="sd" style="color:#60a5fa">100% rata succes</div></div>
+      <div class="sc"><div class="sl">Interviuri programate</div><div class="sv">8</div><div class="sd">3 in aceasta saptamana</div></div>
+      <div class="sc"><div class="sl">Timp mediu analiza</div><div class="sv">28s</div><div class="sd">vs 4 min manual</div></div>
+    </div>
+
+    <div class="g2">
+      <!-- Candidati recenti -->
+      <div class="card">
+        <div class="card-t">Candidati recenti <button class="btn bg bsm" onclick="sv('candidati',document.querySelectorAll('.ni')[1])">Vezi toti →</button></div>
+        <div class="ci" onclick="oc(0)"><div class="cav">AC</div><div><div class="cn">Andrei Constantinescu</div><div class="cp">Manager Vanzari Regional</div></div><span class="pri ph">HIGH</span><div class="cscore sh">91</div></div>
+        <div class="ci" onclick="oc(1)"><div class="cav">FG</div><div><div class="cn">Florin Georgescu</div><div class="cp">Manager Vanzari Regional</div></div><span class="pri ph">HIGH</span><div class="cscore sh">88</div></div>
+        <div class="ci" onclick="oc(2)"><div class="cav">MI</div><div><div class="cn">Maria Ionescu</div><div class="cp">Manager Vanzari Regional</div></div><span class="pri ph">HIGH</span><div class="cscore sh">84</div></div>
+        <div class="ci" onclick="oc(3)"><div class="cav">BP</div><div><div class="cn">Bogdan Popa</div><div class="cp">Stivuitorist Depozit</div></div><span class="pri pm">MED</span><div class="cscore sm">73</div></div>
+        <div class="ci" onclick="oc(4)"><div class="cav">ED</div><div><div class="cn">Elena Dumitrescu</div><div class="cp">Manager Vanzari Regional</div></div><span class="pri pm">MED</span><div class="cscore sm">68</div></div>
+      </div>
+      <!-- Activitate -->
+      <div class="card">
+        <div class="card-t">Activitate recenta</div>
+        <div class="ai"><div class="a-dot" style="background:var(--green)"></div><div><div class="a-txt"><strong>Andrei Constantinescu</strong> — scor 91, recomandat CHEAMA ACUM</div><div class="a-time">acum 12 minute</div></div></div>
+        <div class="ai"><div class="a-dot"></div><div><div class="a-txt">8 CV-uri analizate pentru <strong>Manager Vanzari Regional</strong></div><div class="a-time">acum 14 minute</div></div></div>
+        <div class="ai"><div class="a-dot" style="background:var(--yellow)"></div><div><div class="a-txt">Interviu confirmat: <strong>Florin Georgescu</strong> — 5 iun, 10:00</div><div class="a-time">acum 1 ora</div></div></div>
+        <div class="ai"><div class="a-dot" style="background:var(--blue)"></div><div><div class="a-txt">Post nou creat cu AI: <strong>Stivuitorist Depozit</strong></div><div class="a-time">ieri, 14:32</div></div></div>
+        <div class="ai"><div class="a-dot"></div><div><div class="a-txt"><strong>Elena Dumitrescu</strong> a aplicat pentru Manager Vanzari Regional</div><div class="a-time">ieri, 11:05</div></div></div>
+        <div class="ai"><div class="a-dot" style="background:var(--green)"></div><div><div class="a-txt">Interviu acceptat: <strong>Maria Ionescu</strong> — confirmare automata trimisa</div><div class="a-time">ieri, 09:18</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CANDIDATI ══════════════════════ -->
+<div id="v-candidati" class="view">
+  <div class="topbar">
+    <div><div class="tb-title">Candidati</div><div class="tb-sub">127 procesati cu AI · Click pe un candidat pentru analiza completa</div></div>
+  </div>
+  <div style="padding:24px 28px">
+    <div class="filters">
+      <button class="fb on" onclick="filt(this)">Toti (23)</button>
+      <button class="fb" onclick="filt(this)">🟢 Priority HIGH (7)</button>
+      <button class="fb" onclick="filt(this)">🟡 Priority MEDIUM (9)</button>
+      <button class="fb" onclick="filt(this)">🔴 Priority LOW (7)</button>
+      <button class="fb" onclick="filt(this)">📅 La interviu (3)</button>
+    </div>
+    <div class="ctable">
+      <div class="cth"><span>Candidat</span><span>Post vizat</span><span>Scor AI</span><span>Prioritate</span><span>Status</span><span></span></div>
+      <div class="ctr" onclick="oc(0)"><div><div class="ct-n">Andrei Constantinescu</div><div class="ct-e">andrei.c@gmail.com</div></div><div class="ct-p">Manager Vanzari Regional</div><div class="ct-s sh">91</div><div><span class="pri ph">HIGH</span></div><div><span class="stb st-c">CHEAMA ACUM</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(1)"><div><div class="ct-n">Florin Georgescu</div><div class="ct-e">florin.g@yahoo.com</div></div><div class="ct-p">Manager Vanzari Regional</div><div class="ct-s sh">88</div><div><span class="pri ph">HIGH</span></div><div><span class="stb st-i">LA INTERVIU</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(2)"><div><div class="ct-n">Maria Ionescu</div><div class="ct-e">m.ionescu@gmail.com</div></div><div class="ct-p">Manager Vanzari Regional</div><div class="ct-s sh">84</div><div><span class="pri ph">HIGH</span></div><div><span class="stb st-i">LA INTERVIU</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(5)"><div><div class="ct-n">Ioana Vasilescu</div><div class="ct-e">ioana.v@outlook.com</div></div><div class="ct-p">Manager Vanzari Regional</div><div class="ct-s sm">76</div><div><span class="pri pm">MED</span></div><div><span class="stb st-n">NOU</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(3)"><div><div class="ct-n">Bogdan Popa</div><div class="ct-e">bogdan.p@gmail.com</div></div><div class="ct-p">Stivuitorist Depozit</div><div class="ct-s sm">73</div><div><span class="pri pm">MED</span></div><div><span class="stb st-c">CHEAMA ACUM</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(4)"><div><div class="ct-n">Elena Dumitrescu</div><div class="ct-e">elena.d@gmail.com</div></div><div class="ct-p">Manager Vanzari Regional</div><div class="ct-s sm">68</div><div><span class="pri pm">MED</span></div><div><span class="stb st-n">NOU</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(6)"><div><div class="ct-n">Cristian Munteanu</div><div class="ct-e">c.munteanu@yahoo.com</div></div><div class="ct-p">Manager Vanzari Regional</div><div class="ct-s sl2">52</div><div><span class="pri pl">LOW</span></div><div><span class="stb st-r">RESPINS</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+      <div class="ctr" onclick="oc(7)"><div><div class="ct-n">Ana Stanescu</div><div class="ct-e">ana.s@gmail.com</div></div><div class="ct-p">Casier Supermarket</div><div class="ct-s sh">86</div><div><span class="pri ph">HIGH</span></div><div><span class="stb st-i">LA INTERVIU</span></div><div><button class="btn bg bsm">Detalii</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ POSTURI ══════════════════════ -->
+<div id="v-posturi" class="view">
+  <div class="topbar">
+    <div><div class="tb-title">Posturi deschise</div><div class="tb-sub">Genereaza descrieri complete cu AI in 10 secunde</div></div>
+    <div class="tb-right"><button class="btn bai" onclick="toggleAiBox()">✦ Post nou cu AI</button></div>
+  </div>
+  <div style="padding:24px 28px">
+
+    <!-- AI gen box -->
+    <div id="aiBox" class="ai-box" style="display:none;margin-bottom:20px">
+      <div class="card-t" style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)">✦ Genereaza descriere post cu AI</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div><div class="ai-inp-label">Titlu post *</div><input class="ai-inp" id="aiTitle" value="Sef Depozit" placeholder="ex: Sef Depozit"></div>
+        <div><div class="ai-inp-label">Departament</div><input class="ai-inp" value="Logistica" placeholder="ex: Logistica"></div>
+      </div>
+      <button class="btn bai" id="aiBtn" onclick="runAI()">✦ Genereaza cu AI</button>
+      <div id="aiStatus" style="display:none;margin-top:12px;font-size:13px;color:var(--text2)"><span class="dots"><span>.</span><span>.</span><span>.</span></span> AI scrie descrierea postului...</div>
+      <div id="aiResult" style="display:none;margin-top:16px">
+        <div class="ai-field fadeup"><div class="ai-fl">Descriere post</div><div class="ai-fv" id="aiD"></div></div>
+        <div class="ai-field fadeup" style="animation-delay:.1s"><div class="ai-fl">Responsabilitati</div><div class="ai-fv" id="aiR"></div></div>
+        <div class="ai-field fadeup" style="animation-delay:.2s"><div class="ai-fl">Cerinte</div><div class="ai-fv" id="aiC"></div></div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="btn bp">Salveaza postul →</button>
+          <button class="btn bg" onclick="resetAI()">Regenereaza</button>
+          <button class="btn bg" onclick="toggleAiBox()">Anuleaza</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job list -->
+    <div class="jlist">
+      <div class="jc" onclick="sv('candidati',document.querySelectorAll('.ni')[1])">
+        <div class="jico">👔</div>
+        <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="jt">Manager Vanzari Regional</div><span class="bad-on">Activ</span></div><div class="jm">Management · Bucuresti · Full-time · Publicat 28 mai 2026</div></div>
+        <div class="jstat"><div class="jnum">23</div><div class="jnl">aplicatii</div></div>
+      </div>
+      <div class="jc">
+        <div class="jico">🛒</div>
+        <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="jt">Casier Supermarket</div><span class="bad-on">Activ</span></div><div class="jm">Vanzari · Bucuresti · Full-time · Publicat 20 mai 2026</div></div>
+        <div class="jstat"><div class="jnum">14</div><div class="jnl">aplicatii</div></div>
+      </div>
+      <div class="jc">
+        <div class="jico">📦</div>
+        <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="jt">Stivuitorist Depozit</div><span class="bad-on">Activ</span></div><div class="jm">Logistica · Bucuresti · Full-time · Publicat 15 mai 2026</div></div>
+        <div class="jstat"><div class="jnum">8</div><div class="jnl">aplicatii</div></div>
+      </div>
+      <div class="jc" style="opacity:.6">
+        <div class="jico">👩‍💼</div>
+        <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div class="jt">Specialist Resurse Umane</div><span class="bad-off">Inactiv</span></div><div class="jm">HR · Bucuresti · Full-time · Publicat 5 apr 2026</div></div>
+        <div class="jstat"><div class="jnum" style="color:var(--text2)">5</div><div class="jnl">aplicatii</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ INTERVIURI ══════════════════════ -->
+<div id="v-interviuri" class="view">
+  <div class="topbar">
+    <div><div class="tb-title">Interviuri programate</div><div class="tb-sub">Candidatii primesc link de confirmare automat pe email</div></div>
+    <div class="tb-right"><button class="btn bp bsm" onclick="sv('candidati',document.querySelectorAll('.ni')[1])">+ Programeaza interviu</button></div>
+  </div>
+  <div style="padding:24px 28px">
+    <div class="ilist">
+      <div class="icard"><div class="idate"><div class="id-day">5</div><div class="id-mo">Iun</div></div><div><div class="in">Florin Georgescu</div><div class="im">Manager Vanzari Regional · 10:00 · Sediu central, sala 2 · 60 min</div><div class="im" style="margin-top:4px">📧 Confirmare trimisa · Scor AI: 88 · HIGH priority</div></div><span class="ist ist-ok">CONFIRMAT</span></div>
+      <div class="icard"><div class="idate"><div class="id-day">7</div><div class="id-mo">Iun</div></div><div><div class="in">Andrei Constantinescu</div><div class="im">Manager Vanzari Regional · 14:00 · Sediu central, sala 1 · 90 min</div><div class="im" style="margin-top:4px">📧 Confirmare trimisa · Scor AI: 91 · HIGH priority</div></div><span class="ist ist-w">ASTEPTAM</span></div>
+      <div class="icard"><div class="idate"><div class="id-day">10</div><div class="id-mo">Iun</div></div><div><div class="in">Ana Stanescu</div><div class="im">Casier Supermarket · 11:00 · Magazin Baneasa · 45 min</div><div class="im" style="margin-top:4px">📧 Confirmare trimisa · Scor AI: 86 · HIGH priority</div></div><span class="ist ist-ok">CONFIRMAT</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CARIERE ══════════════════════ -->
+<div id="v-cariere" class="view">
+  <div class="topbar">
+    <div><div class="tb-title">Pagina Cariere — vedere publica</div><div class="tb-sub">Asa arata pagina nexas.ro/cariere — accesibila de oricine, fara login</div></div>
+  </div>
+  <div style="padding:24px 28px">
+    <div class="cp-wrap">
+      <div class="cp-hdr">
+        <div class="cp-brand">N<span>E</span>XAS</div>
+        <div style="font-size:12px;color:#64748b;margin-left:auto">Oportunitati de cariera</div>
+      </div>
+      <div class="cp-hero">
+        <h2>Alatura-te echipei noastre</h2>
+        <p>Cautam oameni pasionati care vor sa creasca alaturi de noi. Aplica direct — primesti raspuns in 24-48h.</p>
+      </div>
+      <div class="cp-list">
+        <div class="cp-jc"><div class="cp-ji"><h3>Manager Vanzari Regional</h3><p>📍 Bucuresti · Full-time · Management</p></div><button class="cp-ab">Aplica acum →</button></div>
+        <div class="cp-jc"><div class="cp-ji"><h3>Casier Supermarket</h3><p>📍 Bucuresti · Full-time · Vanzari</p></div><button class="cp-ab">Aplica acum →</button></div>
+        <div class="cp-jc"><div class="cp-ji"><h3>Stivuitorist Depozit</h3><p>📍 Bucuresti · Full-time · Logistica</p></div><button class="cp-ab">Aplica acum →</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- MODAL -->
+<div class="overlay" id="modal" onclick="if(event.target===this)cm()">
+  <div class="modal">
+    <button class="mcl" onclick="cm()">✕</button>
+    <div id="mContent"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <strong>Demo interactiv NEXAS HR</strong>
+  Navigheaza prin sectiuni si da click pe candidati pentru a vedea analiza AI completa.
+</div>
+
+<script>
+// ── NAV ──
+function sv(name, el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('v-'+name).classList.add('on');
+  if(el) el.classList.add('on');
+  document.getElementById('toast').style.display='none';
+}
+
+// ── FILTER ──
+function filt(el){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ── CANDIDATE DATA ──
+const C=[
+  {n:"Andrei Constantinescu",p:"Manager Vanzari Regional",s:91,pr:"ph",prl:"HIGH",st:"CHEAMA ACUM",e:"andrei.c@gmail.com",exp:"8 ani",
+   sum:"Candidat exceptional cu 8 ani experienta in coordonarea echipelor de vanzari in retail si distributie. A gestionat o echipa de 14 agenti si a depasit target-ul cu 23% in 2025. Potrivire excelenta cu cerintele postului.",
+   str:"Track record demonstrabil de depasire targets, cunoastere aprofundata a pietei de retail, leadership natural, negociator excelent B2B.",
+   mis:"Nu are experienta cu ERP-ul SAP — invatare estimata 2-3 saptamani. Minor.",
+   scr:"Intreaba despre motivatia de schimbare si disponibilitatea de a incepe in 2 saptamani. Clarifica asteptarile salariale inainte de interviu.",
+   act:"CALL NOW",qa:"1. Cel mai dificil moment in gestionarea unui conflict in echipa de vanzari?<br>2. Metodologie pentru mentinerea motivatiei in perioadele slabe?<br>3. Cel mai mare contract incheiat personal?"},
+  {n:"Florin Georgescu",p:"Manager Vanzari Regional",s:88,pr:"ph",prl:"HIGH",st:"LA INTERVIU",e:"florin.g@yahoo.com",exp:"6 ani",
+   sum:"Profesionist cu experienta solida in coordonarea vanzarilor zona Sud. A crescut portofoliul cu 35% in 2 ani. Excelent la training si mentoring echipe noi.",
+   str:"Foarte bun la dezvoltarea oamenilor, strategii de expansiune piata, prezentari executive convingatoare.",
+   mis:"Experienta limitata cu clienti enterprise. Zona de confort: SME pana la 50 angajati.",
+   scr:"Confirma disponibilitatea pentru interviu pe 5 iunie. Intreaba despre experienta cu clienti corporate.",
+   act:"CALL NOW",qa:"1. Strategia ta pentru a intra pe un teritoriu nou?<br>2. Cum gestionezi un agent care isi rateaza constant target-ul?"},
+  {n:"Maria Ionescu",p:"Manager Vanzari Regional",s:84,pr:"ph",prl:"HIGH",st:"LA INTERVIU",e:"m.ionescu@gmail.com",exp:"5 ani",
+   sum:"Background solid in vanzari B2B, focus FMCG. Trecere recenta de la agent la team lead — arata potential clar de leadership. Comunicatoare excelenta.",
+   str:"Empatie naturala cu clientii, organizata, rata retentie client 94% in ultimul an.",
+   mis:"Nu a coordonat echipe mai mari de 4 persoane. Rolul implica 8+ agenti — potential challenge de tranzitie.",
+   scr:"Intreaba deschis despre viziunea ei pentru managementul unei echipe de 8 persoane.",
+   act:"CALL LATER",qa:"1. Cum faci tranzitia de la coleg la manager?<br>2. Cea mai dificila decizie legata de un coleg?"},
+  {n:"Bogdan Popa",p:"Stivuitorist Depozit",s:73,pr:"pm",prl:"MED",st:"CHEAMA ACUM",e:"bogdan.p@gmail.com",exp:"3 ani",
+   sum:"Experienta practica in depozit logistic. Detine permis stivuitorist valabil si cunoastere WMS. Profil curat, disponibil imediat.",
+   str:"Permis actualizat, experienta WMS, disponibil imediat, recomandari bune de la angajatorul anterior.",
+   mis:"Nu a lucrat cu Jungheinrich electric (modelul din depozit). Training estimat 1-2 zile.",
+   scr:"Verifica disponibilitatea imediata si asteptarile salariale. Confirma validitatea permisului.",
+   act:"CALL NOW",qa:"1. Procedura ta la receptia marfii?<br>2. Ce faci daca observi o neregula de securitate?"},
+  {n:"Elena Dumitrescu",p:"Manager Vanzari Regional",s:68,pr:"pm",prl:"MED",st:"NOU",e:"elena.d@gmail.com",exp:"4 ani",
+   sum:"Experienta in vanzari retail — buna cunoastere a proceselor de magazin. Lipsa experienta management, dar potential de crestere pentru rol de team lead intermediar.",
+   str:"Cunoaste procesele din teren, relationeaza bine cu clientii, stabilitate la angajatori anteriori.",
+   mis:"Zero experienta in coordonarea echipelor. Rolul necesita management de 8+ agenti — risc semnificativ.",
+   scr:"Intreaba deschis daca a coordonat colegi si care sunt asteptarile pentru un rol de management.",
+   act:"CALL LATER",qa:"1. De ce crezi ca esti pregatita pentru management acum?<br>2. Cel mai dificil aspect al coordonarii oamenilor?"},
+  {n:"Ioana Vasilescu",p:"Manager Vanzari Regional",s:76,pr:"pm",prl:"MED",st:"NOU",e:"ioana.v@outlook.com",exp:"5 ani",
+   sum:"Experienta key account management — cunoaste ciclul de vanzare complex. CV bine structurat cu realizari cuantificate. Potrivita pentru senior sales cu tranzitie spre management.",
+   str:"Gandire strategica demonstrata, portofoliu impresionant enterprise, analitica si prezentari excelente.",
+   mis:"Nu are experienta in coordonarea directa a echipelor de teren. Background mai mult corporate/birou.",
+   scr:"Clarifica motivatia pentru tranzitia din key account in management de echipa.",
+   act:"CALL LATER",qa:"1. Cum te-ai adapta managementului agentilor de teren vs birou?<br>2. Metodologie pentru evaluarea performantei unui agent?"},
+  {n:"Cristian Munteanu",p:"Manager Vanzari Regional",s:52,pr:"pl",prl:"LOW",st:"RESPINS",e:"c.munteanu@yahoo.com",exp:"2 ani",
+   sum:"Candidat la inceput de cariera cu experienta limitata in vanzari directe. Nu are background in management. Profilul nu corespunde nivelului de senioritate cerut.",
+   str:"Entuziasm ridicat, deschis la invatare, bune abilitati de prospectare telefonica.",
+   mis:"Lipseste complet experienta in management de echipa, negociere contracte si planificare strategica. Prea junior.",
+   scr:"Informeaza politicos ca profilul nu corespunde acestui rol. Sugereaza un rol de senior agent in viitor.",
+   act:"REJECT",qa:"N/A — candidatul nu este recomandat pentru interviu la acest post."},
+  {n:"Ana Stanescu",p:"Casier Supermarket",s:86,pr:"ph",prl:"HIGH",st:"LA INTERVIU",e:"ana.s@gmail.com",exp:"4 ani",
+   sum:"Candidata excelenta — experienta directa si relevanta. 4 ani la Carrefour cu evaluari pozitive constante. Zero erori la casa de marcat in ultimul an. Punctuala, atenta la detalii.",
+   str:"Experienta exacta cu rolul, recomandari excelente, disponibila imediat, locuieste la 10 minute de magazin.",
+   mis:"Nu cunoaste POS-ul Saga (al nostru). Training estimat 1 zi — minor.",
+   scr:"Confirma interviul pe 10 iunie. Intreaba despre disponibilitate ture si weekend.",
+   act:"CALL NOW",qa:"1. Cum gestionezi o coada mare la casa?<br>2. Ce faci la o discrepanta la inchiderea casei?"}
+];
+
+function oc(i){
+  const c=C[i];
+  const sc=c.s>=80?'sh':c.s>=65?'sm':'sl2';
+  const bc=c.s>=80?'var(--green)':c.s>=65?'var(--yellow)':'var(--red)';
+  const ac={'CALL NOW':'#10b981','CALL LATER':'#f59e0b','REJECT':'#ef4444','KEEP FOR OTHER ROLE':'#60a5fa'};
+  document.getElementById('mContent').innerHTML=`
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px">
+      <div style="text-align:center;flex-shrink:0">
+        <div class="scircle ${sc}" style="border-color:${bc};color:${bc}">${c.s}</div>
+      </div>
+      <div style="flex:1">
+        <div class="mname">${c.n}</div>
+        <div class="mpos">${c.p} · ${c.exp} experienta · ${c.e}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <span class="pri ${c.pr}">${c.prl}</span>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--text2)">${c.st}</span>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:${ac[c.act]||'#60a5fa'}">${c.act}</span>
+        </div>
+      </div>
+    </div>
+    <div class="ms"><div class="ms-t">🤖 Rezumat AI</div><div class="ms-c">${c.sum}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="ms"><div class="ms-t">✅ Puncte forte</div><div class="ms-c" style="font-size:13px">${c.str}</div></div>
+      <div class="ms"><div class="ms-t">⚠️ Lipseste</div><div class="ms-c" style="font-size:13px">${c.mis}</div></div>
+    </div>
+    <div class="ms" style="margin-top:10px"><div class="ms-t">📞 Script apel</div><div class="ms-c" style="font-size:13px">${c.scr}</div></div>
+    <div class="ms"><div class="ms-t">❓ Intrebari recomandate interviu</div><div class="ms-c" style="font-size:13px">${c.qa}</div></div>
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn bp bsm" onclick="cm()">📅 Programeaza interviu</button>
+      <button class="btn bg bsm" onclick="cm()">📧 Trimite email</button>
+      <button class="btn bg bsm" onclick="cm()">Arhiveaza</button>
+    </div>`;
+  document.getElementById('modal').classList.add('on');
+}
+function cm(){ document.getElementById('modal').classList.remove('on'); }
+
+// ── AI GEN ──
+function toggleAiBox(){
+  const b=document.getElementById('aiBox');
+  b.style.display=b.style.display==='none'?'block':'none';
+}
+function runAI(){
+  const t=document.getElementById('aiTitle').value||'Sef Depozit';
+  document.getElementById('aiBtn').style.display='none';
+  document.getElementById('aiStatus').style.display='block';
+  document.getElementById('aiResult').style.display='none';
+  setTimeout(()=>{
+    document.getElementById('aiStatus').style.display='none';
+    document.getElementById('aiBtn').style.display='inline-flex';
+    document.getElementById('aiResult').style.display='block';
+    document.getElementById('aiD').innerHTML=`Cautam un <strong>${t}</strong> cu experienta pentru a coordona activitatile operationale ale depozitului din Bucuresti. Vei asigura eficienta proceselor de receptie, stocare si expediere, respectand standardele de calitate si securitate in vigoare.`;
+    document.getElementById('aiR').innerHTML=`• Coordonarea echipei de depozit (10-15 persoane) si stabilirea prioritatilor zilnice<br>• Supervizarea receptiei, stocarii si expedierii conform procedurilor interne<br>• Monitorizarea KPI: acuratete stoc, productivitate, rata erori<br>• Colaborare cu Logistica si Achizitii pentru optimizarea fluxurilor<br>• Raportare zilnica/saptamanala catre managerul de operatiuni`;
+    document.getElementById('aiC').innerHTML=`• Minim 3 ani experienta intr-un rol similar de coordonare depozit/logistica<br>• Cunoasterea sistemelor WMS (avantaj: Logistix sau SAP WM)<br>• Permis stivuitorist valabil reprezinta avantaj<br>• Abilitati dovedite de leadership si gestionare echipe<br>• Orientare catre rezultate si atentie la detalii`;
+  },2600);
+}
+function resetAI(){
+  document.getElementById('aiResult').style.display='none';
+  document.getElementById('aiBtn').style.display='inline-flex';
+}
+
+// ── BANNER DEMO ──
+function runBannerDemo(){
+  const el=document.getElementById('dBanner');
+  const ico=document.getElementById('bIco');
+  const t=document.getElementById('bTitle');
+  const s=document.getElementById('bSub');
+  const p=document.getElementById('bProg');
+  const d=document.getElementById('bDismiss');
+  el.className='banner';
+  ico.className='b-ico spin';
+  ico.textContent='⚙️';
+  t.textContent='Analiza in curs pentru: Manager Vanzari Regional';
+  s.innerHTML='AI proceseaza 8 CV-uri... <span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+  d.style.display='none';
+  p.style.width='0%';
+  el.style.display='flex';
+  let prog=0;
+  const iv=setInterval(()=>{
+    prog+=Math.random()*15+6;
+    if(prog>=100){
+      prog=100;clearInterval(iv);
+      setTimeout(()=>{
+        el.className='banner done';
+        ico.className='b-ico';ico.textContent='✅';
+        t.textContent='✓ Analiza finalizata — Manager Vanzari Regional';
+        s.innerHTML='8 CV-uri procesate · 3 candidati HIGH priority · Timp total: <strong>28 secunde</strong>';
+        d.style.display='inline-flex';
+      },400);
+    }
+    p.style.width=Math.min(prog,100)+'%';
+  },280);
+}
+
+// Hide toast on first interaction
+document.addEventListener('click',()=>{ document.getElementById('toast').style.display='none'; },{once:true});
+</script>
+</body>
+</html>

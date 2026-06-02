@@ -768,16 +768,19 @@ def _compute_next_action(score, data):
     return "REJECT"
 
 
-# ─── DOMAIN COMPATIBILITY MATRIX (100 domenii, 23 clustere, 3 niveluri) ──────
+# ─── DOMAIN COMPATIBILITY MATRIX (1000+ joburi, 46 clustere, 3 niveluri) ─────
 # Niveluri: 2 = COMPATIBIL | 1 = UPSKILL (max 45) | 0 = INCOMPATIBIL (max 28)
 
 _CLUSTER_KW = [
     # ── HORECA & Turism ────────────────────────────────────────────────────────
     ("horeca", [
         "bucatar", "ospatar", "barman", "restaurant", "cofetarie", "patiserie",
-        "horeca", "bucatarie", "chef", "cook", "sef bucatarie", "pizzar",
+        "horeca", "bucatarie", "chef", "cook", "sef bucatarie", "pizzar", "ajutor bucatar",
         "camerista", "housekeeping", "receptionist hotel", "turism", "ghid turistic",
-        "catering", "events", "sommelier", "food service",
+        "catering", "events", "sommelier", "food service", "fast food", "lucrator bucatarie",
+        "manager restaurant", "sef sala", "receptionera", "bellboy", "picol", "brutar",
+        "barista", "hostess", "host", "lucrator fast food", "lucrator comercial horeca",
+        "maitre d", "sous chef", "spalator vase", "carmangier",
     ]),
     # ── Transport & Logistică ──────────────────────────────────────────────────
     ("transport", [
@@ -785,28 +788,42 @@ _CLUSTER_KW = [
         "conducator auto", "livrator", "dispecer transport", "transport rutier",
         "autobuz", "microbuz", "transport persoane", "aviatie", "aeroport",
         "marina", "port", "supply chain", "forklift", "transport international",
-        "logistica", "dispecer logistica",
+        "logistica", "dispecer logistica", "sofer cat", "sofer categoria",
+        "sofer distributie", "manager logistica", "coordonator transport",
+        "sofer c+e", "sofer b", "curier glovo", "curier tazz", "fleet manager",
+        "coordonator auto", "dispecer flota", "supply chain planner",
     ]),
-    # ── Depozit & Producție Entry ──────────────────────────────────────────────
+    # ── Depozit & Producție (Inclusiv Mase Plastice / Industrie) ───────────────
     ("depozit_productie", [
         "stivuitorist", "manipulant", "picker", "packer", "lucrator depozit",
         "muncitor depozit", "operator depozit", "agent depozit", "sorter",
-        "ambalator", "productie", "manufactura", "operator productie",
+        "ambalator", "productie", "manufactura", "operator productie", "operator cnc",
         "alimentara", "procesare carne", "textile", "confectii", "mobilier",
-        "ambalare", "etichetare", "muncitor", "muncitor necalificat",
+        "ambalare", "etichetare", "muncitor", "muncitor necalificat", "gestionar",
+        "frezor", "strungar", "tehnician productie", "sef tura productie", "fasonator",
+        "order picker", "reach truck", "stivuitorist liza", "gestionar depozit",
+        "operator asamblare", "ambalator manual", "controlor calitate productie",
+        "operator extruder", "reglor mase plastice", "reglor masini injectie",
+        "operator injectie", "operator mase plastice", "ambalator produse extrudare",
+        "operator regranulare", "tehnician mase plastice", "matriter",
+        "operator chimist", "operator linie ambalare", "ctc mase plastice",
     ]),
     # ── Retail & Vânzări Entry ─────────────────────────────────────────────────
     ("retail_entry", [
         "casier", "vanzator", "lucrator comercial", "agent vanzari", "lucrator magazin",
         "reponitor", "operator vanzari", "merchandiser", "promotor",
         "supermarket", "hypermarket", "fashion retail", "farmacie", "droguerie",
-        "vanzari b2c", "lucrator farmacie",
+        "vanzari b2c", "lucrator farmacie", "sef magazin", "manager magazin",
+        "sef tura magazin", "consultant vanzari", "asistent vanzari", "casiera",
+        "sef raion", "adjunct sef magazin", "visual merchandiser", "reprezentant vanzari",
+        "shop manager", "store manager", "sales assistant", "vanzator vitrina",
     ]),
     # ── Pază & Securitate ─────────────────────────────────────────────────────
     ("paza", [
         "paznic", "agent paza", "guard", "bodyguard", "supraveghetor",
         "agent securitate", "inspector paza", "securitate evenimente",
-        "monitorizare", "cctv", "close protection",
+        "monitorizare", "cctv", "close protection", "dispecer monitorizare", "sef tura paza",
+        "security officer", "agent interventie", "operator video", "pompier civil", "servant pompier",
     ]),
     # ── Construcții & Instalații ───────────────────────────────────────────────
     ("constructii", [
@@ -814,145 +831,438 @@ _CLUSTER_KW = [
         "beton", "saper", "constructor", "montator", "lacatus", "sudor",
         "electrician constructii", "fierar beton", "muncitor constructii",
         "santier", "supraveghere santier", "topografie", "geodezie", "plumber",
+        "macaragiu", "maistru", "inginer constructor", "diriginte santier",
+        "rigipsar", "tehnician instalatii", "hvac", "mecanic utilaje grele",
+        "excavatorist", "buldoexcavatorist", "electrician curenti slabi",
+        "inginer topograf", "montator fatade", "fasonator otel", "izolator",
+        "instalator sanitar", "instalator tevi", "montator retele apa",
     ]),
     # ── IT & Tech ─────────────────────────────────────────────────────────────
     ("it_tech", [
         "programator", "developer", "devops", "software", "it specialist",
-        "web developer", "data analyst", "data scientist", "cloud", "cybersecurity",
-        "network engineer", "full stack", "backend", "frontend", "system admin",
+        "web developer", "dezvoltator", "dezvoltator aplicatie web", "dezvoltator web",
+        "inginer software", "software engineer", "arhitect software", "software architect",
+        "data analyst", "data scientist", "cloud", "cybersecurity", "security analyst",
+        "network engineer", "full stack", "backend", "frontend", "system admin", "sysadmin",
         "it manager", "data engineer", "qa engineer", "tester", "scrum master",
-        "product owner", "tech lead", "mobile developer", "ai engineer",
-        "machine learning", "it project manager", "it support", "helpdesk",
-        "digital", "web design",
+        "product owner", "tech lead", "mobile developer", "ai engineer", "android", "ios",
+        "machine learning", "it project manager", "it support", "helpdesk", "administrator retea",
+        "digital", "web design", "java", "python", "javascript", "c++", "c#", ".net", "react",
+        "angular", "node", "php", "baze de date", "dba", "database administrator", "suport tehnic",
+        "business analyst", "rpa developer", "manual qa", "automation qa", "ux/ui designer",
+        "noc engineer", "soc analyst", "devsecops", "site reliability engineer", "sre",
+        "linux administrator", "windows administrator", "it service desk", "release manager",
     ]),
     # ── Inginerie ─────────────────────────────────────────────────────────────
     ("inginerie", [
         "inginer", "arhitect tehnic", "proiectant", "inginer mecanic",
         "inginer electric", "inginer electronic", "inginer civil",
         "inginer industrial", "inginer auto", "automotive engineer",
-        "inginer energetic", "renewables", "inginer chimica", "petrochimie",
+        "inginer energetic", "renewables", "inginer chimist", "petrochimie",
         "inginer productie", "inginer calitate", "inginer service", "mentenanta",
-        "inginer apa", "cad specialist",
+        "inginer apa", "cad specialist", "inginer mecatronica", "inginer ofertare",
+        "inginer proces", "inginer proiectant", "automatist", "inginer r&d",
+        "cercetator inginerie", "hw engineer", "hardware engineer", "inginer testare",
+        "tehnician mentenanta", "tehnician service",
+        "inginer mase plastice", "inginer proces mase plastice", "inginer utilitati",
+        "inginer instalare echipamente", "inginer testare materiale", "electromecanic",
+        "electrician joasa tensiune", "tehnician automatizari",
     ]),
     # ── Medical & Sănătate ────────────────────────────────────────────────────
     ("medical", [
         "medic", "asistent medical", "asistenta medicala", "asistenta generalista",
         "farmacist", "infirmiera", "radiolog", "stomatolog", "kinetoterapeut",
         "fizioterapeut", "logoped", "psiholog clinic", "dentist", "moasa",
-        "brancardier", "ingrijitor batrani", "home care", "laborant",
-        "tehnician dentar", "psiholog", "psihoterapeut",
+        "brancardier", "ingrijitor batrani", "home care", "laborant", "farmacista",
+        "tehnician dentar", "psiholog", "psihoterapeut", "medic rezident",
+        "medic specialist", "medic primar", "tehnician radiologie", "biolog",
+        "medic stomatolog", "optician", "optometrist", "reprezentant medical",
+        "medical advisor", "ingrijitor la domiciliu", "operator analize", "chimist medical",
     ]),
     # ── Financiar & Contabilitate ─────────────────────────────────────────────
     ("financiar", [
         "contabil", "economist", "auditor", "controller", "analist financiar",
         "cfo", "trezorier", "contabilitate", "specialist fiscal", "consultant fiscal",
         "banca", "credit", "asigurari", "broker", "investitii", "chief accountant",
-        "finante", "trezorerie", "analyst financiar",
+        "finante", "trezorerie", "analyst financiar", "expert contabil",
+        "analist credite", "ofiter bancar", "consultant financiar", "actuar",
+        "accounts payable", "accounts receivable", "ap analyst", "ar analyst",
+        "order to cash", "otc", "record to report", "r2r", "procure to pay", "p2p",
+        "ifrs", "kyc analyst", "aml analyst", "risk analyst", "collection agent",
+        "analist recuperare creante", "debt collection", "analist risc",
     ]),
     # ── Juridic ───────────────────────────────────────────────────────────────
     ("juridic", [
         "avocat", "jurist", "consilier juridic", "notar", "judecator",
         "procuror", "paralegal", "compliance", "contract manager",
         "executor judecatoresc", "risk manager juridic", "legal",
+        "asistent juridic", "secretar notarial", "magistrat", "legal advisor",
+        "compliance officer", "dpo", "data protection officer",
     ]),
     # ── HR & Recrutare ────────────────────────────────────────────────────────
     ("hr_recrutare", [
         "recruiter", "specialist hr", "hr manager", "hr business partner",
         "talent acquisition", "resurse umane", "specialist recrutare",
         "hr generalist", "payroll", "admin hr", "trainer corporativ",
-        "learning development", "l&d", "hr specialist",
+        "learning development", "l&d", "hr specialist", "inspector resurse umane",
+        "analist hr", "salarizare", "hr admin", "consultant hr", "sourcing specialist",
+        "it recruiter", "hr assistant", "payroll specialist", "compensation and benefits", "c&b",
     ]),
     # ── Educație & Training ───────────────────────────────────────────────────
     ("educatie", [
         "profesor", "invatator", "educator", "instructor", "formator",
         "trainer", "lector", "mentor", "coach", "educator gradinita",
-        "profesor universitar", "cadru didactic",
+        "profesor universitar", "cadru didactic", "pedagog", "consilier scolar",
+        "asistent universitar", "cercetator", "ingrijitor copii", "bona", "nanny",
+        "guvernanta", "teacher", "specialist educatie", "invatamant",
     ]),
     # ── Administrativ / Secretariat ───────────────────────────────────────────
     ("administrativ", [
         "secretara", "asistent administrativ", "receptionist", "operator date",
         "coordonator administrativ", "office manager", "asistent manager",
-        "back office", "administrativ",
+        "back office", "administrativ", "asistent executiv", "arhivar",
+        "data entry", "operator introducere date", "functionar administrativ",
+        "secretar", "personal assistant", "receptionera", "facility manager",
     ]),
     # ── Call Center / BPO / Customer Support ──────────────────────────────────
     ("call_center", [
         "call center", "customer support", "customer service", "bpo",
         "agent suport", "operator call center", "helpdesk client",
-        "relatii clienti", "agent relatii",
+        "relatii clienti", "agent relatii", "telesales", "telemarketing",
+        "suport tehnic", "tech support", "client service", "call-center",
+        "customer care", "order management", "content moderator", "moderator continut",
+        "suport clienti", "inbound", "outbound", "support analyst",
     ]),
     # ── Marketing / Digital Marketing ─────────────────────────────────────────
     ("marketing", [
         "marketing", "digital marketing", "social media", "seo", "sem",
         "content creator", "copywriter", "brand manager", "pr", "comunicare",
-        "publicitate", "media", "grafician", "ux", "ui designer",
+        "publicitate", "media", "grafician", "ux", "ui designer", "designer grafic",
+        "specialist marketing", "marketing manager", "art director", "ppc specialist",
+        "event manager", "organizator evenimente", "performance marketing",
+        "media buyer", "community manager", "trade marketing", "specialist pr",
+        "product manager",
     ]),
-    # ── Sales B2B & Account Management ────────────────────────────────────────
+    # ── Sales B2B ─────────────────────────────────────────────────────────────
     ("sales_b2b", [
         "account manager", "sales manager", "b2b sales", "territory manager",
         "key account", "sales representative", "business developer",
         "sales engineer", "vanzari b2b", "reprezentant comercial",
+        "director vanzari", "sales director", "area sales manager",
+        "regional sales", "client executive",
+        "inginer vanzari tehnice", "technical sales", "reprezentant vanzari tehnice",
     ]),
     # ── Imobiliare ────────────────────────────────────────────────────────────
     ("imobiliare", [
         "imobiliare", "agent imobiliar", "broker imobiliar", "evaluator imobiliar",
-        "property manager", "real estate",
+        "property manager", "real estate", "consultant imobiliar", "property consultant",
+        "facility manager", "property administrator", "agent inchirieri",
     ]),
     # ── Beauty & Wellness ─────────────────────────────────────────────────────
     ("beauty_wellness", [
         "cosmeticiana", "frizer", "coafor", "manichiura", "pedichiura",
         "make-up", "estetician", "spa", "maseur", "masaj", "beauty",
-        "nail technician", "wellness",
+        "nail technician", "wellness", "make-up artist", "tehnician unghii",
+        "hairstylist", "trainer beauty", "receptionist salon", "kinetoterapeut spa",
     ]),
     # ── Agricultură ───────────────────────────────────────────────────────────
     ("agricultura", [
         "agricultor", "fermier", "zootehnist", "agronom", "viticultor",
         "horticultor", "muncitor agricol", "operator utilaje agricole", "silvicultura",
+        "tractorist", "inginer agronom", "medic veterinar", "tehnician veterinar",
+        "mecanizator", "padurar", "tehnician agronom",
     ]),
-    # ── Automotive Service ────────────────────────────────────────────────────
+    # ── Automotive Service & Tehnic ───────────────────────────────────────────
     ("automotive", [
         "mecanic auto", "tinichigiu", "vopsitor auto", "electician auto",
         "diagnostician auto", "tehnician auto", "service auto", "vulcanizare",
-        "inspector itp", "mecanic utilaje",
+        "inspector itp", "mecanic utilaje", "consilier service", "sef service",
+        "receptioner service", "detailer auto", "tehnician diagnoza", "electrician auto",
     ]),
-    # ── Management Executive ──────────────────────────────────────────────────
+    # ── Management Executive & Project Management ─────────────────────────────
     ("management", [
         "manager general", "director general", "ceo", "coo", "cto", "cfo exec",
         "director executiv", "director operational", "vp", "vice president",
-        "country manager", "general manager",
+        "country manager", "general manager", "manager de proiect", "project manager",
+        "program manager", "operations manager", "director sucursala", "agile coach",
+        "business unit manager", "managing director", "board member", "administrator firma",
+        "director productie", "director fabrica",
     ]),
     # ── ONG / Public / Administratie Publica ──────────────────────────────────
     ("ong_public", [
         "ong", "ngo", "asociatie", "fundatie", "functionar public",
         "administratie publica", "primarie", "prefectura", "minister",
         "institutie publica", "sector public", "referent", "inspector public",
+        "lucrator social", "asistent social", "voluntar", "manager proiect ong",
+        "consilier local", "asistent personal", "lucrator comunitar",
+    ]),
+    # ── Curatenie & Facility Operational ─────────────────────────────────────
+    ("curatenie_facility", [
+        "agent curatenie", "personal curatenie", "lucrator curatenie",
+        "femeie de serviciu", "menajera", "ingrijitor cladiri",
+        "administrator cladire", "tehnician intretinere cladiri",
+        "lucrator salubritate", "spalator geamuri",
+        "operator curatenie industriala", "personal curatenie birouri",
+        "personal curatenie mall", "personal curatenie hotel",
+        "houseman", "cleaning operator", "facility technician",
+        "supervizor curatenie", "coordonator echipa curatenie",
+    ]),
+    # ── Energie & Utilitati ──────────────────────────────────────────────────
+    ("energie_utilitati", [
+        "electrician", "electrician mentenanta", "electrician exploatare",
+        "electrician retele", "tehnician utilitati", "inginer energetician",
+        "inginer retele electrice", "operator dispecerat energie",
+        "operator statie electrica", "montator contoare", "cititor contoare",
+        "instalator gaze", "operator gaze", "tehnician gaze",
+        "instalator apa", "operator statie epurare", "operator tratare apa",
+        "operator statie pompare", "tehnician retele apa",
+        "inginer apa canal", "operator distributie utilitati",
+    ]),
+    # ── Telecom & Retele ─────────────────────────────────────────────────────
+    ("telecom", [
+        "tehnician telecom", "instalator fibra optica", "jonctor fibra optica",
+        "tehnician fibra optica", "instalator internet", "instalator cablu tv",
+        "tehnician retele telecom", "field technician telecom",
+        "rigger telecom", "tehnician antene", "inginer telecomunicatii",
+        "network field engineer", "suport telecom", "operator suport telecom",
+        "tehnician service telecom", "coordonator echipe telecom",
+        "proiectant retele telecom",
+    ]),
+    # ── E-commerce & Marketplace ─────────────────────────────────────────────
+    ("ecommerce", [
+        "operator comenzi online", "specialist ecommerce", "e-commerce specialist",
+        "administrator magazin online", "marketplace specialist",
+        "operator marketplace", "specialist emag marketplace",
+        "catalog manager", "operator catalog produse", "content produse",
+        "product listing", "procesare comenzi", "operator retururi",
+        "customer support ecommerce", "asistent magazin online",
+        "coordonator magazin online", "online sales specialist",
+        "digital commerce specialist",
+    ]),
+    # ── Calitate, SSM & HSE ──────────────────────────────────────────────────
+    ("calitate_hse", [
+        "inspector calitate", "controlor calitate", "quality inspector",
+        "quality assurance", "qa specialist", "qc specialist",
+        "responsabil calitate", "inginer calitate", "auditor calitate",
+        "tehnician calitate", "laborant calitate", "inspector ssm",
+        "responsabil ssm", "specialist ssm", "protectia muncii",
+        "responsabil psi", "hse specialist", "ehs specialist",
+        "responsabil mediu", "auditor intern iso", "specialist iso",
+    ]),
+    # ── Mediu, Reciclare & Deseuri ───────────────────────────────────────────
+    ("mediu_reciclare", [
+        "operator reciclare", "sortator deseuri", "operator deseuri",
+        "lucrator salubritate", "colector deseuri", "operator statie sortare",
+        "operator statie reciclare", "responsabil mediu", "consultant mediu",
+        "inginer mediu", "tehnician mediu", "specialist management deseuri",
+        "coordonator reciclare", "operator compostare",
+        "operator tratare deseuri", "inspector mediu",
+    ]),
+    # ── Productie Alimentara ─────────────────────────────────────────────────
+    ("productie_alimentara", [
+        "operator productie alimentara", "muncitor fabrica alimente",
+        "operator linie alimentara", "ambalator alimente",
+        "operator panificatie", "brutar industrial", "patiser industrial",
+        "procesator carne", "transator carne", "macelar",
+        "operator lactate", "operator fabrica bauturi",
+        "operator linie imbuteliere", "operator morarit",
+        "tehnolog alimentar", "inginer industrie alimentara",
+        "controlor calitate alimentara", "laborant industria alimentara",
+        "sef tura productie alimentara",
+    ]),
+    # ── Farma, Biotech & Distributie Medicala ────────────────────────────────
+    ("farma_biotech", [
+        "operator productie farmaceutica", "operator ambalare medicamente",
+        "tehnician farmaceutic", "laborant farmaceutic", "qa pharma",
+        "qc pharma", "specialist regulatory affairs",
+        "pharmacovigilance specialist", "reprezentant medical",
+        "medical sales representative", "depozit farmaceutic",
+        "gestionar farmaceutic", "operator depozit farmaceutic",
+        "specialist validare pharma", "tehnician laborator pharma",
+        "operator productie suplimente", "specialist distributie farmaceutica",
+    ]),
+    # ── BPO & Limbi Straine ──────────────────────────────────────────────────
+    ("bpo_limbi_straine", [
+        "customer support cu germana", "customer support cu franceza",
+        "customer support cu italiana", "customer support cu spaniola",
+        "customer support cu olandeza", "customer support cu poloneza",
+        "customer support cu maghiara", "back office cu germana",
+        "back office cu franceza", "back office cu italiana",
+        "procurement analyst cu germana", "accounts payable cu franceza",
+        "accounts payable cu germana", "order management specialist",
+        "order management cu germana", "support analyst cu limba straina",
+        "content moderator cu limba straina", "moderator continut cu limba straina",
+        "collections agent cu limba straina",
+    ]),
+    # ── Naval & Portuar ──────────────────────────────────────────────────────
+    ("naval_portuar", [
+        "sudor naval", "lacatus naval", "vopsitor naval", "tubulator naval",
+        "electrician naval", "mecanic naval", "inginer naval",
+        "operator portuar", "macaragiu portuar", "docher", "agent maritim",
+        "shipping agent", "expeditor maritim", "coordonator transport naval",
+        "operator terminal portuar", "tehnician mentenanta portuara",
+        "supervizor operatiuni portuare",
+    ]),
+    # ── Asigurari & Pensii Private ───────────────────────────────────────────
+    ("asigurari_pensii", [
+        "agent asigurari", "broker asigurari", "consultant asigurari",
+        "inspector daune", "specialist daune", "constatator daune",
+        "underwriter", "actuar", "consultant pensii private",
+        "specialist pensii private", "analist risc asigurari",
+        "manager agentie asigurari",
+    ]),
+    # ── Arhitectura & Design Interior ────────────────────────────────────────
+    ("arhitectura_design_interior", [
+        "arhitect", "arhitect interior", "designer interior",
+        "proiectant mobilier", "designer mobilier", "desenator tehnic",
+        "cad designer", "bim specialist", "bim coordinator", "urbanist",
+        "peisagist", "randari 3d", "3d visualizer",
+    ]),
+    # ── Evenimente & Entertainment ───────────────────────────────────────────
+    ("evenimente_entertainment", [
+        "organizator evenimente", "event planner", "event coordinator",
+        "manager evenimente", "dj", "fotograf evenimente", "videograf",
+        "operator sunet", "operator lumini", "tehnician scena",
+        "animator copii", "hostess evenimente", "promoter evenimente",
+        "coordonator evenimente corporate",
+    ]),
+    # ── Sport & Fitness ──────────────────────────────────────────────────────
+    ("sport_fitness", [
+        "antrenor fitness", "personal trainer", "instructor fitness",
+        "instructor aerobic", "instructor pilates", "instructor yoga",
+        "antrenor sportiv", "kinetoterapeut sportiv",
+        "receptionist sala fitness", "manager sala fitness",
+        "consultant abonamente fitness", "salvamar", "instructor inot",
+        "maseur sportiv",
+    ]),
+    # ── Servicii Casnice & Ingrijire la Domiciliu ────────────────────────────
+    ("servicii_casnice_ingrijire", [
+        "bona", "nanny", "ingrijitor copii", "ingrijitor batrani",
+        "asistent personal", "menajera", "personal casnic",
+        "infirmier la domiciliu", "home care assistant",
+        "insotitor persoane varstnice", "lucrator ingrijire la domiciliu",
+    ]),
+    # ── Tipografie, Print & Productie Publicitara ────────────────────────────
+    ("tipografie_print_productie_publicitara", [
+        "operator tipografie", "operator print digital", "operator dtp",
+        "grafician dtp", "operator cutter plotter",
+        "operator productie publicitara", "montator reclame",
+        "colantator auto", "serigraf", "legatorie", "finisator tipografie",
+        "operator masina tipar", "tehnician productie publicitara",
+    ]),
+    # ── Textile, Confectii & Moda ────────────────────────────────────────────
+    ("textile_confectii_moda", [
+        "croitor", "confectioner textile", "operator masina cusut",
+        "calcatoreasa", "designer vestimentar", "tehnolog confectii",
+        "tiparist confectii", "controlor calitate textile",
+        "ambalator textile", "sef linie confectii", "modelier",
+        "operator broderie",
+    ]),
+    # ── Mobila, Lemn & Tamplarie ─────────────────────────────────────────────
+    ("mobila_lemn_tamplarie", [
+        "tamplar mobilier", "operator cnc lemn", "montator mobilier",
+        "proiectant mobilier", "lacuitor lemn", "finisor lemn", "tapiter",
+        "operator productie mobilier", "muncitor fabrica mobila",
+        "designer mobilier", "tehnolog industria lemnului",
+        "sef sectie mobilier",
+    ]),
+    # ── Pet Shop & Veterinar ─────────────────────────────────────────────────
+    ("pet_veterinar", [
+        "medic veterinar", "tehnician veterinar", "asistent veterinar",
+        "ingrijitor animale", "groomer animale", "frizer canin",
+        "lucrator pet shop", "consultant vanzari pet shop", "dresor caini",
+        "operator ferma animale", "specialist nutritie animale",
+    ]),
+    # ── Import, Export & Vama ────────────────────────────────────────────────
+    ("import_export_vama", [
+        "declarant vamal", "comisionar vamal", "specialist import export",
+        "coordonator import export", "expeditor international",
+        "operator documente transport", "specialist documente vamale",
+        "customs specialist", "logistics import specialist",
+        "export sales assistant", "specialist incoterms",
+    ]),
+    # ── Achizitii & Aprovizionare ────────────────────────────────────────────
+    ("achizitii_aprovizionare", [
+        "specialist achizitii", "buyer", "purchasing specialist",
+        "procurement specialist", "strategic buyer", "category buyer",
+        "asistent achizitii", "coordonator aprovizionare",
+        "planner aprovizionare", "supply planner", "demand planner",
+        "material planner", "specialist furnizori",
+    ]),
+    # ── Planificare Productie & Supply Chain ─────────────────────────────────
+    ("planificare_productie_supply_chain", [
+        "planner productie", "production planner", "material planner",
+        "demand planner", "supply planner", "specialist planificare",
+        "coordonator planificare productie", "analist stocuri",
+        "inventory planner", "supply chain analyst",
+        "supply chain coordinator", "specialist forecast",
+        "master data specialist",
+    ]),
+    # ── Suport Vanzari & Back Office Comercial ───────────────────────────────
+    ("suport_vanzari_backoffice", [
+        "sales support", "asistent vanzari", "operator suport vanzari",
+        "back office vanzari", "ofertare clienti", "specialist ofertare",
+        "operator comenzi clienti", "customer order specialist",
+        "contract administrator", "asistent comercial", "coordonator comenzi",
+        "operator crm",
     ]),
 ]
 
 # ── 7 Super-clustere ──────────────────────────────────────────────────────────
 _SUPER = {
-    "horeca":           "blue_collar",
-    "transport":        "blue_collar",
-    "depozit_productie":"blue_collar",
-    "retail_entry":     "blue_collar",
-    "paza":             "blue_collar",
-    "agricultura":      "blue_collar",
-    "constructii":      "constructii_tehnic",
-    "automotive":       "constructii_tehnic",
-    "it_tech":          "tech_ing",
-    "inginerie":        "tech_ing",
-    "medical":          "medical",
-    "beauty_wellness":  "medical",
-    "financiar":        "business",
-    "juridic":          "business",
-    "hr_recrutare":     "business",
-    "management":       "business",
-    "imobiliare":       "business",
-    "sales_b2b":        "business",
-    "call_center":      "support",
-    "administrativ":    "support",
-    "marketing":        "support",
-    "ong_public":       "support",
-    "educatie":         "educatie",
+    # blue_collar
+    "horeca":                            "blue_collar",
+    "transport":                         "blue_collar",
+    "depozit_productie":                 "blue_collar",
+    "retail_entry":                      "blue_collar",
+    "paza":                              "blue_collar",
+    "agricultura":                       "blue_collar",
+    "curatenie_facility":                "blue_collar",
+    "mediu_reciclare":                   "blue_collar",
+    "productie_alimentara":              "blue_collar",
+    "servicii_casnice_ingrijire":        "blue_collar",
+    "tipografie_print_productie_publicitara": "blue_collar",
+    "textile_confectii_moda":            "blue_collar",
+    "mobila_lemn_tamplarie":             "blue_collar",
+    # constructii_tehnic
+    "constructii":                       "constructii_tehnic",
+    "automotive":                        "constructii_tehnic",
+    "energie_utilitati":                 "constructii_tehnic",
+    "naval_portuar":                     "constructii_tehnic",
+    # tech_ing
+    "it_tech":                           "tech_ing",
+    "inginerie":                         "tech_ing",
+    "telecom":                           "tech_ing",
+    "arhitectura_design_interior":       "tech_ing",
+    # medical
+    "medical":                           "medical",
+    "beauty_wellness":                   "medical",
+    "farma_biotech":                     "medical",
+    "sport_fitness":                     "medical",
+    "pet_veterinar":                     "medical",
+    # business
+    "financiar":                         "business",
+    "juridic":                           "business",
+    "hr_recrutare":                      "business",
+    "management":                        "business",
+    "imobiliare":                        "business",
+    "sales_b2b":                         "business",
+    "asigurari_pensii":                  "business",
+    "import_export_vama":                "business",
+    "achizitii_aprovizionare":           "business",
+    "planificare_productie_supply_chain":"business",
+    "calitate_hse":                      "business",
+    # support
+    "call_center":                       "support",
+    "administrativ":                     "support",
+    "marketing":                         "support",
+    "ong_public":                        "support",
+    "ecommerce":                         "support",
+    "bpo_limbi_straine":                 "support",
+    "evenimente_entertainment":          "support",
+    "suport_vanzari_backoffice":         "support",
+    # educatie
+    "educatie":                          "educatie",
 }
 
 #             blue  cstr  tech  med   biz   supp  edu

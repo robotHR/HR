@@ -923,6 +923,19 @@ async def dashboard(request: Request, background_tasks: BackgroundTasks):
     auto_reject= [c for c in candidates if (c.recommended_next_action or "") == "REJECT"]
     top3       = (call_now + call_later)[:3]
 
+    # ── Interviuri pentru mini-calendar dashboard ──────────────────────────────
+    import json as _json
+    _db_cal = SessionLocal()
+    _cal_rows = _db_cal.query(Interview).filter(
+        Interview.status != "anulat"
+    ).order_by(Interview.data, Interview.ora).all()
+    _db_cal.close()
+    cal_interviews_json = _json.dumps([
+        {"data": i.data, "ora": i.ora,
+         "name": i.candidate_name or "—", "job": i.job_title or "—"}
+        for i in _cal_rows
+    ], ensure_ascii=False)
+
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
@@ -937,6 +950,7 @@ async def dashboard(request: Request, background_tasks: BackgroundTasks):
             "keep_other": keep_other,
             "auto_reject": auto_reject,
             "top3": top3,
+            "cal_interviews_json": cal_interviews_json,
         }
     )
 

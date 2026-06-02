@@ -1829,6 +1829,7 @@ document.addEventListener("DOMContentLoaded", function(){
     window.dismissAnaliza = function(){
         fetch('/analiza-ack', {method:'POST'}).catch(function(){});
         banner.style.display = 'none';
+        window.location.reload();
     };
 
     checkAnaliza();

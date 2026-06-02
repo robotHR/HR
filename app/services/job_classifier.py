@@ -194,11 +194,17 @@ def evaluate_match(
     if job.family == cand.family:
         family_pts = 50  # 50/50
 
-        if job.subfamily == cand.subfamily:
-            # DIRECT — aceeasi subfamilie
+        # "software_development" este subfamilia generica pentru orice rol de developer.
+        # Un post "Junior Developer" sau "Developer" trebuie sa accepte ca DIRECT orice
+        # subfamilie IT_SOFTWARE (backend, frontend, fullstack, mobile etc.).
+        job_is_generic_dev = (
+            job.family == "IT_SOFTWARE" and job.subfamily == "software_development"
+        )
+
+        if job.subfamily == cand.subfamily or job_is_generic_dev:
+            # DIRECT — aceeasi subfamilie sau job generic de developer
             subfamily_pts = 30  # 30/30
-            spec_pts = 20 if (cand.specialization != "unknown" and cand.specialization == job.family) else min(20, ai // 5)
-            spec_pts = min(20, spec_pts)
+            spec_pts = min(20, ai // 5)
             total = family_pts + subfamily_pts + spec_pts
             total = max(75, min(98, total))
             _log(job, cand, family_pts, subfamily_pts, spec_pts, total, "DIRECT")
@@ -207,7 +213,7 @@ def evaluate_match(
                 family_score=family_pts, subfamily_score=subfamily_pts, spec_score=spec_pts,
                 job_family=job.family, job_subfamily=job.subfamily,
                 candidate_family=cand.family, candidate_subfamily=cand.subfamily,
-                reason="Familie si subfamilie identice.",
+                reason="Familie si subfamilie identice." if job.subfamily == cand.subfamily else "Job generic developer — toate subfamiliile IT acceptate.",
             )
         else:
             # SAME_FAMILY — subfamilie diferita
@@ -321,11 +327,13 @@ def recalibrate_ai_result(data: dict, target_job: str, cv_text: str, ai_score: i
     data["spec_score"] = decision.spec_score
 
     if decision.relation == "DIRECT":
-        data["recommendation"] = "STRONG_YES" if decision.score >= 85 else "YES"
+        # "HIRE" este recunoscut de recommendation_to_status → status "ADMIS"
+        data["recommendation"] = "HIRE"
         data["priority"] = "HIGH" if decision.score >= 85 else "MEDIUM"
         data["recommended_next_action"] = "CALL_NOW"
     elif decision.relation == "SAME_FAMILY":
-        data["recommendation"] = "MAYBE"
+        # "CONSIDER" → status "DE ANALIZAT"
+        data["recommendation"] = "CONSIDER"
         data["priority"] = "MEDIUM"
         data["recommended_next_action"] = "CALL_LATER"
     else:

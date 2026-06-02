@@ -308,6 +308,29 @@ def mark_new_candidates_batch(after_id, batch_id, visible=1, only_files=None, hi
     db.close()
 
 
+def _stamp_and_show_job_candidates(job_title: str, batch_id: str):
+    """
+    Dupa re-analiza unui job, seteaza batch_id si visible_in_dashboard=1 pe TOTI
+    candidatii pentru acel job (nu doar pe cei cu id > after_id).
+    Rezolva cazul in care save_candidate_to_db face UPDATE (upsert) si pastreaza
+    ID-uri vechi care ar fi altfel ignorate de mark_new_candidates_batch.
+    """
+    final_files = get_final_cv_files()
+    db = SessionLocal()
+    rows = db.query(Candidate).filter(Candidate.job_title == job_title).all()
+    for row in rows:
+        row.batch_id = batch_id
+        if row.cv_file in final_files:
+            row.visible_in_dashboard = 0
+            continue
+        if row.status in TERMINAL_STATUSES:
+            row.visible_in_dashboard = 0
+            continue
+        row.visible_in_dashboard = 1
+    db.commit()
+    db.close()
+
+
 def clear_dashboard_only():
     db = SessionLocal()
     rows = db.query(Candidate).all()
@@ -1559,7 +1582,11 @@ def _run_analiza_bg(target_job: str, after_id: int, batch_id: str, job_requireme
     global _analiza_progress
     try:
         result = process_cvs_for_job(target_job, job_requirements=job_requirements)
+        # 1. Marcam candidatii noi (id > after_id)
         mark_new_candidates_batch(after_id=after_id, batch_id=batch_id, visible=1, only_files=None, hide_final_files=True)
+        # 2. Marcam si candidatii actualizati (upsert pe cv_file+job_title pastreaza ID-urile vechi,
+        #    deci mark_new_candidates_batch ii ignora). Setam batch_id si visible pe toti candidatii jobului.
+        _stamp_and_show_job_candidates(target_job, batch_id)
         message = result.get("message", "Analiza finalizata.")
         if has_final_files:
             message += " Candidatii marcati Angajat, Exclus sau Potrivit altor roluri nu mai apar in dashboard."

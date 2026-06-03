@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planograma Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- ─── UPLOAD SCREEN ──────────────────────────────────────────────────────── -->
+<div id="screen-upload" class="screen active">
+  <header class="hero">
+    <div class="logo-wrap">
+      <span class="logo-icon">📦</span>
+      <h1 class="logo-text">Planograma <span class="accent">Agent</span></h1>
+    </div>
+    <p class="tagline">Optimizare inteligentă a sloturilor de depozit pentru Category Managers</p>
+  </header>
+
+  <div class="upload-card" id="drop-zone">
+    <div class="upload-icon">📊</div>
+    <p class="upload-title">Încărcați fișierul Excel</p>
+    <p class="upload-sub">Trageți fișierul aici sau</p>
+    <label class="btn btn-outline" for="file-input">Selectați fișierul</label>
+    <input type="file" id="file-input" accept=".xlsx" hidden />
+    <p class="upload-note">.xlsx — Format Standard sau Format Studiu de Caz</p>
+    <p class="upload-note">Dimensiune maximă: 10 MB</p>
+  </div>
+
+  <div id="file-chosen" class="file-chosen hidden">
+    <span id="file-name"></span>
+    <button class="btn btn-primary" id="btn-analyze">Analizează ▶</button>
+  </div>
+
+  <div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <p>Se procesează datele și se generează analiza AI…</p>
+  </div>
+
+  <div id="error-box" class="error-box hidden">
+    <p id="error-msg"></p>
+    <button class="btn btn-outline" onclick="resetUpload()">Încearcă din nou</button>
+  </div>
+
+  <section class="formats-info">
+    <h3>Formate acceptate</h3>
+    <div class="formats-grid">
+      <div class="format-card">
+        <strong>Format A — Standard</strong>
+        <ul>
+          <li>Foaie <code>Vanzari_SKU</code></li>
+          <li>Foaie <code>Configuratie_Raft</code> (opțional)</li>
+          <li>Coloane: Cod_Produs, Denumire_Produs, Total_Iesiri</li>
+        </ul>
+      </div>
+      <div class="format-card">
+        <strong>Format B — Studiu de Caz</strong>
+        <ul>
+          <li>Foaie <code>ABC Articole</code></li>
+          <li>Foaie <code>Layot depozit</code> (opțional)</li>
+          <li>Foaie <code>Premise si normari</code> (opțional)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ─── DASHBOARD SCREEN ───────────────────────────────────────────────────── -->
+<div id="screen-dashboard" class="screen">
+  <nav class="topbar">
+    <div class="topbar-left">
+      <span class="logo-icon-sm">📦</span>
+      <span class="logo-text-sm">Planograma <span class="accent">Agent</span></span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" id="btn-dl-excel">⬇ Excel</button>
+      <button class="btn btn-outline btn-sm" id="btn-dl-pdf">⬇ PDF</button>
+      <button class="btn btn-ghost btn-sm" id="btn-new">+ Analiză nouă</button>
+    </div>
+  </nav>
+
+  <!-- Metric cards -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Total SKU-uri</div>
+      <div class="metric-value" id="m-total">—</div>
+    </div>
+    <div class="metric-card accent-a">
+      <div class="metric-label">Clasa A</div>
+      <div class="metric-value" id="m-a">—</div>
+      <div class="metric-sub" id="m-a-vol">—% volum</div>
+    </div>
+    <div class="metric-card accent-b">
+      <div class="metric-label">Clasa B</div>
+      <div class="metric-value" id="m-b">—</div>
+      <div class="metric-sub" id="m-b-vol">—% volum</div>
+    </div>
+    <div class="metric-card accent-c">
+      <div class="metric-label">Clasa C</div>
+      <div class="metric-value" id="m-c">—</div>
+      <div class="metric-sub" id="m-c-vol">—% volum</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" data-tab="layout">Layout Depozit</button>
+    <button class="tab-btn" data-tab="abc">Distribuție ABC</button>
+    <button class="tab-btn" data-tab="recs">Recomandări</button>
+  </div>
+
+  <!-- Tab: Layout -->
+  <div id="tab-layout" class="tab-panel active">
+    <div class="warehouse-wrap">
+      <div class="warehouse-legend">
+        <span class="legend-dot dot-a"></span> Zona A — Picking Față (frecvență mare)
+        <span class="legend-dot dot-b"></span> Zona B — Picking Mijloc
+        <span class="legend-dot dot-c"></span> Zona C — Depozitare Spate
+      </div>
+      <svg id="warehouse-svg" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer walls -->
+        <rect x="10" y="10" width="780" height="400" rx="8" fill="#1a1a2e" stroke="#2e2e4e" stroke-width="2"/>
+
+        <!-- Zone C — back -->
+        <rect x="30" y="30" width="740" height="130" rx="6" fill="#1a3d2b" stroke="#69db7c" stroke-width="1.5"/>
+        <text x="400" y="62" text-anchor="middle" fill="#69db7c" font-size="13" font-weight="600">ZONA C — Depozitare Spate (Clasa C)</text>
+        <g id="zone-c-products" font-size="10" fill="#69db7c"></g>
+
+        <!-- Zone B — middle -->
+        <rect x="30" y="175" width="740" height="110" rx="6" fill="#1a2d4a" stroke="#4dabf7" stroke-width="1.5"/>
+        <text x="400" y="207" text-anchor="middle" fill="#4dabf7" font-size="13" font-weight="600">ZONA B — Picking Mijloc (Clasa B)</text>
+        <g id="zone-b-products" font-size="10" fill="#4dabf7"></g>
+
+        <!-- Zone A — front / dispatch -->
+        <rect x="30" y="298" width="740" height="100" rx="6" fill="#3d1a1a" stroke="#ff6b6b" stroke-width="1.5"/>
+        <text x="400" y="330" text-anchor="middle" fill="#ff6b6b" font-size="13" font-weight="600">ZONA A — Picking Față (Clasa A) ← EXPEDIERE</text>
+        <g id="zone-a-products" font-size="10" fill="#ff6b6b"></g>
+
+        <!-- Dispatch door -->
+        <rect x="330" y="380" width="140" height="22" rx="4" fill="#ff6b6b" opacity="0.3"/>
+        <text x="400" y="395" text-anchor="middle" fill="#ff6b6b" font-size="10">🚚 Ieșire Expediere</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Tab: ABC chart -->
+  <div id="tab-abc" class="tab-panel">
+    <div class="chart-wrap">
+      <canvas id="abc-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Tab: Recommendations -->
+  <div id="tab-recs" class="tab-panel">
+    <div class="table-controls">
+      <input type="text" id="rec-search" placeholder="Caută produs sau cod…" class="search-input" />
+      <select id="rec-filter-class" class="filter-select">
+        <option value="">Toate clasele</option>
+        <option value="A">Clasa A</option>
+        <option value="B">Clasa B</option>
+        <option value="C">Clasa C</option>
+      </select>
+      <select id="rec-filter-action" class="filter-select">
+        <option value="">Toate acțiunile</option>
+        <option value="MUTA_FATA">MUTA_FATA</option>
+        <option value="REDUCE_FETE">REDUCE_FETE</option>
+        <option value="CRESTE_FETE">CRESTE_FETE</option>
+        <option value="OK">OK</option>
+      </select>
+    </div>
+    <div class="table-scroll">
+      <table class="recs-table" id="recs-table">
+        <thead>
+          <tr>
+            <th>Cod</th>
+            <th>Produs</th>
+            <th>Clasă</th>
+            <th>Zonă Curentă</th>
+            <th>Zonă Recomandată</th>
+            <th>Acțiune</th>
+            <th>Volum</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="recs-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AI Narrative -->
+  <div class="ai-card">
+    <div class="ai-card-header">
+      <span class="ai-badge">🤖 Analiză AI</span>
+      <span class="ai-model">Claude Sonnet</span>
+    </div>
+    <div id="narrative-text" class="narrative-text"></div>
+  </div>
+</div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+let sessionId = null;
+let allRecs = [];
+let abcChart = null;
+
+// ─── DOM helpers ──────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const show = id => $(id).classList.remove("hidden");
+const hide = id => $(id).classList.add("hidden");
+
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(`screen-${name}`).classList.add("active");
+}
+
+// ─── Upload / drag-drop ───────────────────────────────────────────────────────
+const dropZone = $("drop-zone");
+const fileInput = $("file-input");
+
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+fileInput.addEventListener("change", () => {
+  if (fileInput.files[0]) handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+  if (!file.name.toLowerCase().endsWith(".xlsx")) {
+    showError("Fișierul trebuie să fie în format .xlsx");
+    return;
+  }
+  $("file-name").textContent = file.name;
+  show("file-chosen");
+  hide("error-box");
+  fileInput._file = file;
+}
+
+$("btn-analyze").addEventListener("click", () => {
+  const file = fileInput._file;
+  if (!file) return;
+  startAnalysis(file);
+});
+
+async function startAnalysis(file) {
+  hide("file-chosen");
+  hide("error-box");
+  show("loading");
+
+  const fd = new FormData();
+  fd.append("file", file);
+
+  try {
+    const res = await fetch("/analyze", { method: "POST", body: fd });
+    const data = await res.json();
+    hide("loading");
+
+    if (!data.success) {
+      showError(data.error || "Eroare necunoscută.");
+      return;
+    }
+    renderDashboard(data);
+  } catch (err) {
+    hide("loading");
+    showError("Eroare de rețea. Verificați conexiunea și încercați din nou.");
+  }
+}
+
+function showError(msg) {
+  $("error-msg").textContent = msg;
+  show("error-box");
+  show("file-chosen");
+  hide("loading");
+}
+
+function resetUpload() {
+  hide("error-box");
+  hide("file-chosen");
+  fileInput.value = "";
+  fileInput._file = null;
+  $("file-name").textContent = "";
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+function renderDashboard(data) {
+  sessionId = data.session_id;
+  allRecs = data.recommendations || [];
+  const s = data.stats;
+
+  $("m-total").textContent = s.total_skus;
+  $("m-a").textContent = `${s.a_count} SKU (${s.a_pct}%)`;
+  $("m-a-vol").textContent = `${s.a_vol_pct}% volum`;
+  $("m-b").textContent = `${s.b_count} SKU (${s.b_pct}%)`;
+  $("m-b-vol").textContent = `${s.b_vol_pct}% volum`;
+  $("m-c").textContent = `${s.c_count} SKU (${s.c_pct}%)`;
+  $("m-c-vol").textContent = `${s.c_vol_pct}% volum`;
+
+  renderNarrative(data.narrative);
+  renderWarehouse(allRecs);
+  renderChart(data.chart_data);
+  renderTable(allRecs);
+
+  showScreen("dashboard");
+}
+
+function renderNarrative(text) {
+  const el = $("narrative-text");
+  if (!text) { el.textContent = "Analiza AI indisponibilă temporar."; return; }
+  el.innerHTML = text
+    .split("\n")
+    .map(l => l.trim() ? `<p>${l.trim()}</p>` : "")
+    .join("");
+}
+
+// ─── Warehouse SVG ────────────────────────────────────────────────────────────
+function renderWarehouse(recs) {
+  const zones = { A: [], B: [], C: [] };
+  recs.forEach(r => {
+    if (zones[r.clasa]) zones[r.clasa].push(r);
+  });
+
+  paintZone("zone-a-products", zones.A, 45, 340, "#ff6b6b");
+  paintZone("zone-b-products", zones.B, 45, 217, "#4dabf7");
+  paintZone("zone-c-products", zones.C, 45, 75, "#69db7c");
+}
+
+function paintZone(groupId, recs, startX, y, color) {
+  const g = document.getElementById(groupId);
+  g.innerHTML = "";
+  const top5 = recs.slice(0, 5);
+  top5.forEach((r, i) => {
+    const x = startX + i * 148;
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", x); rect.setAttribute("y", y + 2);
+    rect.setAttribute("width", 140); rect.setAttribute("height", 34);
+    rect.setAttribute("rx", 4); rect.setAttribute("fill", color);
+    rect.setAttribute("opacity", "0.15"); rect.setAttribute("stroke", color);
+    rect.setAttribute("stroke-width", "1");
+    g.appendChild(rect);
+
+    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt.setAttribute("x", x + 70); txt.setAttribute("y", y + 14);
+    txt.setAttribute("text-anchor", "middle"); txt.setAttribute("fill", color);
+    txt.setAttribute("font-size", "9");
+    txt.textContent = r.cod;
+    g.appendChild(txt);
+
+    const txt2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt2.setAttribute("x", x + 70); txt2.setAttribute("y", y + 27);
+    txt2.setAttribute("text-anchor", "middle"); txt2.setAttribute("fill", color);
+    txt2.setAttribute("font-size", "8"); txt2.setAttribute("opacity", "0.8");
+    txt2.textContent = r.produs.substring(0, 18);
+    g.appendChild(txt2);
+  });
+  if (recs.length > 5) {
+    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt.setAttribute("x", 790); txt.setAttribute("y", y + 20);
+    txt.setAttribute("text-anchor", "end"); txt.setAttribute("fill", color);
+    txt.setAttribute("font-size", "9"); txt.setAttribute("opacity", "0.6");
+    txt.textContent = `+${recs.length - 5} mai multe`;
+    g.appendChild(txt);
+  }
+}
+
+// ─── Chart ────────────────────────────────────────────────────────────────────
+function renderChart(cd) {
+  if (abcChart) { abcChart.destroy(); abcChart = null; }
+  const ctx = document.getElementById("abc-chart").getContext("2d");
+  abcChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: cd.labels,
+      datasets: [
+        {
+          label: "% SKU-uri",
+          data: cd.sku_pcts,
+          backgroundColor: ["#ff6b6b99", "#4dabf799", "#69db7c99"],
+          borderColor: ["#ff6b6b", "#4dabf7", "#69db7c"],
+          borderWidth: 2,
+        },
+        {
+          label: "% Volum",
+          data: cd.vol_pcts,
+          backgroundColor: ["#ff6b6b44", "#4dabf744", "#69db7c44"],
+          borderColor: ["#ff6b6b", "#4dabf7", "#69db7c"],
+          borderWidth: 2,
+          borderDash: [6, 3],
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: "#ccc", font: { family: "Inter" } } },
+        tooltip: { mode: "index" },
+      },
+      scales: {
+        x: { ticks: { color: "#aaa", callback: v => v + "%" }, grid: { color: "#1e1e2e" } },
+        y: { ticks: { color: "#eee", font: { size: 14, weight: "bold" } }, grid: { color: "#1e1e2e" } },
+      },
+    },
+  });
+}
+
+// ─── Recommendations table ────────────────────────────────────────────────────
+function renderTable(recs) {
+  const tbody = $("recs-tbody");
+  tbody.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  recs.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.cod}</td>
+      <td>${r.produs}</td>
+      <td><span class="badge badge-${r.clasa}">${r.clasa}</span></td>
+      <td>${r.zona_curenta}</td>
+      <td>${r.zona_recomandata.replace(/_/g, " ")}</td>
+      <td><span class="action action-${r.actiune}">${r.actiune}</span></td>
+      <td>${Number(r.volum).toLocaleString("ro-RO")}</td>
+      <td>${r.score.toFixed(1)}</td>`;
+    frag.appendChild(tr);
+  });
+  tbody.appendChild(frag);
+}
+
+function filterTable() {
+  const q = $("rec-search").value.toLowerCase();
+  const cls = $("rec-filter-class").value;
+  const act = $("rec-filter-action").value;
+  const filtered = allRecs.filter(r => {
+    const matchQ = !q || r.cod.toLowerCase().includes(q) || r.produs.toLowerCase().includes(q);
+    const matchC = !cls || r.clasa === cls;
+    const matchA = !act || r.actiune === act;
+    return matchQ && matchC && matchA;
+  });
+  renderTable(filtered);
+}
+
+$("rec-search").addEventListener("input", filterTable);
+$("rec-filter-class").addEventListener("change", filterTable);
+$("rec-filter-action").addEventListener("change", filterTable);
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+  });
+});
+
+// ─── Downloads ────────────────────────────────────────────────────────────────
+$("btn-dl-excel").addEventListener("click", () => {
+  if (sessionId) window.location.href = `/download/excel/${sessionId}`;
+});
+$("btn-dl-pdf").addEventListener("click", () => {
+  if (sessionId) window.location.href = `/download/pdf/${sessionId}`;
+});
+
+// ─── New analysis ─────────────────────────────────────────────────────────────
+$("btn-new").addEventListener("click", async () => {
+  if (sessionId) {
+    await fetch("/clear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+    sessionId = null;
+  }
+  resetUpload();
+  showScreen("upload");
+});
+</script>
+</body>
+</html>

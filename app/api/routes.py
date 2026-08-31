@@ -93,34 +93,45 @@ def is_allowed_cv_file(filename):
     return ext in ALLOWED_UPLOAD_EXTENSIONS
 
 
+def _add_missing_columns(conn, table, column_defs):
+    """Add columns that don't exist yet. Avoids 'ADD COLUMN IF NOT EXISTS',
+    which Postgres accepts but SQLite's ALTER TABLE grammar doesn't."""
+    existing = {col["name"] for col in inspect(engine).get_columns(table)}
+    for column_name, ddl in column_defs:
+        if column_name not in existing:
+            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {ddl}"))
+
+
 def ensure_candidate_extra_columns():
     if not inspect(engine).has_table("candidates"):
         return
 
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS batch_id VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS visible_in_dashboard INTEGER DEFAULT 1"))
+        _add_missing_columns(conn, "candidates", [
+            ("batch_id", "batch_id VARCHAR"),
+            ("visible_in_dashboard", "visible_in_dashboard INTEGER DEFAULT 1"),
+            ("companies", "companies TEXT"),
+            ("job_id", "job_id INTEGER"),
+            # ── Campuri noi agent AI decizie ──
+            ("decision_reason", "decision_reason TEXT"),
+            ("missing_requirements", "missing_requirements TEXT"),
+            ("must_verify_by_phone", "must_verify_by_phone TEXT"),
+            ("recommended_next_action", "recommended_next_action VARCHAR"),
+            ("priority", "priority VARCHAR"),
+            ("manager_summary", "manager_summary TEXT"),
+            ("phone_call_script", "phone_call_script TEXT"),
+            ("interview_questions", "interview_questions TEXT"),
+            ("better_role_match", "better_role_match VARCHAR"),
+            ("reject_reason_internal", "reject_reason_internal TEXT"),
+            ("created_at", "created_at TIMESTAMP"),
+            # ── Clustere domeniu AI (Variant B) ──
+            ("candidate_cluster", "candidate_cluster VARCHAR"),
+            ("job_cluster", "job_cluster VARCHAR"),
+            # ── GDPR ──
+            ("gdpr_consent", "gdpr_consent INTEGER DEFAULT 0"),
+            ("gdpr_consent_at", "gdpr_consent_at TIMESTAMP"),
+        ])
         conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS companies TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_id INTEGER"))
-        # ── Campuri noi agent AI decizie ──
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS decision_reason TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS missing_requirements TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS must_verify_by_phone TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS recommended_next_action VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS priority VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS manager_summary TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS phone_call_script TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS interview_questions TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS better_role_match VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS reject_reason_internal TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS created_at TIMESTAMP"))
-        # ── Clustere domeniu AI (Variant B) ──
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidate_cluster VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_cluster VARCHAR"))
-        # ── GDPR ──
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS gdpr_consent INTEGER DEFAULT 0"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS gdpr_consent_at TIMESTAMP"))
 
 
 ensure_candidate_extra_columns()
@@ -130,9 +141,11 @@ def ensure_interview_extra_columns():
     if not inspect(engine).has_table("interviews"):
         return
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT FALSE"))
-        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMP"))
-        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS action_token VARCHAR"))
+        _add_missing_columns(conn, "interviews", [
+            ("reminder_sent", "reminder_sent BOOLEAN DEFAULT FALSE"),
+            ("reminder_sent_at", "reminder_sent_at TIMESTAMP"),
+            ("action_token", "action_token VARCHAR"),
+        ])
 
 
 ensure_interview_extra_columns()
@@ -142,7 +155,9 @@ def ensure_scorecard_columns():
     if not inspect(engine).has_table("interview_scorecards"):
         return
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE interview_scorecards ADD COLUMN IF NOT EXISTS evaluator_name VARCHAR"))
+        _add_missing_columns(conn, "interview_scorecards", [
+            ("evaluator_name", "evaluator_name VARCHAR"),
+        ])
 
 
 ensure_scorecard_columns()
@@ -152,8 +167,10 @@ def ensure_scorecard_token_columns():
     if not inspect(engine).has_table("scorecard_tokens"):
         return
     with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE scorecard_tokens ADD COLUMN IF NOT EXISTS evaluator_email VARCHAR"))
-        conn.execute(text("ALTER TABLE scorecard_tokens ADD COLUMN IF NOT EXISTS evaluator_name VARCHAR"))
+        _add_missing_columns(conn, "scorecard_tokens", [
+            ("evaluator_email", "evaluator_email VARCHAR"),
+            ("evaluator_name", "evaluator_name VARCHAR"),
+        ])
 
 
 ensure_scorecard_token_columns()

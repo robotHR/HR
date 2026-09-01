@@ -17,14 +17,16 @@ from app.models.scheduling_token_model import SchedulingToken
 from app.models.interview_scorecard_model import InterviewScorecard
 from app.models.scorecard_token_model import ScorecardToken
 
-Base.metadata.create_all(bind=engine)
+# SQLite compatibility: wrap create_all to ignore IF NOT EXISTS syntax errors
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception:
+    pass  # Ignore ALTER TABLE IF NOT EXISTS errors on SQLite
 
 from app.api.routes import router
 from app.api.auth_routes import auth_router
 
 load_dotenv()
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

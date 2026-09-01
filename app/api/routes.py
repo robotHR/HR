@@ -93,70 +93,105 @@ def is_allowed_cv_file(filename):
     return ext in ALLOWED_UPLOAD_EXTENSIONS
 
 
+def _add_column_if_missing(table: str, column: str, ddl_type: str) -> None:
+    """Adauga o coloana daca tabelul nu o are deja.
+
+    Foloseste un ALTER TABLE ... ADD COLUMN simplu, portabil pe SQLite si
+    PostgreSQL, in loc de forma ADD COLUMN IF NOT EXISTS care exista doar in
+    PostgreSQL (pe SQLite da "near NOT: syntax error"). Existenta coloanei e
+    verificata cu inspectorul, iar fiecare instructiune ruleaza in propria
+    tranzactie, ca o eroare sa nu anuleze si restul patch-urilor.
+    """
+    try:
+        inspector = inspect(engine)
+        if not inspector.has_table(table):
+            return
+        existing = {col["name"] for col in inspector.get_columns(table)}
+        if column in existing:
+            return
+        with engine.begin() as conn:
+            conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}"))
+    except Exception:
+        pass  # Compatibilitate SQLite: un patch de schema nu blocheaza pornirea
+
+
+CANDIDATE_EXTRA_COLUMNS = [
+    ("batch_id", "VARCHAR"),
+    ("visible_in_dashboard", "INTEGER DEFAULT 1"),
+    ("companies", "TEXT"),
+    ("job_id", "INTEGER"),
+    # ── Campuri noi agent AI decizie ──
+    ("decision_reason", "TEXT"),
+    ("missing_requirements", "TEXT"),
+    ("must_verify_by_phone", "TEXT"),
+    ("recommended_next_action", "VARCHAR"),
+    ("priority", "VARCHAR"),
+    ("manager_summary", "TEXT"),
+    ("phone_call_script", "TEXT"),
+    ("interview_questions", "TEXT"),
+    ("better_role_match", "VARCHAR"),
+    ("reject_reason_internal", "TEXT"),
+    ("created_at", "TIMESTAMP"),
+    # ── Clustere domeniu AI (Variant B) ──
+    ("candidate_cluster", "VARCHAR"),
+    ("job_cluster", "VARCHAR"),
+    # ── GDPR ──
+    ("gdpr_consent", "INTEGER DEFAULT 0"),
+    ("gdpr_consent_at", "TIMESTAMP"),
+]
+
+INTERVIEW_EXTRA_COLUMNS = [
+    ("reminder_sent", "BOOLEAN DEFAULT FALSE"),
+    ("reminder_sent_at", "TIMESTAMP"),
+    ("action_token", "VARCHAR"),
+]
+
+SCORECARD_EXTRA_COLUMNS = [
+    ("evaluator_name", "VARCHAR"),
+]
+
+SCORECARD_TOKEN_EXTRA_COLUMNS = [
+    ("evaluator_email", "VARCHAR"),
+    ("evaluator_name", "VARCHAR"),
+]
+
+
 def ensure_candidate_extra_columns():
-    if not inspect(engine).has_table("candidates"):
-        return
+    for column, ddl_type in CANDIDATE_EXTRA_COLUMNS:
+        _add_column_if_missing("candidates", column, ddl_type)
 
-    with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS batch_id VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS visible_in_dashboard INTEGER DEFAULT 1"))
-        conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS companies TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_id INTEGER"))
-        # ── Campuri noi agent AI decizie ──
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS decision_reason TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS missing_requirements TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS must_verify_by_phone TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS recommended_next_action VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS priority VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS manager_summary TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS phone_call_script TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS interview_questions TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS better_role_match VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS reject_reason_internal TEXT"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS created_at TIMESTAMP"))
-        # ── Clustere domeniu AI (Variant B) ──
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidate_cluster VARCHAR"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS job_cluster VARCHAR"))
-        # ── GDPR ──
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS gdpr_consent INTEGER DEFAULT 0"))
-        conn.execute(text("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS gdpr_consent_at TIMESTAMP"))
-
-
-ensure_candidate_extra_columns()
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("UPDATE candidates SET visible_in_dashboard = 1 WHERE visible_in_dashboard IS NULL"))
+    except Exception:
+        pass
 
 
 def ensure_interview_extra_columns():
-    if not inspect(engine).has_table("interviews"):
-        return
-    with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT FALSE"))
-        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMP"))
-        conn.execute(text("ALTER TABLE interviews ADD COLUMN IF NOT EXISTS action_token VARCHAR"))
-
-
-ensure_interview_extra_columns()
+    for column, ddl_type in INTERVIEW_EXTRA_COLUMNS:
+        _add_column_if_missing("interviews", column, ddl_type)
 
 
 def ensure_scorecard_columns():
-    if not inspect(engine).has_table("interview_scorecards"):
-        return
-    with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE interview_scorecards ADD COLUMN IF NOT EXISTS evaluator_name VARCHAR"))
-
-
-ensure_scorecard_columns()
+    for column, ddl_type in SCORECARD_EXTRA_COLUMNS:
+        _add_column_if_missing("interview_scorecards", column, ddl_type)
 
 
 def ensure_scorecard_token_columns():
-    if not inspect(engine).has_table("scorecard_tokens"):
-        return
-    with engine.begin() as conn:
-        conn.execute(text("ALTER TABLE scorecard_tokens ADD COLUMN IF NOT EXISTS evaluator_email VARCHAR"))
-        conn.execute(text("ALTER TABLE scorecard_tokens ADD COLUMN IF NOT EXISTS evaluator_name VARCHAR"))
+    for column, ddl_type in SCORECARD_TOKEN_EXTRA_COLUMNS:
+        _add_column_if_missing("scorecard_tokens", column, ddl_type)
 
 
-ensure_scorecard_token_columns()
+for _ensure_schema_patch in (
+    ensure_candidate_extra_columns,
+    ensure_interview_extra_columns,
+    ensure_scorecard_columns,
+    ensure_scorecard_token_columns,
+):
+    try:
+        _ensure_schema_patch()
+    except Exception:
+        pass  # Compatibilitate SQLite: pornirea nu depinde de patch-urile de schema
 
 
 # ── Scorecard helpers ────────────────────────────────────────────────────────
